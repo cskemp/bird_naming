@@ -895,7 +895,6 @@ table1 <- reduce(LanguageVals,
    # summarise(across(everything(), min, na.rm = TRUE))
  
  # Now minus the smallest value from everything to get Delta BIC
- 
  table1 <- table1 %>% 
    rename_with(str_to_title) %>%
    mutate(across(names(small_bic), 
@@ -904,13 +903,15 @@ table1 <- reduce(LanguageVals,
                            .)),
           Model = gsub(" ", "", Model))%>% 
    mutate_if(is.numeric, round, 2) %>% 
-   filter(!is.na(Variable))
+   filter(!is.na(Variable)) 
+ 
+ # zzzzzz trying to figure out a way to 
  
  # make the table pretty for the paper
  latex_table <- table1 %>% 
    # First, this bit makes the best model overall be bolded with a shaded background (this version of this is slightly lazy because it doesn't deal with the problem of the best model overall being a single predictor model, but only because it didn't have to at this stage. Later I deal with this.)
    mutate(across(names(colour_pairs), 
-                 ~ ifelse(. <= 2 & Statistic == "BIC", 
+                 ~ ifelse(as.numeric(.) <= 2 & Statistic == "BIC", 
                           cell_spec(as.character(.), "latex", 
                                     bold = TRUE, 
                                     background =
@@ -919,7 +920,12 @@ table1 <- reduce(LanguageVals,
    # Find the best model of the single predictor models and makes it bold and coloured
    group_by(Model) %>% 
    mutate(n = n()) %>% 
-   ungroup()%>% 
+   ungroup() %>%
+   
+   
+
+   
+## zzzzzzz this is where the issue is happening
    mutate(across(
     names(colour_pairs), 
     ~ {
