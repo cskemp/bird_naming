@@ -1,0 +1,171 @@
+#NEXUS
+[R-package APE, Mon Jan 20 14:20:30 2025]
+
+BEGIN TAXA;
+	DIMENSIONS NTAX = 79;
+	TAXLABELS
+		Cygnus_cygnus
+		Anser_erythropus
+		Anser_fabalis
+		Anas_acuta
+		Anas_crecca
+		Anas_platyrhynchos
+		Anas_penelope
+		Aythya_fuligula
+		Aythya_marila
+		Mergus_serrator
+		Mergus_merganser
+		Bucephala_clangula
+		Melanitta_fusca
+		Melanitta_perspicillata
+		Clangula_hyemalis
+		Polysticta_stelleri
+		Somateria_spectabilis
+		Somateria_mollissima
+		Lagopus_muta
+		Lagopus_lagopus
+		Tetrao_urogallus
+		Gavia_stellata
+		Gavia_arctica
+		Phalacrocorax_carbo
+		Fulmarus_glacialis
+		Numenius_phaeopus
+		Xenus_cinereus
+		Phalaropus_lobatus
+		Tringa_erythropus
+		Tringa_nebularia
+		Tringa_totanus
+		Actitis_hypoleucos
+		Gallinago_gallinago
+		Philomachus_pugnax
+		Larus_canus
+		Larus_marinus
+		Larus_argentatus
+		Sterna_paradisaea
+		Uria_aalge
+		Charadrius_hiaticula
+		Eudromias_morinellus
+		Haematopus_ostralegus
+		Pluvialis_apricaria
+		Grus_grus
+		Falco_tinnunculus
+		Falco_rusticolus
+		Falco_peregrinus
+		Falco_columbarius
+		Pica_pica
+		Corvus_corone
+		Corvus_corax
+		Perisoreus_infaustus
+		Parus_cinctus
+		Parus_major
+		Riparia_riparia
+		Delichon_urbicum
+		Turdus_pilaris
+		Turdus_iliacus
+		Luscinia_svecica
+		Cinclus_cinclus
+		Plectrophenax_nivalis
+		Motacilla_alba
+		Motacilla_flava
+		Surnia_ulula
+		Aegolius_funereus
+		Strix_nebulosa
+		Bubo_scandiaca
+		Asio_flammeus
+		Dendrocopos_minor
+		Picoides_tridactylus
+		Dryocopus_martius
+		Pandion_haliaetus
+		Accipiter_gentilis
+		Circus_cyaneus
+		Accipiter_nisus
+		Haliaeetus_albicilla
+		Buteo_lagopus
+		Aquila_chrysaetos
+		Cuculus_canorus
+	;
+END;
+BEGIN TREES;
+	TRANSLATE
+		1	Cygnus_cygnus,
+		2	Anser_erythropus,
+		3	Anser_fabalis,
+		4	Anas_acuta,
+		5	Anas_crecca,
+		6	Anas_platyrhynchos,
+		7	Anas_penelope,
+		8	Aythya_fuligula,
+		9	Aythya_marila,
+		10	Mergus_serrator,
+		11	Mergus_merganser,
+		12	Bucephala_clangula,
+		13	Melanitta_fusca,
+		14	Melanitta_perspicillata,
+		15	Clangula_hyemalis,
+		16	Polysticta_stelleri,
+		17	Somateria_spectabilis,
+		18	Somateria_mollissima,
+		19	Lagopus_muta,
+		20	Lagopus_lagopus,
+		21	Tetrao_urogallus,
+		22	Gavia_stellata,
+		23	Gavia_arctica,
+		24	Phalacrocorax_carbo,
+		25	Fulmarus_glacialis,
+		26	Numenius_phaeopus,
+		27	Xenus_cinereus,
+		28	Phalaropus_lobatus,
+		29	Tringa_erythropus,
+		30	Tringa_nebularia,
+		31	Tringa_totanus,
+		32	Actitis_hypoleucos,
+		33	Gallinago_gallinago,
+		34	Philomachus_pugnax,
+		35	Larus_canus,
+		36	Larus_marinus,
+		37	Larus_argentatus,
+		38	Sterna_paradisaea,
+		39	Uria_aalge,
+		40	Charadrius_hiaticula,
+		41	Eudromias_morinellus,
+		42	Haematopus_ostralegus,
+		43	Pluvialis_apricaria,
+		44	Grus_grus,
+		45	Falco_tinnunculus,
+		46	Falco_rusticolus,
+		47	Falco_peregrinus,
+		48	Falco_columbarius,
+		49	Pica_pica,
+		50	Corvus_corone,
+		51	Corvus_corax,
+		52	Perisoreus_infaustus,
+		53	Parus_cinctus,
+		54	Parus_major,
+		55	Riparia_riparia,
+		56	Delichon_urbicum,
+		57	Turdus_pilaris,
+		58	Turdus_iliacus,
+		59	Luscinia_svecica,
+		60	Cinclus_cinclus,
+		61	Plectrophenax_nivalis,
+		62	Motacilla_alba,
+		63	Motacilla_flava,
+		64	Surnia_ulula,
+		65	Aegolius_funereus,
+		66	Strix_nebulosa,
+		67	Bubo_scandiaca,
+		68	Asio_flammeus,
+		69	Dendrocopos_minor,
+		70	Picoides_tridactylus,
+		71	Dryocopus_martius,
+		72	Pandion_haliaetus,
+		73	Accipiter_gentilis,
+		74	Circus_cyaneus,
+		75	Accipiter_nisus,
+		76	Haliaeetus_albicilla,
+		77	Buteo_lagopus,
+		78	Aquila_chrysaetos,
+		79	Cuculus_canorus
+	;
+	TREE * UNTITLED = [&R] (((((((((((57:0.0375,58:0.0375)1:0.0375,59:0.075)1:0.0375,60:0.1125)1:0.0375,((62:0.0375,63:0.0375)1:0.0375,61:0.075)1:0.075)1:0.0375,((53:0.0625,54:0.0625)1:0.0625,(55:0.0625,56:0.0625)1:0.0625)1:0.0625)1:0.0625,(((50:0.04166666667,51:0.04166666667)1:0.04166666667,49:0.08333333333)1:0.08333333333,52:0.1666666667)1:0.08333333333)1:0.08333333333,((46:0.08333333333,47:0.08333333333)1:0.08333333333,45:0.1666666667,48:0.1666666667)1:0.1666666667)1:0.1666666667,(((((66:0.06666666667,67:0.06666666667)1:0.06666666667,68:0.1333333333)1:0.06666666667,(64:0.1,65:0.1)1:0.1)1:0.1,((69:0.1,70:0.1)1:0.1,71:0.2)1:0.1)1:0.1,(((((73:0.04,74:0.04)0.992:0.04,75:0.08)1:0.04,(76:0.06,77:0.06)1:0.06)1:0.04,78:0.16)1:0.04,72:0.2)1:0.2)1:0.1)1:0.1666666667,79:0.6666666667)1:0.1666666667,(((((((((((29:0.01333333333,30:0.01333333333)1:0.01333333333,31:0.02666666667)1:0.01333333333,32:0.04)0.58:0.01333333333,(27:0.02666666667,28:0.02666666667)1:0.02666666667)1:0.02666666667,33:0.08)0.796:0.02666666667,34:0.1066666667)1:0.02666666667,26:0.1333333333)1:0.1333333333,((((36:0.03333333333,37:0.03333333333)1:0.03333333333,35:0.06666666667)1:0.06666666667,38:0.1333333333)1:0.06666666667,39:0.2)1:0.06666666667)1:0.1333333333,(((40:0.1,41:0.1)1:0.1,42:0.2)0.984:0.1,43:0.3)1:0.1)1:0.1333333333,44:0.5333333333)1:0.1333333333,(((22:0.1666666667,23:0.1666666667)1:0.1666666667,24:0.3333333333)0.608:0.1666666667,25:0.5)1:0.1666666667)1:0.1666666667)1:0.1666666667,((((((((10:0.05333333333,11:0.05333333333)1:0.05333333333,12:0.1066666667)1:0.05333333333,(13:0.08,14:0.08)1:0.08)1:0.05333333333,(((17:0.02666666667,18:0.02666666667)1:0.02666666667,16:0.05333333333)1:0.05333333333,15:0.1066666667)0.66:0.1066666667)1:0.05333333333,(8:0.1333333333,9:0.1333333333)1:0.1333333333)0.984:0.1333333333,(((4:0.1,5:0.1)0.676:0.1,6:0.2)1:0.1,7:0.3)1:0.1)1:0.1,((2:0.125,3:0.125)1:0.125,1:0.25)1:0.25)1:0.25,((19:0.25,20:0.25)1:0.25,21:0.5)1:0.25)1:0.25)1;
+END;

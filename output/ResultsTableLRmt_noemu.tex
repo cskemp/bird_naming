@@ -1,0 +1,50 @@
+\begin{table}[!h]
+\centering
+\caption{\label{tab:table:resultsNoEmu}Logistic regression for Monotypic/non-Monotypic for Anindilyakwa with emu removed}
+\centering
+\begin{tabular}[t]{lllc}
+\toprule
+\multicolumn{1}{c}{Model} & \multicolumn{1}{c}{Pred.} & \multicolumn{1}{c}{Stat.} & \multicolumn{1}{c}{Anindilyakwa} \\
+\cmidrule(l{3pt}r{3pt}){1-1} \cmidrule(l{3pt}r{3pt}){2-2} \cmidrule(l{3pt}r{3pt}){3-3} \cmidrule(l{3pt}r{3pt}){4-4}
+  &    &     & Anindilyakwa\\
+\midrule
+\addlinespace[0.0em]
+\multicolumn{4}{c}{Null Model}\\
+\hline
+null &  & $\Delta BIC$ & 62.22\\
+\addlinespace[0.0em]
+\hline
+\multicolumn{4}{c}{Single Predictor Models}\\
+\hline
+23 &  & $\Delta BIC$ & 10.83\\
+ & 23 & $\beta$ & 1.47\\
+74 &  & $\Delta BIC$ & 8.71\\
+ & 74 & $\beta$ & 1.5\\
+Phy &  & $\Delta BIC$ & 54.18\\
+ & Phy & $\beta$ & 0.65\\
+Per &  & $\Delta BIC$ & 22.86\\
+ & Per & $\beta$ & 2.06\\
+\addlinespace[0.0em]
+\hline
+\multicolumn{4}{c}{Two Predictor Models}\\
+\hline
+74+Phy &  & $\Delta BIC$ & 13.17\\
+ & 74 & $\beta$ & 1.43\\
+ & Phy & $\beta$ & 0.19\\
+74+Per &  & $\Delta BIC$ & \cellcolor[HTML]{ffe0f1}{\textbf{0}}\\
+ & 74 & $\beta$ & 1.19\\
+ & Per & $\beta$ & 1.43\\
+Phy+Per &  & $\Delta BIC$ & 24.15\\
+ & Phy & $\beta$ & 0.4\\
+ & Per & $\beta$ & 1.93\\
+\addlinespace[0.0em]
+\hline
+\multicolumn{4}{c}{Full Model}\\
+\hline
+74+Phy+Per &  & $\Delta BIC$ & 5.17\\
+ & 74 & $\beta$ & 1.17\\
+ & Phy & $\beta$ & 0.06\\
+ & Per & $\beta$ & 1.41\\
+\bottomrule
+\end{tabular}
+\end{table}

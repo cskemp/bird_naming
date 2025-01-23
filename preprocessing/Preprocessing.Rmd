@@ -1,0 +1,4197 @@
+---
+title: "Preprocessing"
+output: html_notebook
+---
+
+# Setup
+
+```{r}
+
+rm(list = ls())
+
+if (!requireNamespace("renv", quietly = TRUE)) install.packages("renv")
+renv::init()
+
+library(tidyverse)
+library(here)
+library(Hmisc)
+library(ape)
+library(rdist)
+library(phytools)
+library(treeio)
+library(Rtsne)
+
+select <- dplyr::select
+
+```
+
+# Define Functions
+
+```{r}
+
+# This is for finding the minimum value in a row in the pairwise matrices while ignoring duplicate birds but still allowing legitimate 0 values, to calculate "perceptual isolation" score of the bird. It's not the most elegant but I tried it so many different, less convoluted ways and it kept messing up in bizarre ways that I couldn't debug. This is fine
+
+MinVal <- function(mat) {
+  
+  # make a dataframe with names as well as unsuffixed names to store the minimum values
+  minvals <- data.frame(Names = rownames(mat)) %>% 
+    mutate(pure_names = gsub("\\..*", "", Names))
+  
+  # remove duplicates from the matrix. This is the bit that's slightly cowboy but the more I think about it, the more I reckon it's far less convoluted than it was in the previous iterations
+  processed_mat <- mat %>% 
+    rownames_to_column("row_names") %>% 
+    mutate(row_names = gsub("\\..*","",row_names)) %>% 
+    distinct(row_names, .keep_all=TRUE) %>% 
+    column_to_rownames("row_names") %>% 
+    t() %>% 
+    as.data.frame() %>% 
+    rownames_to_column("row_names") %>% 
+    mutate(row_names = gsub("\\..*","",row_names)) %>% 
+    distinct(row_names, .keep_all=TRUE) %>% 
+    column_to_rownames("row_names")
+  
+  # Diagonals set to NA so they will be ignored
+  diag(processed_mat) <- NA
+  
+  # Find the minimum value of each row
+  vals <- apply(processed_mat, 1, function (x) min(x, na.rm = TRUE)) %>% 
+    as.data.frame() %>% 
+    rename(Values = ".") %>% 
+    rownames_to_column("pure_names")
+  
+  # Pop it back into a dataframe and send it on its way
+  minvals <- left_join(minvals, vals, by = "pure_names")
+  
+  return(minvals)
+  
+}
+
+# This one calculates similarity based on matches and mismatches in a taxonomy. You just give it a dataframe and a list of the columns to compare. The columns should be Order, Family, Genus and Species if you're just comparing birds. Species should be the binomial species name (including both the genus and the species) because the second part of the species name on its own can match between totally unrelated species (e.g., Dromaius novaehollandiae & Larus novaehollandiae)
+
+TaxSimCalc <- function(data, columns_to_compare) {
+  
+    # Function to take numbers and punctuation out of names - I had to add this because I have sometimes added numbers to the ends of species to make them unique in the datasets.
+  clean <- function(str) {
+    # Remove punctuation and numbers
+    cleaned_str <- gsub("[[:punct:]0-9]", "", str)
+    # Convert to lowercase for case-insensitive matching - probably not necessary but just in case
+    tolower(cleaned_str)
+  }
+  
+  data <- data %>% drop_na(columns_to_compare)
+  
+  # Create an empty matrix
+  matrix <- matrix(0, nrow = nrow(data), ncol = nrow(data))
+  
+  # Calculate matches for taxa
+  for (i in 1:(nrow(data) - 1)) {
+    for (j in (i + 1):nrow(data)) {
+
+      # Clean and preprocess strings for comparison
+      cleaned_i <- clean(data[i, columns_to_compare])
+      cleaned_j <- clean(data[j, columns_to_compare])
+      
+      # Count the number of matching values across columns
+      matches <- sum(cleaned_i == cleaned_j)
+      
+      # Store the matches count in the matrix
+      matrix[i, j] <- matches
+      matrix[j, i] <- matches
+    }
+    
+    # Make the diagonal terms all perfect matches
+    matrix[i, i] <- length(columns_to_compare)
+  }
+  
+  # Make it so that perfect match = 0 and perfect mismatch = how many steps up the taxonomic tree you have to get to before they are in the same taxon. (Which in the case of birds species would always be 4 because they're all in the same class - Aves)
+  matrix <- length(columns_to_compare) - matrix
+  
+  # Convert the matrix to a data frame
+  df <- as.data.frame(matrix)
+  
+  # Put the names back in
+  colnames(df) <- data$CanonicalName
+  df$Species1 <- data$CanonicalName
+  
+  # Create pairwise list
+  list <- df %>% 
+    pivot_longer(cols = -contains("Species1"),
+                 names_to = "Species2",
+                 values_to = "Dist") %>%  
+    mutate(s1 = pmin(Species1, Species2),
+           s2 = pmax(Species1, Species2)) %>% 
+    select(s1, s2, Dist) %>% 
+    distinct() %>% 
+    filter(s1 != s2) %>% 
+    rename(Species1 = s1,
+           Species2 = s2) %>% 
+    mutate(ScaleDist = scale(Dist)[,1])
+  
+  return(list(matrix = df, pairs = list))
+}
+
+```
+
+# Import Datasets
+
+```{r}
+
+holman_birds <- read.csv(here("preprocessing/data/holman_data.csv"))
+# zoe_birds <- read.csv(here("preprocessing/data/bird_data.csv"))
+
+# Anindilyakwa dataset for testing
+anindilyakwa_waddy <- read.csv(here("preprocessing/data/anindilyakwa_waddy.csv"))
+
+tlingit_zoe <- read.csv(here("preprocessing/data/tlingit_data.csv"))
+
+zapotec_zoe <- read.csv(here("preprocessing/data/zapotec_data.csv"))
+
+```
+
+## Make Holman dataset useful
+
+```{r}
+
+holman_birds <- holman_birds %>% 
+  rename(Language = culture,
+         IndexFG = category_index,
+         ScientificName = scientific_name) %>% 
+  mutate(Language = str_to_title(Language)) 
+
+# Fixing a spelling mistake
+
+holman_birds$ScientificName[holman_birds$ScientificName == "Myiagra ruficoilis"] <-
+  "Myiagra ruficollis"
+
+```
+
+# Check how well the Holman and Zoë Anindilyakwa ones line up
+
+```{r}
+
+anindilyakwa_waddy <- anindilyakwa_waddy %>% 
+  mutate(CommonNameOG = ifelse(CommonNameWaddy == "",
+                               CommonName,
+                               CommonNameWaddy),
+         ScientificNameOG = ifelse(ScientificNameWaddy == "", 
+                                   ScientificName, 
+                                   ScientificNameWaddy))%>% 
+  rename(FolkGeneric = LanguageName) %>% 
+  group_by(FolkGeneric) %>% 
+  mutate(n = n()) %>% 
+  ungroup() %>% 
+  select(CommonName, 
+         ScientificName,
+         CommonNameOG,
+         ScientificNameOG,
+         n,
+         FolkGeneric)
+
+anindilyakwa_holman <- holman_birds %>% 
+  filter(Language == "Anindilyakwa") %>% 
+  rename(ScientificNameOG = ScientificName) %>% 
+  group_by(IndexFG) %>% 
+  mutate(n = n()) %>% 
+  ungroup()
+
+in_waddy_not_holman <- setdiff(
+  anindilyakwa_waddy %>% filter(FolkGeneric != "") %>% select(ScientificNameOG),                                
+  anindilyakwa_holman %>% select(ScientificNameOG))
+
+in_holman_not_waddy <- setdiff(
+  anindilyakwa_holman %>% select(ScientificNameOG),
+  anindilyakwa_waddy %>% filter(FolkGeneric != "") %>% select(ScientificNameOG))
+
+```
+
+There's a mismatch because of how it's indexed Egretta alba, that's totally fine.
+There's another one where two birds that definitely have different names are listed as having the same name, that's annoying and I don't know why.
+
+Also, the emu and the bustard are both missing from Holman. I don't know why and it's very weird because they are two of the big distinctive birds.
+
+But, I have confirmed that the dataset is very close to the same as Waddy's original one, transcribed by me from a book that is currently propping up my right elbow, so I feel confident moving forward with this analysis using all of the languages in the dataset. Yay!
+
+Now to align all of the bird names to the taxonomies that we need. These are:
+- 1974 Clements taxonomy (for 1974 traditional similarity)
+- 2023 Clements taxonomy (for 2023 traditional similarity)
+- BirdLife Version 3 taxonomy (for compatibility with BirdTree for phylogenetic similarity)
+- 2021 Clements taxonomy (for compatibility with AVONET)
+- Canonical Names (based on 2023 Clements but made unique)
+
+# Adding all taxonomies to datasets 
+
+```{r}
+
+# Full Clements 2023 taxonomy for Family and Order
+clements_2023 <- read.csv(here("preprocessing/data/clements_2023.csv")) %>% 
+  rename(Order2023 = order, 
+         ScientificName2023 = scientific.name,
+         CommonName2023 = English.name) %>% 
+  mutate(Family2023 = str_trim(str_extract(family,"\\b\\w+")))
+
+# Match genuses with families from 1974
+
+GenusMatch1974 <- read.csv(here("preprocessing/data/genus_match_1974.csv"))
+
+```
+
+Just before I do this, I'm going to just check how well the birdtree taxonomy matches the Birdlife V3, because they are actually a bit different (Birdtree recognises 111 species that aren't in the V3)
+
+```{r}
+
+taxonomy_birdtree <- read.csv(here("preprocessing/data/taxonomy_birdtree.csv"))
+
+taxonomy_V3 <- read.csv(here("preprocessing/data/taxonomy_V3.csv")) %>%
+  filter(Recognised == "R")
+
+birdtree_extras <- anti_join(taxonomy_birdtree, 
+                             taxonomy_V3, 
+                             by = c("ScientificNameBT" = "ScientificNameV3"))
+
+```
+
+Okay now this little dataframe contains the 111 birds that are recognised by birdtree and not V3.
+
+## Anindilyakwa
+
+Specific datasets for Anindilyakwa
+
+```{r}
+
+# Birds that should exist in Anindilyakwa territory
+species_NT <- read.csv(here("preprocessing/data/species-list_anindilyakwa.csv"))
+
+# Matching 2022 and 2023 Clements names
+eBird_2022_2023_NT <- read.csv(here("preprocessing/data/eBird_2022_2023_NT.csv"))
+
+# Matching 1974 and 2023 Clements names - this one isn't specific to Anindilyakwa
+eBird_1974_2023 <- read.csv(here("preprocessing/data/eBird_1974_2023.csv"))
+changes_74_23 <- eBird_1974_2023
+
+# Matching V3 and 2023 Clements names - also universal
+
+changes_V3_23 <- read.csv(here("preprocessing/data/changes_V3_Clements23.csv"))
+
+# Matching 2021 and 2023 Clements names - also universal
+
+changes_21_23 <- read.csv(here("preprocessing/data/Changes_Clements21_Clements23.csv"))
+
+# 1974 Orders
+
+orders_74 <- read.csv(here("preprocessing/data/clements_1974_orders.csv")) %>% 
+  rename(Family1974 = Family,
+         Order1974 = Order) %>% 
+  mutate(Order1974 = str_trim(Order1974),
+         Family1974 = str_trim(Family1974))
+
+```
+
+First I'll merge the Anindilyakwa data I already have into the Holman dataset 
+
+```{r}
+
+anindilyakwa_holman <- anindilyakwa_holman %>% 
+  left_join(anindilyakwa_waddy %>% 
+              select(ScientificName, 
+                     ScientificNameOG, 
+                     CommonName), 
+            by = "ScientificNameOG",
+            multiple = "all")
+
+# Take away the rows with the double-ups of the reef herons
+
+anindilyakwa_holman <- anindilyakwa_holman %>% 
+  filter((CommonName != "Pacific Reef-Heron (light morph)" & n != 4) | 
+         (CommonName != "Pacific Reef-Heron (dark morph)" & n != 1))
+
+# Join in the missing birds
+
+rows_to_add <- anindilyakwa_waddy %>% 
+  filter(FolkGeneric != "") %>%
+  anti_join(anindilyakwa_holman, by = "ScientificNameOG") %>% 
+  mutate(Language = "Anindilyakwa", IndexFG = NA) %>% 
+  select(Language, IndexFG, ScientificNameOG, n, ScientificName, CommonName)
+
+anindilyakwa_holman <- rbind(anindilyakwa_holman, rows_to_add)
+
+anindilyakwa_holman$IndexFG[anindilyakwa_holman$ScientificName == "Haematopus longirostris"] <- 
+  NA
+
+max_value <- max(anindilyakwa_holman$IndexFG, na.rm = TRUE)
+
+for (i in seq_along(anindilyakwa_holman$IndexFG)) {
+  if (is.na(anindilyakwa_holman$IndexFG[i])) {
+    anindilyakwa_holman$IndexFG[i] <- max_value + 1
+    max_value <- max_value + 1
+  }
+}
+
+anindilyakwa_holman <- anindilyakwa_holman %>% 
+  group_by(IndexFG) %>% 
+  mutate(n = n()) %>% 
+  ungroup()
+
+```
+
+### Clements 2023 
+
+Clements 2022 names are already in the dataset so I just need to change them to 2023.
+
+```{r}
+
+eBirdNT <- eBird_2022_2023_NT %>% 
+  filter(str_count(ScientificName2022, "\\S+") == 2,
+         !str_detect(ScientificName2022, "[[:punct:]]"))
+
+anindilyakwa_holman <- anindilyakwa_holman %>% 
+   rename(ScientificName2022 = "ScientificName",
+          CommonName2022 = CommonName) %>%
+  left_join(eBirdNT %>%
+              select(ScientificName2022,
+                     ScientificName2023,
+                     CommonName2023),
+            by = "ScientificName2022",
+            keep = FALSE) %>% 
+  mutate(ScientificName2023 = ifelse(is.na(ScientificName2023),
+                                     ScientificName2022,
+                                     ScientificName2023),
+         CommonName2023 = ifelse(is.na(CommonName2023),
+                                 CommonName2022,
+                                 CommonName2023))
+
+# Now I'm going to check if anything has punctuation or is just blank, because that means I'll have some googling to do.
+
+check <- anindilyakwa_holman %>% 
+  filter(ScientificName2023 == "" | str_detect(ScientificName2023, "[[:punct:]]"))
+
+# Four birds need some attention
+
+anindilyakwa_holman$ScientificName2023[
+  anindilyakwa_holman$ScientificName2022=="Ninox boobook"] <- 
+  "Ninox boobook"
+anindilyakwa_holman$CommonName2023[
+  anindilyakwa_holman$CommonName2022=="Southern Boobook"] <- 
+  "Southern Boobook"
+
+anindilyakwa_holman$ScientificName2023[
+  anindilyakwa_holman$ScientificName2022=="Ardea intermedia"] <- 
+  "Ardea plumifera"
+anindilyakwa_holman$CommonName2023[
+  anindilyakwa_holman$CommonName2022=="Intermediate Egret"] <- 
+  "Plumed Egret"
+
+anindilyakwa_holman$ScientificName2023[
+  anindilyakwa_holman$ScientificName2022=="Charadrius mongolus"] <- 
+  "Anarhynchus mongolus"
+anindilyakwa_holman$CommonName2023[
+  anindilyakwa_holman$CommonName2022=="Lesser Sand-Plover"] <- 
+  "Siberian Sand-Plover"
+
+anindilyakwa_holman$ScientificName2023[
+  anindilyakwa_holman$ScientificName2022=="Gelochelidon nilotica"] <- 
+  "Gelochelidon macrotarsa"
+anindilyakwa_holman$CommonName2023[
+  anindilyakwa_holman$CommonName2022=="Gull-billed Tern"] <- 
+  "Australian Tern"
+
+# Should be all good now!
+
+# Now I will check if there are any birds that do not appear in the territory where the data was collected, as this may identify birds that had had their definitions or names changed.
+
+notin <- anindilyakwa_holman[!(anindilyakwa_holman$ScientificName2023 %in% species_NT$ScientificName), ]
+
+```
+
+Manually checked all of these birdies:
+
+To keep the same: 
+ Gallinago hardwickii - Doesn't seem to live here but I'm leaving it in; it lives close by
+ Antigone antigone - Doesn't appear on the island but lives close enough by on the mainland
+ Gallinula tenebrosa - Appears nearby on mainland
+ Platalea flavipes - Appears nearby on mainland
+ Ardea pacifica - appears nearby on the mainland
+ Falco subniger - doesn't occur there 
+ Smicrornis brevirostris - doesn't appear here but is on mainland close by
+ Trichoglossus chlorolepidotus - these don't appear anywhere near here and there doesn't seem to be anythingin the dataset they cound be confused for
+ Bathilda ruficauda - doesn't appear here or near here 
+ 
+To change:
+ Todiramphus chloris - change to Todiramphus sordidus
+ Colluricincla megarhyncha - change to Colluricincla woodwardi (changed my mind on this)
+ Megapodius freycinet - change to Megapodius reinwardt (it seems like classifying megapodes has always been bit of a mess but these were probably under the same umbrella for a bit)
+ Sphecotheres viridis - change to Sphecotheres vieilloti (used to be classed together)
+ Lalage sueurii - change to Lalage tricolor
+ Myiagra inquieta - change to Myiagra nana
+ Rhipidura rufifrons - change to Rhipidura dryas
+ Cacomantis flabelliformis - change to Cacomantis pallidus
+ Circus assimilis - change to Circus approximans
+ Ixobrychus minutus - change to Ixobrychus dubius
+
+
+
+```{r}
+
+anindilyakwa_holman$ScientificName2023[
+  anindilyakwa_holman$ScientificName2023=="Todiramphus chloris"] <- 
+  "Todiramphus sordidus"
+
+# anindilyakwa_holman$ScientificName2023[
+#   anindilyakwa_holman$ScientificName2023=="Colluricincla megarhyncha"] <- 
+#   "Colluricincla woodwardi"
+# This was a bad decision
+
+anindilyakwa_holman$ScientificName2023[
+  anindilyakwa_holman$ScientificName2023=="Megapodius freycinet"] <- 
+  "Megapodius reinwardt"
+
+anindilyakwa_holman$ScientificName2023[
+  anindilyakwa_holman$ScientificName2023=="Sphecotheres viridis"] <- 
+  "Sphecotheres vieilloti"
+
+anindilyakwa_holman$ScientificName2023[
+  anindilyakwa_holman$ScientificName2023=="Lalage sueurii"] <- 
+  "Lalage tricolor"
+
+anindilyakwa_holman$ScientificName2023[
+  anindilyakwa_holman$ScientificName2023=="Myiagra inquieta"] <- 
+  "Myiagra nana"
+
+anindilyakwa_holman$ScientificName2023[
+  anindilyakwa_holman$ScientificName2023=="Rhipidura rufifrons"] <- 
+  "Rhipidura dryas"
+
+anindilyakwa_holman$ScientificName2023[
+  anindilyakwa_holman$ScientificName2023=="Cacomantis flabelliformis"] <- 
+  "Cacomantis pallidus"
+
+anindilyakwa_holman$ScientificName2023[
+  anindilyakwa_holman$ScientificName2023=="Circus assimilis"] <- 
+  "Circus approximans"
+
+anindilyakwa_holman$ScientificName2023[
+  anindilyakwa_holman$ScientificName2023=="Ixobrychus minutus"] <- 
+  "Ixobrychus dubius"
+
+# Now to import all of the common names from the species list
+
+anindilyakwa_holman <- anindilyakwa_holman %>% 
+  left_join(species_NT,
+            by = c("ScientificName2023" = "ScientificName"),
+            keep = FALSE) %>% 
+  mutate(CommonName2023 = 
+           ifelse(ScientificNameOG %in% notin$ScientificNameOG &
+                    !is.na(CommonName),
+                  CommonName,
+                  CommonName2023))
+
+# Now all of the 2023 scientific names should be as accurate as they can be, and actually indicating the correct bird. So I can go ahead with finding all of the other names now!
+
+# Wait first I need the Family names from 2023
+
+anindilyakwa_holman <- anindilyakwa_holman %>% 
+  left_join(clements_2023 %>% 
+              select(ScientificName2023,
+                     Family2023,
+                     Order2023),
+            by = "ScientificName2023",
+            multiple = "all")
+
+```
+
+
+### Clements 1974
+
+```{r}
+
+# Add 1974 names for things that have just changed their name without changing species concept
+
+anindilyakwa_holman <- anindilyakwa_holman %>% 
+  left_join(eBird_1974_2023 %>% select(ScientificName2023,
+                                       ScientificName1974,
+                                       CommonName1974),
+            by = "ScientificName2023",
+            multiple = "all")
+
+# Now the ones that have NA in the dataset are ones that have not changed between 1974 and 2023. So we can just make them the same
+
+anindilyakwa_holman <- anindilyakwa_holman %>% 
+  mutate(ScientificName1974 = ifelse(
+    is.na(ScientificName1974),
+    ScientificName2023,
+    ScientificName1974),
+  )
+
+# Filter out the ones that don't have 1974 data to figure out what to do with them
+
+anindilyakwa_leftovers <- anindilyakwa_holman %>% 
+  filter(ScientificName1974 == "" | is.na(ScientificName1974)) %>% 
+  select("Language":"Order2023") %>%
+  mutate(CommonName1974 = CommonName2023) %>% 
+  left_join(eBird_1974_2023 %>% select(ScientificName1974,
+                                       CommonName1974),
+            by = ("CommonName1974")) %>% 
+   filter(is.na(ScientificName1974) | 
+            !(ScientificName1974 == "Rhodospingus cruentus") & 
+            !(ScientificName1974 == "Rhipidura setosa"))
+
+anindilyakwa_holman <- anindilyakwa_holman %>% 
+  filter(ScientificName1974 != "" & !is.na(ScientificName1974)) %>% 
+  rbind(anindilyakwa_leftovers)
+
+anindilyakwa_leftovers <- anindilyakwa_holman %>% 
+  filter(ScientificName1974 == "" | is.na(ScientificName1974)) %>% 
+  select("Language":"Order2023") %>%
+  mutate(ScientificName1974 = ScientificName2023) %>% 
+  left_join(eBird_1974_2023 %>% select(ScientificName1974,
+                                       CommonName1974),
+            by=("ScientificName1974"))
+
+# Change Corvus orru to Corvus cecilae (Australian Crow)
+# Change Coracina papuensis to Coracina hypoleuca (White-breasted Cuckoo-Shrike)
+# Change Ptilinopus regina to Ptilinopus ewingi (Rose-crowned Pigeon)
+# Idea for next time - match the common names first and see if that changes things.
+# Change Rhipidura dryas to Rhipidura rufifrons (Arafura fantail)
+
+anindilyakwa_leftovers$ScientificName1974[
+  anindilyakwa_leftovers$ScientificName2023 == "Rhipidura dryas"] <- 
+  "Rhipidura rufifrons"
+
+anindilyakwa_leftovers$ScientificName1974[
+  anindilyakwa_leftovers$ScientificName2023 == "Corvus orru"] <- 
+  "Corvus cecilae"
+
+anindilyakwa_leftovers$ScientificName1974[
+  anindilyakwa_leftovers$ScientificName2023 == "Coracina papuensis"] <- 
+  "Coracina hypoleuca"
+
+anindilyakwa_leftovers$ScientificName1974[
+  anindilyakwa_leftovers$ScientificName2023 == "Ptilinopus regina"] <- 
+  "Ptilinopus ewingi"
+
+anindilyakwa_leftovers$ScientificName1974[
+  anindilyakwa_leftovers$ScientificName2023 == "Gelochelidon macrotarsa"] <- 
+  "Gelochelidon nilotica"
+
+anindilyakwa_leftovers$ScientificName1974[
+  anindilyakwa_leftovers$ScientificName2023 == "Chrysococcyx minutillus"] <- 
+  "Chalcites minutillus"
+
+anindilyakwa_leftovers$ScientificName1974[
+  anindilyakwa_leftovers$ScientificName2023 == "Anarhynchus mongolus"] <- 
+  "Charadrius mongolus"
+
+anindilyakwa_leftovers$ScientificName1974[
+  anindilyakwa_leftovers$ScientificName2023 == "Anarhynchus ruficapillus"] <-
+  "Charadrius alexandrinus"
+
+anindilyakwa_leftovers$ScientificName1974[
+  anindilyakwa_leftovers$ScientificName2023 == "Ninox boobook"] <-
+  "Ninox novaeseelandiae"
+
+anindilyakwa_leftovers$ScientificName1974[
+  anindilyakwa_leftovers$ScientificName2023 == "Anas superciliosa"] <-
+  "Anas poecilorhyncha"
+
+anindilyakwa_leftovers$ScientificName1974[
+  anindilyakwa_leftovers$ScientificName2023 == "Chalcophaps longirostris"] <-
+  "Chalcophaps indica"
+
+anindilyakwa_leftovers$ScientificName1974[
+  anindilyakwa_leftovers$ScientificName2023 == "Myiagra nana"] <-
+  "Seisura inquieta"
+
+anindilyakwa_leftovers$ScientificName1974[
+  anindilyakwa_leftovers$ScientificName2023 == "Rhipidura phasiana"] <-
+  "Rhipidura fuliginosa"
+
+anindilyakwa_leftovers$ScientificName1974[
+  anindilyakwa_leftovers$ScientificName2023 == "Smicrornis brevirostris"] <-
+  "Smicrornis flavescens"
+
+anindilyakwa_leftovers$ScientificName1974[
+  anindilyakwa_leftovers$ScientificName2023 == "Trichoglossus rubritorquis"] <-
+  "Trichoglossus haematodus"
+
+# Bind it all together
+
+anindilyakwa_holman <- anindilyakwa_holman %>% 
+  filter(ScientificName1974 != "" & !is.na(ScientificName1974)) %>% 
+  rbind(anindilyakwa_leftovers) 
+
+# Change a couple more things
+
+anindilyakwa_holman$ScientificName1974[
+  anindilyakwa_holman$ScientificName2023 == "Ramsayornis fasciatus"
+] <- "Gliciphila fasciatus"
+# This came from the Clements book, it's not the same in avibase
+
+anindilyakwa_holman$ScientificName1974[
+  anindilyakwa_holman$ScientificName2023 == "Cincloramphus timoriensis"
+] <-  "Megalurus timoriensis"
+
+anindilyakwa_holman$ScientificName1974[
+  anindilyakwa_holman$ScientificName2023 == "Edolisoma tenuirostre"
+] <-  "Coracina tenuirostris" 
+
+anindilyakwa_holman$ScientificName1974[
+  anindilyakwa_holman$ScientificName2023 == "Todiramphus sordidus"
+] <- "Halcyon chloris"
+
+anindilyakwa_holman$ScientificName1974[
+  anindilyakwa_holman$ScientificName2023 == "Haematopus longirostris"
+] <- "Haematopus ostralegus"
+
+
+
+anindilyakwa_holman <- anindilyakwa_holman %>% 
+  mutate(Genus1974 = str_extract(ScientificName1974, "\\b\\w+\\b")) %>% 
+  left_join(GenusMatch1974 %>% select(Genus1974, 
+                                      Family1974), 
+            by = "Genus1974") %>% 
+  left_join(orders_74 %>% select(Family1974, 
+                                 Order1974), 
+            by = "Family1974",
+            multiple = "all")
+
+```
+
+### V3
+
+Handbook of Birds of the World and BirdLife International Illustrated Checklist of the Birds of the World Version 3 taxonomy - for compatibility with BirdTree
+
+```{r}
+
+# Add V3 names for things that have just changed their name without changing species concept
+
+anindilyakwa_holman <- anindilyakwa_holman %>% 
+  left_join(changes_V3_23 %>% select(ScientificName2023,
+                                       ScientificNameV3,
+                                       CommonNameV3,
+                                     FamilyV3),
+            by = "ScientificName2023",
+            multiple = "all")
+
+# Now the ones that have NA in the dataset are ones that have not changed between V3 and 2023. So we can just make them the same
+
+anindilyakwa_holman <- anindilyakwa_holman %>% 
+  mutate(ScientificNameV3 = ifelse(
+    is.na(ScientificNameV3),
+    ScientificName2023,
+    ScientificNameV3),
+  )
+
+anindilyakwa_leftovers <- anindilyakwa_holman %>% 
+  filter(ScientificNameV3 == "" | is.na(ScientificNameV3)) %>% 
+  select("Language":"Order1974") %>%
+  mutate(CommonNameV3 = CommonName2023) %>% 
+  left_join(changes_V3_23 %>% select(ScientificNameV3,
+                                     CommonNameV3,
+                                     FamilyV3),
+            by = ("CommonNameV3"))
+
+anindilyakwa_holman <- anindilyakwa_holman %>% 
+  filter(ScientificNameV3 != "" & !is.na(ScientificNameV3)) %>% 
+  rbind(anindilyakwa_leftovers)
+
+anindilyakwa_leftovers <- anindilyakwa_holman %>% 
+  filter(ScientificNameV3 == "" | is.na(ScientificNameV3)) %>% 
+  select("Language":"Order1974") %>%
+  mutate(ScientificNameV3 = ScientificName2023) %>% 
+  left_join(changes_V3_23 %>% select(ScientificNameV3,
+                                     CommonNameV3,
+                                     FamilyV3),
+            by=("ScientificNameV3"))
+
+```
+
+Birds to change:
+Himantopus leucocephalus = Himantopus himantopus
+Anarhynchus mongolus = Charadrius mongolus
+
+Ixobrychus flavicollis - should be okay
+Edolisoma tenuirostre = Coracina tenuirostris
+Synoicus chinensis = Coturnix chinensis
+Rhipidura dryas = Rhipidura rufifrons
+Ardea plumifera = Mesophoyx intermedia
+Gelochelidon macrotarsa = Sterna nilotica
+Chalcophaps longirostris = Chalcophaps indica
+Myiagra nana = Myiagra inquieta 
+Trichoglossus rubritorquis = Trichoglossus haematodus
+Todiramphus sordidus = Todiramphus chloris
+
+```{r}
+
+anindilyakwa_leftovers$ScientificNameV3[
+  anindilyakwa_leftovers$ScientificName2023 == "Anarhynchus mongolus"] <- 
+  "Charadrius mongolus"
+
+anindilyakwa_leftovers$ScientificNameV3[
+  anindilyakwa_leftovers$ScientificName2023 == "Gelochelidon macrotarsa"] <- 
+  "Sterna nilotica"
+
+anindilyakwa_leftovers$ScientificNameV3[
+  anindilyakwa_leftovers$ScientificName2023 == "Ixobrychus dubius"] <- 
+  "Ixobrychus minutus"
+
+anindilyakwa_leftovers$ScientificNameV3[
+  anindilyakwa_leftovers$ScientificName2023 == "Chalcophaps longirostris"] <- 
+  "Chalcophaps indica"
+
+anindilyakwa_leftovers$ScientificNameV3[
+  anindilyakwa_leftovers$ScientificName2023 == "Myiagra nana"] <- 
+  "Myiagra inquieta"
+
+anindilyakwa_leftovers$ScientificNameV3[
+  anindilyakwa_leftovers$ScientificName2023 == "Trichoglossus rubritorquis"] <- "Trichoglossus haematodus"
+
+anindilyakwa_leftovers$ScientificNameV3[
+  anindilyakwa_leftovers$ScientificName2023 == "Todiramphus sordidus"] <- 
+  "Todiramphus chloris"
+
+anindilyakwa_leftovers$ScientificNameV3[
+  anindilyakwa_leftovers$ScientificName2023 == "Edolisoma tenuirostre"] <- 
+  "Coracina tenuirostris"
+
+anindilyakwa_leftovers$ScientificNameV3[
+  anindilyakwa_leftovers$ScientificName2023 == "Synoicus chinensis"] <- 
+  "Coturnix chinensis"
+
+anindilyakwa_leftovers$ScientificNameV3[
+  anindilyakwa_leftovers$ScientificName2023 == "Rhipidura dryas"] <- 
+  "Rhipidura rufifrons"
+
+anindilyakwa_leftovers$ScientificNameV3[
+  anindilyakwa_leftovers$ScientificName2023 == "Ardea plumifera"] <- 
+  "Mesophoyx intermedia"
+
+anindilyakwa_leftovers$ScientificNameV3[
+  anindilyakwa_leftovers$ScientificName2023 == "Gelochelidon macrotarsa"] <- 
+  "Sterna nilotica"
+
+# Bind it all back together
+
+anindilyakwa_holman <- anindilyakwa_holman %>% 
+  filter(ScientificNameV3 != "" & !is.na(ScientificNameV3)) %>% 
+  rbind(anindilyakwa_leftovers)
+
+to_change <-anindilyakwa_holman$ScientificName2023 %in% birdtree_extras$ScientificNameBT
+
+look <- anindilyakwa_holman[to_change, ]
+
+anindilyakwa_holman$ScientificNameV3[
+  anindilyakwa_holman$ScientificName2023 == "Ninox boobook"] <- 
+  "Ninox boobook"
+
+```
+
+### Clements 2021
+
+For compatability with AVONET
+
+```{r}
+
+# Add 2021 names for things that have just changed their name without changing species concept
+# Just realised I do not need family names. Should go back and changed that for V3
+
+anindilyakwa_holman <- anindilyakwa_holman %>% 
+  left_join(changes_21_23 %>% select(ScientificName2023,
+                                       ScientificName2021,
+                                       CommonName2021),
+            by = "ScientificName2023",
+            multiple = "all")
+
+# Now the ones that have NA in the dataset are ones that have not changed between V3 and 2023. So we can just make them the same
+
+anindilyakwa_holman <- anindilyakwa_holman %>% 
+  mutate(ScientificName2021 = ifelse(
+    is.na(ScientificName2021),
+    ScientificName2023,
+    ScientificName2021),
+  )
+
+# Pull out the ones that have changed between 2021 and 2023 and match them based on common name
+
+anindilyakwa_leftovers <- anindilyakwa_holman %>% 
+  filter(ScientificName2021 == "" | is.na(ScientificName2021)) %>% 
+  select("Language":"FamilyV3") %>%
+  mutate(CommonName2021 = CommonName2023) %>% 
+  left_join(changes_21_23 %>% select(ScientificName2021,
+                                     CommonName2021),
+            by = ("CommonName2021"))
+
+# Bind it all back together
+
+anindilyakwa_holman <- anindilyakwa_holman %>% 
+  filter(ScientificName2021 != "" & !is.na(ScientificName2021)) %>% 
+  rbind(anindilyakwa_leftovers)
+
+# Pull out the changed ones again and match them on scientific name
+
+anindilyakwa_leftovers <- anindilyakwa_holman %>% 
+  filter(ScientificName2021 == "" | is.na(ScientificName2021)) %>% 
+  select("Language":"FamilyV3") %>%
+  mutate(ScientificName2021 = ScientificName2023) %>% 
+  left_join(changes_21_23 %>% select(ScientificName2021,
+                                     CommonName2021),
+            by=("ScientificName2021"))
+
+anindilyakwa_leftovers$ScientificName2021[
+  anindilyakwa_leftovers$ScientificName2023 == "Ardea plumifera"] <- 
+  "Ardea intermedia"
+
+anindilyakwa_leftovers$ScientificName2021[
+  anindilyakwa_leftovers$ScientificName2023 == "Gelochelidon macrotarsa"] <- 
+  "Gelochelidon nilotica"
+
+anindilyakwa_leftovers$ScientificName2021[
+  anindilyakwa_leftovers$ScientificName2023 == "Anarhynchus mongolus"] <- 
+  "Charadrius mongolus"
+
+anindilyakwa_holman <- anindilyakwa_holman %>% 
+  filter(ScientificName2021 != "" & !is.na(ScientificName2021)) %>% 
+  rbind(anindilyakwa_leftovers)
+
+anindilyakwa <- anindilyakwa_holman %>% 
+  mutate(Genus2023 = str_extract(
+    ScientificName2023, 
+    "\\b\\w+\\b"),
+         CommonName = CommonName2023) %>% 
+  select(Language,
+         CommonName,
+         IndexFG,
+         n,
+         ScientificName2023,
+         Genus2023,
+         Family2023,
+         Order2023,
+         ScientificName1974,
+         Genus1974,
+         Family1974,
+         Order1974,
+         ScientificName2021,
+         ScientificNameV3)
+
+```
+
+## Innu
+
+```{r}
+
+montagnais_holman <-  holman_birds %>% 
+  filter(Language == "Montagnais")  %>% 
+  mutate(combined = paste(ScientificName,IndexFG,sep = "_"))
+
+# Delete double Somateria mollissima (there's a subspecies in the dataset)
+
+# to_delete <- duplicated(montagnais_holman$ScientificName) & montagnais_holman$ScientificName == "Somateria mollissima"
+
+unacceptable_duplicates <- which(duplicated(montagnais_holman$combined))
+
+montagnais_holman <- montagnais_holman[-unacceptable_duplicates,] %>% 
+  select(-combined) %>% 
+  group_by(IndexFG) %>% 
+  mutate(n = n()) %>% 
+  ungroup()
+
+species_can <-
+  read.csv(here("preprocessing/data/species-list_montagnais.csv")) %>% 
+  filter(ScientificName2023 != "") %>% 
+  distinct()
+
+```
+
+### Clements 2023 (Canonical) Names
+
+```{r}
+
+# I have no idea what taxonomy this list of birds is using, so I'm going to cross-reference it with the 2023 list of birds that should be there
+
+notin <- montagnais_holman[!(montagnais_holman$ScientificName %in% species_can$ScientificName2023), ]
+
+# Okay apart from "Anas" being spelled like "Anus" (lol), it seems like some of the names are just old.
+# I will have a look at which ones line up with 2023 names and go from there.
+
+montagnais_holman <- montagnais_holman %>% 
+  mutate(ScientificName = str_replace(ScientificName, "^Anus\\b", "Anas")) %>% 
+  left_join(clements_2023 %>% 
+              select(ScientificName2023,
+                     CommonName2023,
+                     Family2023,
+                     Order2023),
+            by = c("ScientificName" = "ScientificName2023"),
+            multiple = "all")
+
+# I'll see if any of the remaining ones are the same as in 1974
+
+montagnais_holman <- montagnais_holman %>% 
+  left_join(changes_74_23 %>% select(ScientificName1974,
+                                     ScientificName2023,
+                                     CommonName2023),
+            by = c("ScientificName" = "ScientificName1974"),
+            multiple = "all")
+
+# Mash together the 2023 Scientific names
+
+montagnais_holman <- montagnais_holman %>% 
+  mutate(ScientificName2023 = ifelse((is.na(ScientificName2023) | 
+                                        ScientificName2023 == "") &
+                                       !is.na(Family2023), 
+                                     ScientificName, 
+                                     ScientificName2023)) %>% 
+  mutate(CommonName = coalesce(CommonName2023.x, 
+                               CommonName2023.y)) %>%
+  select(-CommonName2023.x, 
+         -CommonName2023.y)
+
+# Time to google some birdies one by one
+
+montagnais_holman$ScientificName2023[
+  montagnais_holman$ScientificName == "Capella gallinago"] <- 
+  "Gallinago delicata"
+
+montagnais_holman$ScientificName2023[
+  montagnais_holman$ScientificName == "Dendroica petechia"] <- 
+  "Setophaga petechia"
+
+montagnais_holman$ScientificName2023[
+  montagnais_holman$ScientificName == "Anas carolinensis"] <- 
+  "Anas crecca"
+
+montagnais_holman$ScientificName2023[
+  montagnais_holman$ScientificName == "Oidemia nigra"] <- 
+  "Melanitta americana"  ## Watch this later, in 1974 it was Melanitta nigra
+
+montagnais_holman$ScientificName2023[
+  montagnais_holman$ScientificName == "Falco colombarius"] <- 
+  "Falco columbarius"
+
+montagnais_holman$ScientificName2023[
+  montagnais_holman$ScientificName == "Erolia melanotos"] <- 
+  "Calidris melanotos"
+
+montagnais_holman$ScientificName2023[
+  montagnais_holman$ScientificName == "Totanus melanoleucus"] <- 
+  "Tringa melanoleuca"
+
+montagnais_holman$ScientificName2023[
+  montagnais_holman$ScientificName == "Erolia minutilla"] <- 
+  "Calidris minutilla"
+
+montagnais_holman$ScientificName[
+  montagnais_holman$ScientificName == "Lopipes lobatus"] <- 
+  "Lobipes lobatus"  ## Spelling mistake
+montagnais_holman$ScientificName2023[
+  montagnais_holman$ScientificName == "Lobipes lobatus"] <- 
+  "Phalaropus lobatus"
+
+montagnais_holman$ScientificName[
+  montagnais_holman$ScientificName == "Picoides tridactylis"] <- 
+  "Picoides tridactylus"  ## Another spelling mistake
+montagnais_holman$ScientificName2023[
+  montagnais_holman$ScientificName == "Picoides tridactylus"] <- 
+  "Picoides dorsalis"  # Changed it because this bird isn't found in this area
+
+montagnais_holman$ScientificName2023[
+  montagnais_holman$ScientificName == "Iridoprocne bicolor"] <- 
+  "Tachycineta bicolor"
+
+montagnais_holman$ScientificName[
+  montagnais_holman$ScientificName == "Pinicola enudeator"] <- 
+  "Pinicola enucleator" ## Spelling mistake
+montagnais_holman$ScientificName2023[
+  montagnais_holman$ScientificName == "Pinicola enucleator"] <- 
+  "Pinicola enucleator"
+
+montagnais_holman$ScientificName2023[
+  montagnais_holman$ScientificName == "Plautus alle"] <- 
+  "Alle alle"
+
+# Now that they all have their 2023 names, I'll check again to see if everything should be appearing in that area
+
+notin <- montagnais_holman[!(montagnais_holman$ScientificName2023 %in% species_can$ScientificName2023), ]
+
+# Turns out there's just one and it's sometimes grouped together with something that should be there
+
+montagnais_holman$ScientificName2023[
+  montagnais_holman$ScientificName == "Circus cyaneus"] <-
+  "Circus hudsonius"
+
+# Now to get the Family and Order data
+
+montagnais_holman <- montagnais_holman %>% 
+  select(Language,
+         IndexFG,
+         n,
+         ScientificName,
+         ScientificName2023) %>% 
+  rename(ScientificNameOG = ScientificName) %>% 
+  left_join(clements_2023 %>% select(ScientificName2023,
+                                     CommonName2023,
+                                     Family2023,
+                                     Order2023),
+            by = "ScientificName2023",
+            multiple = "all") %>% 
+  rename(CommonName = CommonName2023)
+  
+```
+
+### Clements 1974
+
+```{r}
+
+# Add 1974 names for things that have just changed their name without changing species concept
+
+montagnais_holman <- montagnais_holman %>% 
+  left_join(eBird_1974_2023 %>% select(ScientificName2023,
+                                       ScientificName1974),
+            by = "ScientificName2023",
+            multiple = "all")
+
+# Now the ones that have NA in the dataset are ones that have not changed between 1974 and 2023. So we can just make them the same
+
+montagnais_holman <- montagnais_holman %>% 
+  mutate(ScientificName1974 = ifelse(
+    is.na(ScientificName1974),
+    ScientificName2023,
+    ScientificName1974),
+  )
+
+# Filter out the ones that don't have 1974 data and match them based on their Common Names
+
+montagnais_leftovers <- montagnais_holman %>% 
+  filter(ScientificName1974 == "" | is.na(ScientificName1974)) %>% 
+  select("Language":"Order2023") %>%
+  mutate(CommonName1974 = CommonName) %>% 
+  left_join(eBird_1974_2023 %>% select(ScientificName1974,
+                                             CommonName1974),
+            by = ("CommonName1974"))
+
+# Bind it all back together again
+
+montagnais_holman <- montagnais_holman %>% 
+  filter(ScientificName1974 != "" & !is.na(ScientificName1974)) %>% 
+  rbind(montagnais_leftovers %>% select(-CommonName1974))
+
+# Now filter out the ones that still don't have 1974 names and see if the 1974 names might match the original scientific names in the dataset
+
+montagnais_leftovers <- montagnais_holman %>% 
+  filter(ScientificName1974 == "" | is.na(ScientificName1974)) %>% 
+  select("Language":"Order2023") %>%
+  mutate(ScientificName1974 = ScientificNameOG) %>% 
+  left_join(eBird_1974_2023 %>% select(ScientificName1974,
+                                       CommonName1974),
+            by=("ScientificName1974"))
+
+# Seems like they do. So bind it all back together again and pull in the Family and Order data from 1974
+
+montagnais_holman <- montagnais_holman %>% 
+  filter(ScientificName1974 != "" & !is.na(ScientificName1974)) %>% 
+  rbind(montagnais_leftovers %>% select(-CommonName1974)) %>% 
+  mutate(Genus1974 = str_extract(ScientificName1974, "\\b\\w+\\b")) %>% 
+  left_join(GenusMatch1974 %>% 
+              select(Genus1974, Family1974), 
+            by = "Genus1974") %>% 
+  left_join(orders_74 %>% select(Family1974, 
+                                 Order1974), 
+            by = "Family1974",
+            multiple = "all")
+
+```
+
+### V3
+
+```{r}
+# Add V3 names for things that have just changed their name without changing species concept
+
+montagnais_holman <- montagnais_holman %>% 
+  left_join(changes_V3_23 %>% select(ScientificName2023,
+                                     ScientificNameV3),
+            by = "ScientificName2023",
+            multiple = "all")
+
+# Now the ones that have NA in the dataset are ones that have not changed between V3 and 2023. So we can just make them the same
+
+montagnais_holman <- montagnais_holman %>% 
+  mutate(ScientificNameV3 = ifelse(
+    is.na(ScientificNameV3),
+    ScientificName2023,
+    ScientificNameV3),
+  )
+
+# Filter out the ones that don't have a V3 scientific name yet, and match them by common name
+
+montagnais_leftovers <- montagnais_holman %>% 
+  filter(ScientificNameV3 == "" | is.na(ScientificNameV3)) %>% 
+  select("Language":"Order1974") %>%
+  mutate(CommonNameV3 = CommonName) %>% 
+  left_join(changes_V3_23 %>% select(ScientificNameV3,
+                                     CommonNameV3),
+            by = ("CommonNameV3"))
+
+# Bind it all back together again
+
+montagnais_holman <- montagnais_holman %>% 
+  filter(ScientificNameV3 != "" & !is.na(ScientificNameV3)) %>% 
+  rbind(montagnais_leftovers %>% select(-CommonNameV3))
+
+# Filter out leftovers again and match by 2023 name
+
+montagnais_leftovers <- montagnais_holman %>% 
+  filter(ScientificNameV3 == "" | is.na(ScientificNameV3)) %>% 
+  select("Language":"Order1974") %>%
+  mutate(ScientificNameV3 = ScientificName2023) %>% 
+  left_join(changes_V3_23 %>% select(ScientificNameV3,
+                                     CommonNameV3,
+                                     FamilyV3),
+            by = ("ScientificNameV3"))
+
+montagnais_leftovers$ScientificNameV3[
+  montagnais_leftovers$ScientificName2023 == "Gallinago delicata"] <- 
+  "Gallinago gallinago"
+
+# Bind it all back together 
+
+montagnais_holman <- montagnais_holman %>% 
+  filter(ScientificNameV3 != "" & !is.na(ScientificNameV3)) %>% 
+  rbind(montagnais_leftovers %>% select(-CommonNameV3, 
+                                        -FamilyV3))
+
+
+```
+
+### Clements 2021
+
+```{r}
+
+# Add 2021 names for things that have just changed their name without changing species concept
+
+montagnais_holman <- montagnais_holman %>% 
+  left_join(changes_21_23 %>% select(ScientificName2023,
+                                       ScientificName2021),
+            by = "ScientificName2023",
+            multiple = "all")
+
+# Now the ones that have NA in the dataset are ones that have not changed between V3 and 2023. And as it turns out there's only one that isn't NA, and upon googling it I realised it's the same too. Awesome, that just saved me a bunch of work.
+
+montagnais_holman <- montagnais_holman %>% 
+  mutate(ScientificName2021 = ScientificName2023)
+
+# Make it all neat and pretty
+
+montagnais <- montagnais_holman %>% 
+  mutate(Genus2023 = str_extract(
+    ScientificName2023, 
+    "\\b\\w+\\b")) %>% 
+  select(Language,
+         CommonName,
+         IndexFG,
+         n,
+         ScientificName2023,
+         Genus2023,
+         Family2023,
+         Order2023,
+         ScientificName1974,
+         Genus1974,
+         Family1974,
+         Order1974,
+         ScientificName2021,
+         ScientificNameV3)
+
+```
+
+## Rangi
+
+```{r}
+
+rangi_holman <-  holman_birds %>% 
+  filter(Language == "Rangi")
+
+# Acceptable duplicates
+## Alopochen aegyptiaca
+## Colius striatus
+## Lagonosticta senegala
+## Vidua paradisaea 
+## Charadrius hiaticula
+## Tringa glareola
+## Charadrius tricollaris
+## Vidua fischeri
+## Emberiza tahapisi
+
+unacceptable_duplicates <- which(duplicated(rangi_holman[,c("ScientificName","IndexFG")]))
+
+rangi_holman <- rangi_holman[-unacceptable_duplicates,] %>% 
+  group_by(IndexFG) %>% 
+  mutate(n = n()) %>% 
+  ungroup()
+
+species_TZ <-
+  read.csv(here("preprocessing/data/species-list_rangi.csv")) %>% 
+  filter(ScientificName2023 != "") %>% 
+  distinct()
+
+```
+
+### Clements 2023 (Canonical) Names
+
+```{r}
+rangi_holman <- rangi_holman %>% 
+  left_join(clements_2023 %>% 
+              select(ScientificName2023,
+                     CommonName2023,
+                     Family2023,
+                     Order2023),
+            by = c("ScientificName" = "ScientificName2023"),
+            multiple = "all")
+
+# I'll see if any of the remaining ones are the same as in 1974
+
+rangi_holman <- rangi_holman %>% 
+  left_join(changes_74_23 %>% select(ScientificName1974,
+                                     ScientificName2023,
+                                     CommonName2023),
+            by = c("ScientificName" = "ScientificName1974"),
+            multiple = "all")
+
+# Mash together the 2023 Scientific names
+
+rangi_holman <- rangi_holman %>% 
+  mutate(ScientificName2023 = ifelse((is.na(ScientificName2023) | 
+                                        ScientificName2023 == "") &
+                                       !is.na(Family2023), 
+                                     ScientificName, 
+                                     ScientificName2023)) %>% 
+  mutate(CommonName = coalesce(CommonName2023.x, 
+                               CommonName2023.y)) %>%
+  select(-CommonName2023.x, 
+         -CommonName2023.y)
+
+# There are a lot of birds to google this time.
+
+rangi_holman$ScientificName2023[
+  rangi_holman$ScientificName == "Threskiornis aethiopica"] <- 
+  "Threskiornis aethiopicus"
+
+rangi_holman$ScientificName2023[
+  rangi_holman$ScientificName == "Egretta intermedia"] <- 
+  "Ardea brachyrhyncha"
+
+rangi_holman$ScientificName2023[
+  rangi_holman$ScientificName == "Treron calva"] <- 
+  "Treron calvus"
+
+rangi_holman$ScientificName2023[
+  rangi_holman$ScientificName == "Hirundo daurica"] <- 
+  "Cecropis daurica"
+
+rangi_holman$ScientificName2023[
+  rangi_holman$ScientificName == "Delichon urbica"] <- 
+  "Delichon urbicum"
+
+rangi_holman$ScientificName2023[
+  rangi_holman$ScientificName == "Prionops plumata"] <- 
+  "Prionops plumatus"
+
+rangi_holman$ScientificName2023[
+  rangi_holman$ScientificName == "Francolinus afer"] <- 
+  "Pternistis afer"
+
+rangi_holman$ScientificName2023[
+  rangi_holman$ScientificName == "Serinus atrogularis"] <- 
+  "Crithagra atrogularis"
+
+rangi_holman$ScientificName2023[
+  rangi_holman$ScientificName == "Egretta alba"] <- 
+  "Ardea alba"
+
+rangi_holman$ScientificName2023[
+  rangi_holman$ScientificName == "Alopochen aegyptiacus"] <- 
+  "Alopochen aegyptiaca"
+
+rangi_holman$ScientificName2023[
+  rangi_holman$ScientificName == "Tringa hypoleucos"] <- 
+  "Actitis hypoleucos"
+
+rangi_holman$ScientificName2023[
+  rangi_holman$ScientificName == "Cursorius chalcopterus"] <- 
+  "Rhinoptilus chalcopterus"
+
+rangi_holman$ScientificName2023[
+  rangi_holman$ScientificName == "Hirundo griseopyga"] <- 
+  "Pseudhirundo griseopyga"
+
+rangi_holman$ScientificName2023[
+  rangi_holman$ScientificName == "Hirundo fuligula"] <- 
+  "Ptyonoprogne fuligula"
+
+rangi_holman$ScientificName[
+  rangi_holman$ScientificName == "Mirafra rufacinnamonea"] <- 
+  "Mirafra rufocinnamomea" ## Spelling error
+rangi_holman$ScientificName2023[
+  rangi_holman$ScientificName == "Mirafra rufocinnamomea"] <- 
+  "Mirafra rufocinnamomea"
+
+rangi_holman$ScientificName[
+  rangi_holman$ScientificName == "Euplectes axillarius"] <- 
+  "Euplectes axillaris" ## Spelling error
+rangi_holman$ScientificName2023[
+  rangi_holman$ScientificName == "Euplectes axillaris"] <- 
+  "Euplectes axillaris"
+
+rangi_holman$ScientificName2023[
+  rangi_holman$ScientificName == "Vidua paradisea"] <- 
+  "Vidua paradisaea"
+
+rangi_holman$ScientificName[
+  rangi_holman$ScientificName == "Nectarinia senegalinsis"] <- 
+  "Nectarinia senegalinsis"  # Spelling error
+
+rangi_holman$ScientificName2023[
+  rangi_holman$ScientificName == "Nectarinia senegalinsis"] <- 
+  "Chalcomitra senegalensis"
+
+# Cross-reference to see if any shouldn't be in the area
+
+notin <- rangi_holman[!(rangi_holman$ScientificName2023 %in% species_TZ$ScientificName2023), ]
+
+# There are a few whose species boundaries have been changed.
+
+rangi_holman$ScientificName2023[
+  rangi_holman$ScientificName == "Circaetus gallicus"] <- 
+  "Circaetus pectoralis"
+
+rangi_holman$ScientificName2023[
+  rangi_holman$ScientificName == "Balearica pavonina"] <- 
+  "Balearica regulorum"
+
+rangi_holman$ScientificName2023[
+  rangi_holman$ScientificName == "Porphyrio porphyrio"] <- 
+  "Porphyrio madagascariensis"
+
+rangi_holman$ScientificName2023[
+  rangi_holman$ScientificName == "Hirundo lucida"] <- 
+  "Hirundo angolensis"
+## I'm guessing that this one was misidentified by the people who compiled the dataset. It's very similar and is found in the area.
+
+rangi_holman$ScientificName2023[
+  rangi_holman$ScientificName == "Anthus novaeseelandiae"] <- 
+  "Anthus cinnamomeus"
+
+## I'm keeping Cairina moschata in because it's probably domesticated there, same with Gallus gallus.
+## I can't explain Calidris alpina
+## Keeping in Apus horus because it lives pretty close by.
+
+# Add in the family and order data
+
+rangi_holman <- rangi_holman %>% 
+  select(Language,
+         IndexFG,
+         n,
+         ScientificName,
+         ScientificName2023) %>% 
+  rename(ScientificNameOG = ScientificName) %>% 
+  left_join(clements_2023 %>% select(ScientificName2023,
+                                     CommonName2023,
+                                     Family2023,
+                                     Order2023),
+            by = "ScientificName2023",
+            multiple = "all") %>% 
+  rename(CommonName = CommonName2023)
+```
+
+### Clements 1974
+
+```{r}
+
+# Add 1974 names for things that have just changed their name without changing species concept
+
+rangi_holman <- rangi_holman %>% 
+  left_join(changes_74_23 %>% select(ScientificName2023,
+                                       ScientificName1974),
+            by = "ScientificName2023",
+            multiple = "all")
+
+# Now the ones that have NA in the dataset are ones that have not changed between 1974 and 2023. So we can just make them the same
+
+rangi_holman <- rangi_holman %>% 
+  mutate(ScientificName1974 = ifelse(
+    is.na(ScientificName1974),
+    ScientificName2023,
+    ScientificName1974),
+  )
+
+# Filter out the ones that don't have 1974 data and match them based on their Common Names
+
+rangi_leftovers <- rangi_holman %>% 
+  filter(ScientificName1974 == "" | is.na(ScientificName1974)) %>% 
+  select("Language":"Order2023") %>%
+  mutate(CommonName1974 = CommonName) %>% 
+  left_join(changes_74_23 %>% select(ScientificName1974,
+                                             CommonName1974),
+            by = ("CommonName1974"))
+
+# Bind it all back together again
+
+rangi_holman <- rangi_holman %>% 
+  filter(ScientificName1974 != "" & !is.na(ScientificName1974)) %>% 
+  rbind(rangi_leftovers %>% select(-CommonName1974))
+
+# Now filter out the ones that still don't have 1974 names and see if the 1974 names might match the original scientific names in the dataset
+
+rangi_leftovers <- rangi_holman %>% 
+  filter(ScientificName1974 == "" | is.na(ScientificName1974)) %>% 
+  select("Language":"Order2023") %>%
+  mutate(ScientificName1974 = ScientificNameOG) %>% 
+  left_join(changes_74_23 %>% select(ScientificName1974,
+                                             CommonName1974),
+            by=("ScientificName1974"))
+
+# There are a couple still missing names
+
+rangi_leftovers$ScientificName1974[
+  rangi_leftovers$ScientificName2023 == "Vidua paradisaea"] <- 
+  "Vidua paradisaea"
+
+rangi_leftovers$ScientificName1974[
+  rangi_leftovers$ScientificName2023 == "Ptyonoprogne fuligula"] <- 
+  "Ptyonoprogne fuligula"
+
+# Bind it all back together again and pull in the Family and Order data from 1974
+
+rangi_holman <- rangi_holman %>% 
+  filter(ScientificName1974 != "" & !is.na(ScientificName1974)) %>% 
+  rbind(rangi_leftovers %>% select(-CommonName1974)) %>% 
+  mutate(Genus1974 = str_extract(ScientificName1974, "\\b\\w+\\b")) %>% 
+  left_join(GenusMatch1974 %>% 
+              select(Genus1974, Family1974), 
+            by = "Genus1974") %>% 
+  left_join(orders_74 %>% select(Family1974, Order1974), 
+            by = "Family1974",
+            multiple = "all")
+
+```
+
+### V3
+
+```{r}
+
+# Add V3 names for things that have just changed their name without changing species concept
+
+rangi_holman <- rangi_holman %>% 
+  left_join(changes_V3_23 %>% select(ScientificName2023,
+                                     ScientificNameV3),
+            by = "ScientificName2023",
+            multiple = "all")
+
+# Now the ones that have NA in the dataset are ones that have not changed between V3 and 2023. So we can just make them the same
+
+rangi_holman <- rangi_holman %>% 
+  mutate(ScientificNameV3 = ifelse(
+    is.na(ScientificNameV3),
+    ScientificName2023,
+    ScientificNameV3),
+  )
+
+# Filter out the ones that don't have a V3 scientific name yet, and match them by common name
+
+rangi_leftovers <- rangi_holman %>% 
+  filter(ScientificNameV3 == "" | is.na(ScientificNameV3)) %>% 
+  select("Language":"Order1974") %>%
+  mutate(CommonNameV3 = CommonName) %>% 
+  left_join(changes_V3_23 %>% select(ScientificNameV3,
+                                     CommonNameV3),
+            by = ("CommonNameV3"))
+
+# Bind it all back together again
+
+rangi_holman <- rangi_holman %>% 
+  filter(ScientificNameV3 != "" & !is.na(ScientificNameV3)) %>% 
+  rbind(rangi_leftovers %>% select(-CommonNameV3))
+
+# Match by scientific name
+
+rangi_leftovers <- rangi_holman %>% 
+  filter(ScientificNameV3 == "" | is.na(ScientificNameV3)) %>% 
+  select("Language":"Order1974") %>%
+  mutate(ScientificNameV3 = ScientificName2023) %>% 
+  left_join(changes_V3_23 %>% select(ScientificNameV3,
+                                     CommonNameV3,
+                                     FamilyV3),
+            by = ("ScientificNameV3"))
+
+rangi_leftovers$ScientificNameV3[
+  rangi_leftovers$ScientificName2023 == "Porphyrio madagascariensis"] <- 
+  "Porphyrio porphyrio"
+
+rangi_leftovers$ScientificNameV3[
+  rangi_leftovers$ScientificName2023 == "Ardea brachyrhyncha"] <- 
+  "Mesophoyx intermedia"
+
+rangi_leftovers$ScientificNameV3[
+  rangi_leftovers$ScientificName2023 == "Anthus cinnamomeus"] <- 
+  "Anthus richardi"
+
+rangi_leftovers$ScientificNameV3[
+  rangi_leftovers$ScientificName2023 == "Crithagra atrogularis"] <- 
+  "Serinus atrogularis"
+
+# Bind it all back together 
+
+rangi_holman <- rangi_holman %>% 
+  filter(ScientificNameV3 != "" & !is.na(ScientificNameV3)) %>% 
+  rbind(rangi_leftovers %>% select(-CommonNameV3, -FamilyV3))
+
+```
+
+### Clements 2021
+
+```{r}
+
+# Add 2021 names for things that have just changed their name without changing species concept
+
+rangi_holman <- rangi_holman %>% 
+  left_join(changes_21_23 %>% select(ScientificName2023,
+                                       ScientificName2021),
+            by = "ScientificName2023",
+            multiple = "all")
+
+# Now the ones that have NA in the dataset are ones that have not changed between V3 and 2023. So we can just make them the same
+
+rangi_holman <- rangi_holman %>% 
+  mutate(ScientificName2021 = ifelse(
+    is.na(ScientificName2021),
+    ScientificName2023,
+    ScientificName2021),
+  )
+
+# Pull out the ones that have changed between 2021 and 2023 and match them based on common name
+
+rangi_leftovers <- rangi_holman %>% 
+  filter(ScientificName2021 == "" | is.na(ScientificName2021)) %>% 
+  select("Language":"ScientificNameV3") %>%
+  mutate(CommonName2021 = CommonName) %>% 
+  left_join(changes_21_23 %>% select(ScientificName2021,
+                                     CommonName2021),
+            by = ("CommonName2021"))
+
+rangi_leftovers$ScientificName2021[
+  rangi_leftovers$ScientificName2023 == "Ardea brachyrhyncha"] <- 
+  "Ardea intermedia"
+
+rangi_leftovers$ScientificName2021[
+  rangi_leftovers$ScientificName2023 == "Delichon urbicum"] <- 
+  "Delichon urbicum"
+
+rangi_leftovers$ScientificName2021[
+  rangi_leftovers$ScientificName2023 == "Bubulcus ibis"] <- 
+  "Bubulcus ibis"
+
+rangi_holman <- rangi_holman %>% 
+  filter(ScientificName2021 != "" & !is.na(ScientificName2021)) %>% 
+  rbind(rangi_leftovers %>% select(-CommonName2021))
+
+```
+
+```{r}
+
+# Make it all pretty now
+
+rangi <- rangi_holman %>% 
+  mutate(Genus2023 = str_extract(
+    ScientificName2023, 
+    "\\b\\w+\\b")) %>% 
+  select(Language,
+         CommonName,
+         IndexFG,
+         n,
+         ScientificName2023,
+         Genus2023,
+         Family2023,
+         Order2023,
+         ScientificName1974,
+         Genus1974,
+         Family1974,
+         Order1974,
+         ScientificName2021,
+         ScientificNameV3)
+
+```
+
+## Saami
+
+```{r}
+
+saami_holman <- holman_birds %>% 
+  filter(Language == "Saami")
+
+# Acceptable Duplicates:
+## "Larus argentatus"
+
+unacceptable_duplicates <- which(duplicated(saami_holman[, c("ScientificName", "IndexFG")]))
+
+saami_holman <- saami_holman %>% 
+  group_by(IndexFG) %>% 
+  mutate(n = n()) %>% 
+  ungroup()
+
+species_SD <-
+  read.csv(here("preprocessing/data/species-list_saami.csv")) %>% 
+  filter(ScientificName2023 != "") %>% 
+  distinct()
+
+```
+
+### Clements 2023 (Canonical) Names
+
+```{r}
+
+ # First I'm just going to fix the substantial number of spelling mistakes
+
+saami_holman$ScientificName[
+  saami_holman$ScientificName == "Perisoerus infaustus"] <- 
+  "Perisoreus infaustus"
+
+saami_holman$ScientificName[
+  saami_holman$ScientificName == "Turdus iliaeus"] <- 
+  "Turdus iliacus"
+
+saami_holman$ScientificName[
+  saami_holman$ScientificName == "Tringa hypoleuces"] <- 
+  "Tringa hypoleucos"
+
+saami_holman$ScientificName[
+  saami_holman$ScientificName == "Sterna paradisea"] <- 
+  "Sterna paradisaea"
+
+saami_holman$ScientificName[
+  saami_holman$ScientificName == "Phalacrocorax carba"] <- 
+  "Phalacrocorax carbo"
+
+saami_holman$ScientificName[
+  saami_holman$ScientificName == "Dendrocopus minor"] <- 
+  "Dendrocopos minor"
+
+saami_holman$ScientificName[
+  saami_holman$ScientificName == "Dendrocopus martius"] <- 
+  "Dendrocopos martius"
+
+saami_holman$ScientificName[
+  saami_holman$ScientificName == "Accipter gentilis"] <- 
+  "Accipiter gentilis"
+
+saami_holman$ScientificName[
+  saami_holman$ScientificName == "Accipter nisus"] <- 
+  "Accipiter nisus"
+
+saami_holman$ScientificName[
+  saami_holman$ScientificName == "Falco columbarias"] <- 
+  "Falco columbarius"
+
+saami_holman$ScientificName[
+  saami_holman$ScientificName == "Haliaetus albicilla"] <- 
+  "Haliaeetus albicilla"
+
+saami_holman <- saami_holman %>% 
+  left_join(clements_2023 %>% 
+              select(ScientificName2023,
+                     CommonName2023,
+                     Family2023,
+                     Order2023),
+            by = c("ScientificName" = "ScientificName2023"),
+            multiple = "all")
+
+# I'll see if any of the remaining ones are the same as in 1974
+
+saami_holman <- saami_holman %>% 
+  left_join(changes_74_23 %>% select(ScientificName1974,
+                                     ScientificName2023,
+                                     CommonName2023),
+            by = c("ScientificName" = "ScientificName1974"),
+            multiple = "all")
+
+```
+
+
+```{r}
+
+# Mash together the 2023 Scientific names
+
+saami_holman <- saami_holman %>% 
+  mutate(ScientificName2023 = ifelse((is.na(ScientificName2023) | 
+                                        ScientificName2023 == "") &
+                                       !is.na(Family2023), 
+                                     ScientificName, 
+                                     ScientificName2023)) %>% 
+  mutate(CommonName = coalesce(CommonName2023.x, 
+                               CommonName2023.y)) %>%
+  select(-CommonName2023.x, 
+         -CommonName2023.y)
+
+```
+
+```{r}
+
+# Google some birds
+
+saami_holman$ScientificName2023[
+  saami_holman$ScientificName == "Delichon urbica"] <- 
+  "Delichon urbicum"
+
+saami_holman$ScientificName2023[
+  saami_holman$ScientificName == "Cyanosylvia svecica"] <- 
+  "Luscinia svecica"
+
+saami_holman$ScientificName2023[
+  saami_holman$ScientificName == "Tringa hypoleucos"] <- 
+  "Actitis hypoleucos"
+
+saami_holman$ScientificName2023[
+  saami_holman$ScientificName == "Dendrocopus minor"] <- 
+  "Dryobates minor"
+
+saami_holman$ScientificName2023[
+  saami_holman$ScientificName == "Dendrocopos martius"] <- 
+  "Dryocopus martius"
+
+```
+
+```{r}
+
+notin <- saami_holman[!(saami_holman$ScientificName2023 %in% species_SD$ScientificName2023), ]
+
+```
+
+```{r}
+
+# Add in the family and order data
+
+saami_holman <- saami_holman %>% 
+  select(Language,
+         IndexFG,
+         n,
+         ScientificName,
+         ScientificName2023) %>% 
+  rename(ScientificNameOG = ScientificName) %>% 
+  left_join(clements_2023 %>% select(ScientificName2023,
+                                     CommonName2023,
+                                     Family2023,
+                                     Order2023),
+            by = "ScientificName2023",
+            multiple = "all") %>% 
+  rename(CommonName = CommonName2023)
+
+```
+
+### Clements 1974
+
+```{r}
+# Add 1974 names for things that have just changed their name without changing species concept
+
+saami_holman <- saami_holman %>% 
+  left_join(changes_74_23 %>% select(ScientificName2023,
+                                       ScientificName1974),
+            by = "ScientificName2023",
+            multiple = "all")
+
+# Now the ones that have NA in the dataset are ones that have not changed between 1974 and 2023. So we can just make them the same
+
+saami_holman <- saami_holman %>% 
+  mutate(ScientificName1974 = ifelse(
+    is.na(ScientificName1974),
+    ScientificName2023,
+    ScientificName1974),
+  )
+
+```
+
+
+```{r}
+
+# Filter out the ones that don't have 1974 data and match them based on their Common Names
+
+saami_leftovers <- saami_holman %>% 
+  filter(ScientificName1974 == "" | is.na(ScientificName1974)) %>% 
+  select("Language":"Order2023") %>%
+  mutate(CommonName1974 = CommonName) %>% 
+  left_join(changes_74_23 %>% select(ScientificName1974,
+                                             CommonName1974),
+            by = ("CommonName1974"))
+
+```
+
+```{r}
+
+# Bind it all back together again
+
+saami_holman <- saami_holman %>% 
+  filter(ScientificName1974 != "" & !is.na(ScientificName1974)) %>% 
+  rbind(saami_leftovers %>% select(-CommonName1974))
+
+```
+
+
+```{r}
+
+# Now filter out the ones that still don't have 1974 names and see if the 1974 names might match the original scientific names in the dataset
+
+saami_leftovers <- saami_holman %>% 
+  filter(ScientificName1974 == "" | is.na(ScientificName1974)) %>% 
+  select("Language":"Order2023") %>%
+  mutate(ScientificName1974 = ScientificNameOG) %>% 
+  left_join(changes_74_23 %>% select(ScientificName1974,
+                                             CommonName1974),
+            by = ("ScientificName1974"))
+
+```
+
+```{r}
+
+saami_holman <- saami_holman %>% 
+  filter(ScientificName1974 != "" & !is.na(ScientificName1974)) %>% 
+  rbind(saami_leftovers %>% select(-CommonName1974)) %>% 
+  mutate(Genus1974 = str_extract(ScientificName1974, "\\b\\w+\\b")) %>% 
+  left_join(GenusMatch1974 %>% 
+              select(Genus1974, Family1974), 
+            by = "Genus1974") %>% 
+  left_join(orders_74 %>% select(Family1974, Order1974), 
+            by = "Family1974",
+            multiple = "all")
+
+```
+
+### V3
+
+```{r}
+
+# Add V3 names for things that have just changed their name without changing species concept
+
+saami_holman <- saami_holman %>% 
+  left_join(changes_V3_23 %>% select(ScientificName2023,
+                                     ScientificNameV3),
+            by = "ScientificName2023",
+            multiple = "all")
+
+# Now the ones that have NA in the dataset are ones that have not changed between V3 and 2023. So we can just make them the same
+
+saami_holman <- saami_holman %>% 
+  mutate(ScientificNameV3 = ifelse(
+    is.na(ScientificNameV3),
+    ScientificName2023,
+    ScientificNameV3),
+  )
+
+# Filter out the ones that don't have a V3 scientific name yet, and match them by common name
+
+saami_leftovers <- saami_holman %>% 
+  filter(ScientificNameV3 == "" | is.na(ScientificNameV3)) %>% 
+  select("Language":"Order1974") %>%
+  mutate(CommonNameV3 = CommonName) %>% 
+  left_join(changes_V3_23 %>% select(ScientificNameV3,
+                                     CommonNameV3),
+            by = ("CommonNameV3"))
+
+# Bind it all back together again
+
+saami_holman <- saami_holman %>% 
+  filter(ScientificNameV3 != "" & !is.na(ScientificNameV3)) %>% 
+  rbind(saami_leftovers %>% select(-CommonNameV3))
+
+saami_leftovers <- saami_holman %>% 
+  filter(ScientificNameV3 == "" | is.na(ScientificNameV3)) %>% 
+  select("Language":"Order1974") %>%
+  mutate(ScientificNameV3 = ScientificName2023) %>% 
+  left_join(changes_V3_23 %>% select(ScientificNameV3,
+                                     CommonNameV3,
+                                     FamilyV3),
+            by = ("ScientificNameV3"))
+
+# Magically they are all fine. Is it a coincidence that this is the European dataset? Bind it all back together 
+
+saami_holman <- saami_holman %>% 
+  filter(ScientificNameV3 != "" & !is.na(ScientificNameV3)) %>% 
+  rbind(saami_leftovers %>% select(-CommonNameV3, -FamilyV3))
+
+```
+
+### Clements 2021
+
+```{r}
+
+# Add 2021 names for things that have just changed their name without changing species concept
+
+saami_holman <- saami_holman %>% 
+  left_join(changes_21_23 %>% select(ScientificName2023,
+                                       ScientificName2021),
+            by = "ScientificName2023",
+            multiple = "all")
+
+# Now the ones that have NA in the dataset are ones that have not changed between V3 and 2023. So we can just make them the same. And actually I just checked and the other two are the same as well.
+
+saami_holman <- saami_holman %>% 
+  mutate(ScientificName2021 = ifelse(
+    (is.na(ScientificName2021) | ScientificName2021 == ""),
+    ScientificName2023,
+    ScientificName2021),
+  )
+
+```
+
+```{r}
+
+# Make it all pretty now
+
+saami <- saami_holman %>% 
+  mutate(Genus2023 = str_extract(
+    ScientificName2023, 
+    "\\b\\w+\\b")) %>% 
+  select(Language,
+         CommonName,
+         IndexFG,
+         n,
+         ScientificName2023,
+         Genus2023,
+         Family2023,
+         Order2023,
+         ScientificName1974,
+         Genus1974,
+         Family1974,
+         Order1974,
+         ScientificName2021,
+         ScientificNameV3)
+
+```
+
+## Tobelo
+
+I think this data was collected on Halmahera Island
+
+```{r}
+
+tobelo_holman <-  holman_birds %>% 
+  filter(Language == "Tobelo")
+
+# Error in dataset: in the dataset it puts Meleagris gallopavo and Pelecanus conspicillatus in a group together, in the original data (Taylor 1990) they are not classed together (p. 120)
+tobelo_holman$IndexFG[tobelo_holman$ScientificName == "Pelecanus conspicillatus"] <- max(tobelo_holman$IndexFG) + 1
+
+# Acceptable duplicates:
+## Lorius roratus (Eclectus roratus)
+## Monarcha alecto (Myiagra alecto) x3
+## Symposiachrus trivirgatus (Monarcha trivirgatus)
+## Myiagra galeata
+## Egretta sacra
+## Zosterops atriceps
+
+# Unacceptable duplicates
+## Centropus goliath (has a subtype name when it's particularly ugly)
+## Artamus leucorhynchus (just has two separate names, both of which are only applicable to the one bird)
+## Geoffroyus geoffroyi
+## Aplonis metallica
+## Aplonis mysolensis
+## Tanysiptera galatea
+## Ptilinopus superbus - actually just needs to be renamed because of an error
+## Dicrurus hottentottus - doesn't show up
+
+change <- duplicated(tobelo_holman$ScientificName) & tobelo_holman$ScientificName == "Ptilinopus superbus"
+tobelo_holman$ScientificName[change] <- "Ptilinopus granulifrons"
+
+unacceptable_duplicates <- c(which(
+  duplicated(
+    tobelo_holman[,c("ScientificName", "IndexFG")])),
+  which(tobelo_holman$ScientificName == "Dicrurus hottentottus")[1],
+  which(tobelo_holman$ScientificName == "Artamus leucorhynchus")[1])
+
+
+tobelo_holman <- tobelo_holman[-unacceptable_duplicates,] %>% 
+  group_by(IndexFG) %>% 
+  mutate(n = n()) %>% 
+  ungroup()
+
+species_MI <-
+  read.csv(here("preprocessing/data/species-list_tobelo.csv")) %>% 
+  filter(ScientificName2023 != "") %>% 
+  distinct()
+
+```
+
+### Clements 2023 (Canonical) Names
+
+```{r}
+
+# Addressing Spelling Mistakes 
+
+tobelo_holman$ScientificName[
+  tobelo_holman$ScientificName == "Columba vittiensis"] <- 
+  "Columba vitiensis"
+
+tobelo_holman$ScientificName[
+  tobelo_holman$ScientificName == "Artamus leucorhynchus"] <- 
+  "Artamus leucorynchus"
+
+tobelo_holman$ScientificName[
+  tobelo_holman$ScientificName == "Reinwardtoena reinwardtii"] <- 
+  "Reinwardtoena reinwardti"
+
+tobelo_holman$ScientificName[
+  tobelo_holman$ScientificName == "Eudynamis scolopacea"] <- 
+  "Eudynamys scolopacea"
+
+tobelo_holman$ScientificName[
+  tobelo_holman$ScientificName == "Ptilinopus hyogaster"] <- 
+  "Ptilinopus hyogastrus"
+
+tobelo_holman$ScientificName[
+  tobelo_holman$ScientificName == "Alisterus amboinensus"] <- 
+  "Alisterus amboinensis"
+
+tobelo_holman$ScientificName[
+  tobelo_holman$ScientificName == "Semeioptera wallacii"] <- 
+  "Semioptera wallacii"
+
+# Figure out which ones are the same as 2023
+
+tobelo_holman <- tobelo_holman %>% 
+  left_join(clements_2023 %>% 
+              select(ScientificName2023,
+                     CommonName2023,
+                     Family2023,
+                     Order2023),
+            by = c("ScientificName" = "ScientificName2023"),
+            multiple = "all")
+
+# I'll see if any of the remaining ones are the same as in 1974
+
+tobelo_holman <- tobelo_holman %>% 
+  left_join(changes_74_23 %>% select(ScientificName1974,
+                                     ScientificName2023,
+                                     CommonName2023),
+            by = c("ScientificName" = "ScientificName1974"),
+            multiple = "all")
+
+# Mash together the 2023 Scientific names
+
+tobelo_holman <- tobelo_holman %>% 
+  mutate(ScientificName2023 = ifelse((is.na(ScientificName2023) | 
+                                        ScientificName2023 == "") &
+                                       !is.na(Family2023), 
+                                     ScientificName, 
+                                     ScientificName2023)) %>% 
+  mutate(CommonName = coalesce(CommonName2023.x, 
+                               CommonName2023.y)) %>%
+  select(-CommonName2023.x, 
+         -CommonName2023.y)
+
+tobelo_holman$ScientificName2023[
+  tobelo_holman$ScientificName == "Monarcha trivirgatus"] <- 
+  "Symposiachrus trivirgatus"
+
+tobelo_holman$ScientificName2023[
+  tobelo_holman$ScientificName == "Nectarinia jugularis"] <- 
+  "Cinnyris clementiae"
+
+tobelo_holman$ScientificName2023[
+  tobelo_holman$ScientificName == "Pitta erythrogaster"] <- 
+  "Erythropitta rufiventris"
+
+tobelo_holman$ScientificName2023[
+  tobelo_holman$ScientificName == "Monarcha trivirgatus"] <- 
+  "Symposiachrus trivirgatus"
+
+tobelo_holman$ScientificName2023[
+  tobelo_holman$ScientificName == "Aceros plicatus"] <- 
+  "Rhyticeros plicatus"
+
+tobelo_holman$ScientificName2023[
+  tobelo_holman$ScientificName == "Locustella fasciolata"] <- 
+  "Helopsaltes fasciolatus"
+
+tobelo_holman$ScientificName2023[
+  tobelo_holman$ScientificName == "Rallus philippensis"] <- 
+  "Gallirallus philippensis"
+
+tobelo_holman$ScientificName2023[
+  tobelo_holman$ScientificName == "Collocalia vanikorensis"] <- 
+  "Aerodramus vanikorensis"
+
+tobelo_holman$ScientificName2023[
+  tobelo_holman$ScientificName == "Piezorhynchus alecto"] <- 
+  "Myiagra alecto"
+
+tobelo_holman$ScientificName2023[
+  tobelo_holman$ScientificName == "Nectarinia sericea"] <- 
+  "Leptocoma aspasia"
+
+tobelo_holman$ScientificName2023[
+  tobelo_holman$ScientificName == "Lorius roratus"] <- 
+  "Eclectus roratus"
+
+tobelo_holman$ScientificName2023[
+  tobelo_holman$ScientificName == "Monarcha pileatus"] <- 
+  "Carterornis pileatus"
+
+tobelo_holman$ScientificName2023[
+  tobelo_holman$ScientificName == "Megapodius wallacei"] <- 
+  "Eulipoa wallacei"
+
+tobelo_holman$ScientificName2023[
+  tobelo_holman$ScientificName == "Habroptila wallacii"] <- 
+  "Gallirallus wallacii"
+
+tobelo_holman$ScientificName2023[
+  tobelo_holman$ScientificName == "Accipiter griseogularis"] <- 
+  "Accipiter hiogaster"
+
+tobelo_holman$ScientificName2023[
+  tobelo_holman$ScientificName == "Haliaetus leucogaster"] <- 
+  "Icthyophaga leucogaster"
+
+tobelo_holman$ScientificName2023[
+  tobelo_holman$ScientificName == "Haliaetus leucogaster"] <- 
+  "Icthyophaga leucogaster"
+
+tobelo_holman$ScientificName2023[
+  tobelo_holman$ScientificName == "Eudynamys scolopacea"] <- 
+  "Eudynamys scolopaceus"
+
+notin <- tobelo_holman[!(tobelo_holman$ScientificName2023 %in% species_MI$ScientificName2023), ]
+
+```
+
+Meleagris gallopavo - it's a wild turkey, it's probably there
+Same with Gallus gallus - just a normal chicken
+
+```{r}
+
+tobelo_holman$ScientificName2023[
+  tobelo_holman$ScientificName == "Pachycephala pectoralis"] <- 
+  "Pachycephala mentalis"
+
+tobelo_holman$ScientificName2023[
+  tobelo_holman$ScientificName == "Amaurornis olivacea"] <- 
+  "Amaurornis moluccana"
+
+tobelo_holman$ScientificName2023[
+  tobelo_holman$ScientificName == "Amaurornis olivacea"] <- 
+  "Amaurornis moluccana"
+
+# Add in the family and order data
+
+tobelo_holman <- tobelo_holman %>% 
+  select(Language,
+         IndexFG,
+         n,
+         ScientificName,
+         ScientificName2023) %>% 
+  rename(ScientificNameOG = ScientificName) %>% 
+  left_join(clements_2023 %>% select(ScientificName2023,
+                                     CommonName2023,
+                                     Family2023,
+                                     Order2023),
+            by = "ScientificName2023",
+            multiple = "all") %>% 
+  rename(CommonName = CommonName2023)
+
+```
+
+### Clements 1974
+
+```{r}
+
+# Add 1974 names for things that have just changed their name without changing species concept
+
+tobelo_holman <- tobelo_holman %>% 
+  left_join(changes_74_23 %>% select(ScientificName2023,
+                                       ScientificName1974),
+            by = "ScientificName2023",
+            multiple = "all")
+
+```
+
+```{r}
+
+# Now the ones that have NA in the dataset are ones that have not changed between 1974 and 2023. So we can just make them the same
+
+tobelo_holman <- tobelo_holman %>% 
+  mutate(ScientificName1974 = ifelse(
+    is.na(ScientificName1974),
+    ScientificName2023,
+    ScientificName1974),
+  )
+
+```
+
+```{r}
+
+# Filter out the ones that don't have 1974 data and match them based on their Common Names
+
+tobelo_leftovers <- tobelo_holman %>% 
+  filter(ScientificName1974 == "" | is.na(ScientificName1974)) %>% 
+  select("Language":"Order2023") %>%
+  mutate(CommonName1974 = CommonName) %>% 
+  left_join(changes_74_23 %>% select(ScientificName1974,
+                                             CommonName1974),
+            by = ("CommonName1974"))
+
+```
+
+```{r}
+
+# Bind it all back together again
+
+tobelo_holman <- tobelo_holman %>% 
+  filter(ScientificName1974 != "" & !is.na(ScientificName1974)) %>% 
+  rbind(tobelo_leftovers %>% select(-CommonName1974))
+
+```
+
+```{r}
+
+# Now filter out the ones that still don't have 1974 names and see if the 1974 names might match the original scientific names in the dataset
+
+tobelo_leftovers <- tobelo_holman %>% 
+  filter(ScientificName1974 == "" | is.na(ScientificName1974)) %>% 
+  select("Language":"Order2023") %>%
+  mutate(ScientificName1974 = ScientificNameOG) %>% 
+  left_join(changes_74_23 %>% select(ScientificName1974,
+                                             CommonName1974),
+            by = ("ScientificName1974"))
+
+```
+
+```{r}
+
+tobelo_leftovers$ScientificName1974[
+  tobelo_leftovers$ScientificName2023 == "Eurystomus azureus"] <- 
+  "Eurystomus orientalis"
+
+tobelo_leftovers$ScientificName1974[
+  tobelo_leftovers$ScientificName2023 == "Centropus bengalensis"] <-   
+  "Centropus toulou"
+
+tobelo_leftovers$ScientificName1974[
+  tobelo_leftovers$ScientificName2023 == "Otus magicus"] <- 
+  "Otus manadensis"
+
+tobelo_leftovers$ScientificName1974[
+  tobelo_leftovers$ScientificName2023 == "Ducula basilica"] <- 
+  "Ducula rufigaster"
+
+tobelo_leftovers$ScientificName1974[
+  tobelo_leftovers$ScientificName2023 == "Accipiter hiogaster"] <- 
+  "Accipiter novaehollandiae"
+
+tobelo_leftovers$ScientificName1974[
+  tobelo_leftovers$ScientificName2023 == "Accipiter hiogaster"] <- 
+  "Accipiter novaehollandiae"
+
+tobelo_leftovers$ScientificName1974[
+  tobelo_leftovers$ScientificName2023 == "Pitta maxima"] <- 
+  "Pitta sordida"
+
+```
+
+Good:
+Aerodramus vanikorensis
+Myiagra galeata
+Eclectus roratus
+
+Dunno:
+Pitta maxima
+Lonchura molucca
+
+```{r}
+
+tobelo_holman <- tobelo_holman %>% 
+  filter(ScientificName1974 != "" & !is.na(ScientificName1974)) %>% 
+  rbind(tobelo_leftovers %>% select(-CommonName1974)) %>% 
+  mutate(Genus1974 = str_extract(ScientificName1974, "\\b\\w+\\b")) %>% 
+  left_join(GenusMatch1974 %>% 
+              select(Genus1974, Family1974), 
+            by = "Genus1974") %>% 
+  left_join(orders_74 %>% select(Family1974, Order1974), 
+            by = "Family1974",
+            multiple = "all")
+
+```
+
+### V3
+
+```{r}
+
+# Add V3 names for things that have just changed their name without changing species concept
+
+tobelo_holman <- tobelo_holman %>% 
+  left_join(changes_V3_23 %>% select(ScientificName2023,
+                                     ScientificNameV3),
+            by = "ScientificName2023",
+            multiple = "all")
+
+# Now the ones that have NA in the dataset are ones that have not changed between V3 and 2023. So we can just make them the same
+
+tobelo_holman <- tobelo_holman %>% 
+  mutate(ScientificNameV3 = ifelse(
+    is.na(ScientificNameV3),
+    ScientificName2023,
+    ScientificNameV3),
+  )
+
+# Filter out the ones that don't have a V3 scientific name yet, and match them by common name
+
+tobelo_leftovers <- tobelo_holman %>% 
+  filter(ScientificNameV3 == "" | is.na(ScientificNameV3)) %>% 
+  select("Language":"Order1974") %>%
+  mutate(CommonNameV3 = CommonName) %>% 
+  left_join(changes_V3_23 %>% select(ScientificNameV3,
+                                     CommonNameV3),
+            by = ("CommonNameV3"))
+
+# Bind it all back together again
+
+tobelo_holman <- tobelo_holman %>% 
+  filter(ScientificNameV3 != "" & !is.na(ScientificNameV3)) %>% 
+  rbind(tobelo_leftovers %>% select(-CommonNameV3))
+
+tobelo_leftovers <- tobelo_holman %>% 
+  filter(ScientificNameV3 == "" | is.na(ScientificNameV3)) %>% 
+  select("Language":"Order1974") %>%
+  mutate(ScientificNameV3 = ScientificName2023) %>% 
+  left_join(changes_V3_23 %>% select(ScientificNameV3,
+                                     CommonNameV3,
+                                     FamilyV3),
+            by = ("ScientificNameV3"))
+
+tobelo_leftovers$ScientificNameV3[
+  tobelo_leftovers$ScientificName2023 == "Cinnyris clementiae"] <- 
+  "Nectarinia jugularis"
+
+tobelo_leftovers$ScientificNameV3[
+  tobelo_leftovers$ScientificName2023 == "Erythropitta rufiventris"] <- 
+  "Pitta erythrogaster"
+
+tobelo_leftovers$ScientificNameV3[
+  tobelo_leftovers$ScientificName2023 == "Hypsipetes affinis"] <- 
+  "Alophoixus affinis"
+
+tobelo_leftovers$ScientificNameV3[
+  tobelo_leftovers$ScientificName2023 == "Accipiter hiogaster"] <- 
+  "Accipiter novaehollandiae"
+
+tobelo_leftovers$ScientificNameV3[
+  tobelo_leftovers$ScientificName2023 == "Pachycephala mentalis"] <- 
+  "Pachycephala pectoralis"
+
+tobelo_leftovers$ScientificNameV3[
+  tobelo_leftovers$ScientificName2023 == "Helopsaltes fasciolatus"] <- 
+  "Locustella fasciolata"
+
+# Bind it all back together 
+
+tobelo_holman <- tobelo_holman %>% 
+  filter(ScientificNameV3 != "" & !is.na(ScientificNameV3)) %>% 
+  rbind(tobelo_leftovers %>% select(-CommonNameV3, -FamilyV3))
+
+```
+
+### Clements 2021
+
+```{r}
+
+# Add 2021 names for things that have just changed their name without changing species concept
+
+tobelo_holman <- tobelo_holman %>% 
+  left_join(changes_21_23 %>% select(ScientificName2023,
+                                       ScientificName2021),
+            by = "ScientificName2023",
+            multiple = "all")
+
+# Now the ones that have NA in the dataset are ones that have not changed between V3 and 2023. So we can just make them the same. And besides this one guy who needs changing, all of the blank ones can change too. 
+
+tobelo_holman$ScientificName2021[
+  tobelo_holman$ScientificName2023 == "Cinnyris clementiae"] <- 
+    "Cinnyris jugularis"
+
+
+tobelo_holman <- tobelo_holman %>% 
+  mutate(ScientificName2021 = ifelse(
+    (is.na(ScientificName2021) | ScientificName2021 == ""),
+    ScientificName2023,
+    ScientificName2021),
+  )
+
+```
+
+```{r}
+
+# Make it all pretty now
+
+tobelo <- tobelo_holman %>% 
+  mutate(Genus2023 = str_extract(
+    ScientificName2023, 
+    "\\b\\w+\\b")) %>% 
+  select(Language,
+         CommonName,
+         IndexFG,
+         n,
+         ScientificName2023,
+         Genus2023,
+         Family2023,
+         Order2023,
+         ScientificName1974,
+         Genus1974,
+         Family1974,
+         Order1974,
+         ScientificName2021,
+         ScientificNameV3)
+
+```
+
+## Tzeltal
+
+```{r}
+
+tzeltal_holman <-  holman_birds %>% 
+  filter(Language == "Tzeltal") %>% 
+  distinct() %>% 
+  group_by(IndexFG) %>% 
+  mutate(n = n()) %>% 
+  ungroup()
+
+# Acceptable duplicates:
+## Aratinga canicularis
+
+unacceptable_duplicates <- which(duplicated(tzeltal_holman[,c("ScientificName", "IndexFG")]))
+
+species_CS <-
+  read.csv(here("preprocessing/data/species-list_tzeltal.csv")) %>% 
+  filter(ScientificName2023 != "") %>% 
+  distinct()
+
+```
+
+### Clements 2023 (Canonical) Names
+
+```{r}
+
+tzeltal_holman <- tzeltal_holman %>% 
+  left_join(clements_2023 %>% 
+              select(ScientificName2023,
+                     CommonName2023,
+                     Family2023,
+                     Order2023),
+            by = c("ScientificName" = "ScientificName2023"),
+            multiple = "all")
+
+tzeltal_holman <- tzeltal_holman %>% 
+  left_join(changes_74_23 %>% select(ScientificName1974,
+                                     ScientificName2023,
+                                     CommonName2023),
+            by = c("ScientificName" = "ScientificName1974"),
+            multiple = "all")
+
+tzeltal_holman <- tzeltal_holman %>% 
+  mutate(ScientificName2023 = ifelse((is.na(ScientificName2023) | 
+                                        ScientificName2023 == "") &
+                                       !is.na(Family2023), 
+                                     ScientificName, 
+                                     ScientificName2023)) %>% 
+  mutate(CommonName = coalesce(CommonName2023.x, 
+                               CommonName2023.y)) %>%
+  select(-CommonName2023.x, 
+         -CommonName2023.y)
+
+tzeltal_holman$ScientificName2023[
+  tzeltal_holman$ScientificName == "Accipiter chionogaster"] <- 
+  "Accipiter striatus"
+
+tzeltal_holman$ScientificName2023[
+  tzeltal_holman$ScientificName == "Columba fasciata"] <- 
+  "Patagioenas fasciata"
+
+tzeltal_holman$ScientificName2023[
+  tzeltal_holman$ScientificName == "Otus guatemalae"] <- 
+  "Megascops guatemalae"
+
+tzeltal_holman$ScientificName2023[
+  tzeltal_holman$ScientificName == "Caprimulgus vociferus"] <- 
+  "Antrostomus vociferus"
+
+tzeltal_holman$ScientificName2023[
+  tzeltal_holman$ScientificName == "Aratinga holochlora"] <- 
+  "Psittacara holochlorus"
+
+tzeltal_holman$ScientificName2023[
+  tzeltal_holman$ScientificName == "Centurus aurifrons"] <- 
+  "Melanerpes aurifrons"
+
+tzeltal_holman$ScientificName2023[
+  tzeltal_holman$ScientificName == "Thryothorus modestus"] <- 
+  "Cantorchilus modestus"
+
+tzeltal_holman$ScientificName2023[
+  tzeltal_holman$ScientificName == "Troglodytes musculus"] <- 
+  "Troglodytes aedon"
+
+tzeltal_holman$ScientificName2023[
+  tzeltal_holman$ScientificName == "Dendroica petechia"] <- 
+  "Setophaga petechia"
+
+tzeltal_holman$ScientificName2023[
+  tzeltal_holman$ScientificName == "Melozone biarcuatum"] <- 
+  "Melozone biarcuata"
+
+tzeltal_holman$ScientificName2023[
+  tzeltal_holman$ScientificName == "Chlorospingus ophthalmicus"] <- 
+  "Chlorospingus flavopectus"
+
+tzeltal_holman$ScientificName2023[
+  tzeltal_holman$ScientificName == "Icterus sclateri"] <- 
+  "Icterus pustulatus"
+
+tzeltal_holman$ScientificName2023[
+  tzeltal_holman$ScientificName == "Egretta alba"] <- 
+  "Ardea alba"
+
+tzeltal_holman$ScientificName2023[
+  tzeltal_holman$ScientificName == "Aulacorynchus prasinus"] <- 
+  "Aulacorhynchus prasinus"
+
+tzeltal_holman$ScientificName2023[
+  tzeltal_holman$ScientificName == "Piculus rubiginosus"] <- 
+  "Colaptes rubiginosus"
+
+tzeltal_holman$ScientificName2023[
+  tzeltal_holman$ScientificName == "Myiozetes similis"] <- 
+  "Myiozetetes similis"
+
+tzeltal_holman$ScientificName2023[
+  tzeltal_holman$ScientificName == "Vermivora superciliosa"] <- 
+  "Oreothlypis superciliosa"
+
+tzeltal_holman$ScientificName2023[
+  tzeltal_holman$ScientificName == "Myioborus picta"] <- 
+  "Myioborus pictus"
+
+tzeltal_holman$ScientificName2023[
+  tzeltal_holman$ScientificName == "Zarhynchus wagleri"] <- 
+  "Psarocolius wagleri"
+
+```
+
+```{r}
+
+notin <- tzeltal_holman[!(tzeltal_holman$ScientificName2023 %in% species_CS$ScientificName2023), ]
+
+```
+
+- Can't really figure out why the Anas platyrhynchos is in there. There are a couple of Anas that aren't but none of them have ever been conspecific with this guy.
+- Meleagris gallopavo is a wild turkey, they're just kind of everywhere
+- Gallus gallus is in there three times, I'll have to check that.
+- Turdus migratorius doesn't appear here, there's an endemic bird that's pretty similar and I think maybe the researchers got them confused at the time
+
+Birds that have been reclassified: 
+- Stelgidopteryx ruficollis
+- Amazona ochrocephala
+- Trogon violaceus
+- Momotus momota
+- Certhia familiaris
+- Contopus cinereus
+- Pipilo erythrophthalmus
+- Saltator coerulescens
+ 
+```{r}
+
+tzeltal_holman$ScientificName2023[
+  tzeltal_holman$ScientificName == "Stelgidopteryx ruficollis"] <- 
+  "Stelgidopteryx serripennis"
+
+tzeltal_holman$ScientificName2023[
+  tzeltal_holman$ScientificName == "Amazona ochrocephala"] <- 
+  "Amazona auropalliata"
+
+tzeltal_holman$ScientificName2023[
+  tzeltal_holman$ScientificName == "Trogon violaceus"] <- 
+  "Trogon caligatus"
+
+tzeltal_holman$ScientificName2023[
+  tzeltal_holman$ScientificName == "Momotus momota"] <- 
+  "Momotus coeruliceps"
+
+tzeltal_holman$ScientificName2023[
+  tzeltal_holman$ScientificName == "Certhia familiaris"] <- 
+  "Certhia americana"
+
+tzeltal_holman$ScientificName2023[
+  tzeltal_holman$ScientificName == "Contopus cinereus"] <- 
+  "Contopus bogotensis"
+
+tzeltal_holman$ScientificName2023[
+  tzeltal_holman$ScientificName == "Turdus migratorius"] <- 
+  "Turdus rufopalliatus"
+
+tzeltal_holman$ScientificName2023[
+  tzeltal_holman$ScientificName == "Pipilo erythrophthalmus"] <- 
+  "Pipilo maculatus"
+
+tzeltal_holman$ScientificName2023[
+  tzeltal_holman$ScientificName == "Saltator coerulescens"] <- 
+  "Saltator grandis"
+
+```
+
+```{r}
+
+# Add in the family and order data
+
+tzeltal_holman <- tzeltal_holman %>% 
+  select(Language,
+         IndexFG,
+         n,
+         ScientificName,
+         ScientificName2023) %>% 
+  rename(ScientificNameOG = ScientificName) %>% 
+  left_join(clements_2023 %>% select(ScientificName2023,
+                                     CommonName2023,
+                                     Family2023,
+                                     Order2023),
+            by = "ScientificName2023",
+            multiple = "all") %>% 
+  rename(CommonName = CommonName2023)
+
+```
+
+### Clements 1974
+
+```{r}
+# Add 1974 names for things that have just changed their name without changing species concept
+
+tzeltal_holman <- tzeltal_holman %>% 
+  left_join(changes_74_23 %>% select(ScientificName2023,
+                                       ScientificName1974),
+            by = "ScientificName2023",
+            multiple = "all")
+
+# Now the ones that have NA in the dataset are ones that have not changed between 1974 and 2023. So we can just make them the same
+
+tzeltal_holman <- tzeltal_holman %>% 
+  mutate(ScientificName1974 = ifelse(
+    is.na(ScientificName1974),
+    ScientificName2023,
+    ScientificName1974),
+  )
+
+# Filter out the ones that don't have 1974 data and match them based on their Common Names
+
+tzeltal_leftovers <- tzeltal_holman %>% 
+  filter(ScientificName1974 == "" | is.na(ScientificName1974)) %>% 
+  select("Language":"Order2023") %>%
+  mutate(CommonName1974 = CommonName) %>% 
+  left_join(changes_74_23 %>% select(ScientificName1974,
+                                             CommonName1974),
+            by = ("CommonName1974"))
+
+# Bind it all back together again
+
+tzeltal_holman <- tzeltal_holman %>% 
+  filter(ScientificName1974 != "" & !is.na(ScientificName1974)) %>% 
+  rbind(tzeltal_leftovers %>% select(-CommonName1974))
+
+# Now filter out the ones that still don't have 1974 names and see if the 1974 names might match the original scientific names in the dataset
+
+tzeltal_leftovers <- tzeltal_holman %>% 
+  filter(ScientificName1974 == "" | is.na(ScientificName1974)) %>% 
+  select("Language":"Order2023") %>%
+  mutate(ScientificName1974 = ScientificNameOG) %>% 
+  left_join(changes_74_23 %>% select(ScientificName1974,
+                                             CommonName1974),
+            by = ("ScientificName1974"))
+
+tzeltal_leftovers$ScientificName1974[
+  tzeltal_leftovers$ScientificName2023 == "Strix fulvescens"] <- 
+  "Strix varia"
+
+tzeltal_leftovers$ScientificName1974[
+  tzeltal_leftovers$ScientificName2023 == "Aulacorhynchus prasinus"] <- 
+  "Aulacorhynchus prasinus"
+
+tzeltal_leftovers$ScientificName1974[
+  tzeltal_leftovers$ScientificName2023 == "Icterus galbula"] <- 
+  "Icterus bullockii"
+
+tzeltal_holman <- tzeltal_holman %>% 
+  filter(ScientificName1974 != "" & !is.na(ScientificName1974)) %>% 
+  rbind(tzeltal_leftovers %>% select(-CommonName1974)) %>% 
+  mutate(Genus1974 = str_extract(ScientificName1974, "\\b\\w+\\b")) %>% 
+  left_join(GenusMatch1974 %>% 
+              select(Genus1974, Family1974), 
+            by = "Genus1974") %>% 
+  left_join(orders_74 %>% select(Family1974, Order1974), 
+            by = "Family1974",
+            multiple = "all")
+
+```
+
+### V3
+
+```{r}
+
+# Add V3 names for things that have just changed their name without changing species concept
+
+tzeltal_holman <- tzeltal_holman %>% 
+  left_join(changes_V3_23 %>% select(ScientificName2023,
+                                     ScientificNameV3),
+            by = "ScientificName2023",
+            multiple = "all")
+
+# Now the ones that have NA in the dataset are ones that have not changed between V3 and 2023. So we can just make them the same
+
+tzeltal_holman <- tzeltal_holman %>% 
+  mutate(ScientificNameV3 = ifelse(
+    is.na(ScientificNameV3),
+    ScientificName2023,
+    ScientificNameV3),
+  )
+
+# Filter out the ones that don't have a V3 scientific name yet, and match them by common name
+
+tzeltal_leftovers <- tzeltal_holman %>% 
+  filter(ScientificNameV3 == "" | is.na(ScientificNameV3)) %>% 
+  select("Language":"Order1974") %>%
+  mutate(CommonNameV3 = CommonName) %>% 
+  left_join(changes_V3_23 %>% select(ScientificNameV3,
+                                     CommonNameV3),
+            by = ("CommonNameV3"))
+
+# Bind it all back together again
+
+tzeltal_holman <- tzeltal_holman %>% 
+  filter(ScientificNameV3 != "" & !is.na(ScientificNameV3)) %>% 
+  rbind(tzeltal_leftovers %>% select(-CommonNameV3))
+
+tzeltal_leftovers <- tzeltal_holman %>% 
+  filter(ScientificNameV3 == "" | is.na(ScientificNameV3)) %>% 
+  select("Language":"Order1974") %>%
+  mutate(ScientificNameV3 = ScientificName2023) %>% 
+  left_join(changes_V3_23 %>% select(ScientificNameV3,
+                                     CommonNameV3,
+                                     FamilyV3),
+            by = ("ScientificNameV3"))
+
+tzeltal_leftovers$ScientificNameV3[
+  tzeltal_leftovers$ScientificName2023 == "Antrostomus vociferus"] <- 
+  "Caprimulgus vociferus"
+
+tzeltal_leftovers$ScientificNameV3[
+  tzeltal_leftovers$ScientificName2023 == "Momotus coeruliceps"] <- 
+  "Momotus momota"
+
+tzeltal_leftovers$ScientificNameV3[
+  tzeltal_leftovers$ScientificName2023 == "Contopus bogotensis"] <- 
+  "Contopus cinereus"
+
+tzeltal_leftovers$ScientificNameV3[
+  tzeltal_leftovers$ScientificName2023 == "Cantorchilus modestus"] <- 
+  "Thryothorus modestus"
+
+tzeltal_leftovers$ScientificNameV3[
+  tzeltal_leftovers$ScientificName2023 == "Chlorospingus flavopectus"] <- 
+  "Chlorospingus ophthalmicus"
+
+tzeltal_leftovers$ScientificNameV3[
+  tzeltal_leftovers$ScientificName2023 == "Saltator grandis"] <- 
+  "Saltator coerulescens"
+
+# Bind it all back together 
+
+tzeltal_holman <- tzeltal_holman %>% 
+  filter(ScientificNameV3 != "" & !is.na(ScientificNameV3)) %>% 
+  rbind(tzeltal_leftovers %>% select(-CommonNameV3, -FamilyV3))
+```
+
+### Clements 2021
+
+```{r}
+# Add 2021 names for things that have just changed their name without changing species concept
+
+tzeltal_holman <- tzeltal_holman %>% 
+  left_join(changes_21_23 %>% select(ScientificName2023,
+                                       ScientificName2021),
+            by = "ScientificName2023",
+            multiple = "all")
+
+# Bubo virginianus is fine
+# Sturnella magna is fine
+# Chlorospingus flavopectus is fine
+
+tzeltal_holman$ScientificName2021[
+  tzeltal_holman$ScientificName2023 == "Contopus bogotensis"] <-
+  "Contopus cinereus"
+
+# Now the ones that have NA or are blank in the dataset are ones that have not changed between V3 and 2023. So we can just make them the same. 
+
+tzeltal_holman <- tzeltal_holman %>% 
+  mutate(ScientificName2021 = ifelse(
+    (is.na(ScientificName2021) | ScientificName2021 == ""),
+    ScientificName2023,
+    ScientificName2021),
+  )
+```
+
+```{r}
+
+# Make it all pretty now
+
+tzeltal <- tzeltal_holman %>% 
+  mutate(Genus2023 = str_extract(
+    ScientificName2023, 
+    "\\b\\w+\\b")) %>% 
+  select(Language,
+         CommonName,
+         IndexFG,
+         n,
+         ScientificName2023,
+         Genus2023,
+         Family2023,
+         Order2023,
+         ScientificName1974,
+         Genus1974,
+         Family1974,
+         Order1974,
+         ScientificName2021,
+         ScientificNameV3)
+
+```
+
+## Tlingit
+
+```{r}
+
+tlingit_zoe <- tlingit_zoe %>% 
+  mutate(Language = "Tlingit") %>%
+  rename(CommonName = CommonName2023) %>% 
+  mutate(Genus1974 = str_extract(ScientificName1974, "\\b\\w+\\b")) %>% 
+  filter(!is.na(FolkGeneric)) %>%
+  filter(!is.na(ScientificName2023)) %>% 
+  distinct(ScientificName2023, .keep_all = TRUE) %>% 
+  mutate(FolkGeneric = gsub("\\d+","",FolkGeneric)) %>% 
+  mutate(IndexFG = as.integer(factor(FolkGeneric, 
+                                     levels = unique(FolkGeneric)))) %>% 
+  group_by(IndexFG) %>% 
+  mutate(n = n()) %>% 
+  ungroup()
+  
+species_AK <- read.csv(here("preprocessing/data/species-list_tlingit.csv")) %>% distinct(ScientificName2023, .keep_all=TRUE)
+
+```
+
+```{r}
+
+diff <- setdiff(tlingit_zoe$ScientificName2023,species_AK$ScientificName2023)
+
+# Turkey is fine, they're everywhere
+
+```
+
+This dataset already has the current 2023 names, the 1974 taxonomic information and the V3 names because I preprocessed it for something else. Just needs Clements 2021. And also one V3 name that I missed the first time I preprocessed it.
+
+### Clements 2021
+
+```{r}
+
+# Add 2021 names for things that have just changed their name without changing species concept
+
+tlingit_zoe <- tlingit_zoe %>% 
+  left_join(changes_21_23 %>% select(ScientificName2023,
+                                       ScientificName2021),
+            by = "ScientificName2023",
+            multiple = "all")
+
+tlingit_zoe$ScientificName2021[
+  tlingit_zoe$ScientificName2023 == "Accipiter atricapillus"] <- 
+  "Accipiter gentilis"
+
+# There's an owl too but it's fine, I checked.
+
+tlingit_zoe <- tlingit_zoe %>% 
+  mutate(ScientificName2021 = ifelse(is.na(ScientificName2021) | ScientificName2021 == "",
+                                     ScientificName2023, 
+                                     ScientificName2021))
+
+```
+
+```{r}
+
+tlingit_zoe$ScientificNameV3[tlingit_zoe$ScientificName2023 == "Pica hudsonia"] <- "Pica hudsonia"
+
+```
+
+```{r}
+
+# Make it all pretty now
+
+tlingit <- tlingit_zoe %>% 
+  mutate(Genus2023 = str_extract(
+    ScientificName2023, 
+    "\\b\\w+\\b")) %>% 
+  select(Language,
+         CommonName,
+         IndexFG,
+         n,
+         ScientificName2023,
+         Genus2023,
+         Family2023,
+         Order2023,
+         ScientificName1974,
+         Genus1974,
+         Family1974,
+         Order1974,
+         ScientificName2021,
+         ScientificNameV3)
+
+```
+
+## Zapotec
+
+```{r}
+
+zapotec_zoe <- zapotec_zoe %>% 
+  mutate(Language = "Zapotec") %>%
+  rename(CommonName = CommonName2023) %>% 
+  mutate(Genus1974 = str_extract(ScientificName1974, "\\b\\w+\\b")) %>% 
+  filter(!is.na(FolkGeneric)) %>%
+  filter(!is.na(ScientificName2023)) %>% 
+  distinct(ScientificName2023, .keep_all = TRUE) %>% 
+  mutate(FolkGeneric = gsub("\\d+","",FolkGeneric)) %>% 
+  mutate(IndexFG = as.integer(factor(FolkGeneric, 
+                                     levels = unique(FolkGeneric)))) %>% 
+  group_by(IndexFG) %>% 
+  mutate(n = n()) %>% 
+  ungroup()
+  
+species_OA <- read.csv(here("preprocessing/data/species-list_zapotec.csv")) %>% distinct(ScientificName2023, .keep_all=TRUE)
+
+```
+
+```{r}
+diff <- setdiff(zapotec_zoe$ScientificName2023,species_OA$ScientificName2023)
+print(diff)
+
+# Anser anser seems to be there sometimes maybe?
+# Anas platyrhynchos turns up there sometimes
+# Anser cygnoides same
+# Meleagris gallopavo is that same turkey that's just turning up everywhere
+# Gallus gallus is the chicken that is also everywhere.
+
+zapotec_zoe$ScientificName2023[zapotec_zoe$ScientificName2023 == "Ciccaba virgata"] <- 
+  "Strix virgata"
+
+```
+
+Like the Tlingit dataset, I have already preprocessed this one a bunch for a different project, so I'll skip V3 and Clements 1974 and just add in Clements 2021
+
+### Clements 2021
+
+```{r}
+# Add 2021 names for things that have just changed their name without changing species concept
+
+zapotec_zoe <- zapotec_zoe %>%
+  left_join(changes_21_23 %>% select(ScientificName2023,
+                                       ScientificName2021),
+            by = "ScientificName2023",
+            multiple = "all")
+
+# Manually checked and everything is fine
+
+zapotec_zoe <- zapotec_zoe %>%
+  mutate(ScientificName2021 = ifelse(is.na(ScientificName2021) | ScientificName2021 == "",
+                                     ScientificName2023,
+                                     ScientificName2021))
+
+```
+
+### Make it all pretty now
+
+```{r}
+zapotec <- zapotec_zoe %>% 
+  mutate(Genus2023 = str_extract(
+    ScientificName2023, 
+    "\\b\\w+\\b")) %>% 
+  select(Language,
+         CommonName,
+         IndexFG,
+         n,
+         ScientificName2023,
+         Genus2023,
+         Family2023,
+         Order2023,
+         ScientificName1974,
+         Genus1974,
+         Family1974,
+         Order1974,
+         ScientificName2021,
+         ScientificNameV3)
+
+```
+
+# Combine all languages into a master dataset
+
+```{r}
+
+bird_data <- rbind(anindilyakwa, 
+                   montagnais, 
+                   rangi, 
+                   saami, 
+                   tlingit, 
+                   tobelo, 
+                   tzeltal, 
+                   zapotec) %>% 
+  mutate(CanonicalName = make.unique(ScientificName2023, sep = "."),
+         IndexFG = paste0(str_sub(Language,1,3), ".", IndexFG)) %>% 
+  select(Language,
+         CanonicalName,
+         CommonName,
+         IndexFG,
+         n,
+         ScientificName2023,
+         Genus2023,
+         Family2023,
+         Order2023,
+         ScientificName1974,
+         Genus1974,
+         Family1974,
+         Order1974,
+         ScientificName2021,
+         ScientificNameV3)
+
+bird_data$CanonicalName <- make.unique(bird_data$ScientificName2023)
+
+# Just check about these extra V3 names
+
+check <- bird_data$ScientificName2023 %in% birdtree_extras$ScientificNameBT
+check2 <- bird_data$CommonName %in% birdtree_extras$CommonNameBT
+
+look <- bird_data[check,]
+look2 <- bird_data[check2,]
+  
+```
+
+# Similarity over all the different variables
+
+## Perceptual Data
+
+### Add AVONET data
+
+```{r}
+
+#prepare avonet dataset
+
+AVONET<-read.csv(here("preprocessing/data/AVONET2_eBird.csv")) %>% 
+  rename(
+    c(ScientificName="Species2",
+      Family=Family2,
+      Order=Order2,
+      BeakLengthCulmen="Beak.Length_Culmen",
+      BeakLengthNares="Beak.Length_Nares",
+      BeakWidth="Beak.Width",
+      BeakDepth="Beak.Depth",
+      TarsusLength="Tarsus.Length",
+      WingLength="Wing.Length",
+      KippsDistance="Kipps.Distance",
+      Secondary="Secondary1",
+      HandWingIndex="Hand.Wing.Index",
+      TailLength="Tail.Length",
+      HabitatDensity="Habitat.Density",
+      TrophicLevel="Trophic.Level",
+      TrophicNiche="Trophic.Niche",
+      Lifestyle="Primary.Lifestyle")) %>% 
+  select(c(ScientificName,
+           Family,
+           Order,
+           BeakLengthCulmen,
+           BeakLengthNares,
+           BeakWidth,
+           BeakDepth,
+           TarsusLength,
+           WingLength,
+           KippsDistance,
+           Secondary,
+           HandWingIndex,
+           TailLength,
+           Mass,
+           Habitat,
+           HabitatDensity,
+           Migration,
+           TrophicLevel,
+           TrophicNiche,
+           Lifestyle))
+
+bird_data <- left_join(bird_data, 
+                       AVONET %>%
+                    select(ScientificName,
+                           BeakLengthCulmen:Mass), 
+                    by = c(
+                      "ScientificName2021" = "ScientificName")) 
+
+```
+
+### Calculate Perceptual Similarity & Isolation
+
+```{r}
+
+pairwise_list_per <- list()
+per_dist_matrices <- list()
+bird_data$IsoPer <- NA
+bird_data$zIsoPer <- NA
+
+languages <- c("Anindilyakwa",
+               "Montagnais",
+               "Rangi",
+               "Saami",
+               "Tlingit",
+               "Tobelo",
+               "Tzeltal",
+               "Zapotec")
+
+for (language in languages) {
+  
+  language_data <- bird_data %>% 
+    filter(Language == language) %>% 
+    select(CanonicalName,BeakLengthCulmen:Mass) %>% 
+    filter(complete.cases(.[sapply(., is.numeric)])) %>%
+    mutate_if(is.numeric, log) %>% # log transform the skewed variables
+    mutate(HandWingIndex = exp(HandWingIndex)) %>% # un-transform the variable that isn't skewed
+    mutate_if(is.numeric, ~scale(.)[,1]) #This fixes that pesky problem where it changes the column name when it scales
+  
+  data_for_indices <- bird_data %>% 
+    filter(Language == language)
+  
+  # Make a matrix with euclidean distances between all birds based on their AVONET traits
+  matrices <- language_data  %>%
+    select(c(BeakLengthCulmen:Mass)) %>% 
+    data.matrix() %>% 
+    pdist(metric = "euclidean", p = 2) %>% 
+    as.data.frame() 
+  
+  rownames(matrices) <- language_data$CanonicalName
+  colnames(matrices) <- language_data$CanonicalName
+  
+  # Put perceptual isolation values back into main dataframe (The distance between a bird and its closest neighbour) - not sure if I'm using these but I might as well put them in now in case I want them later
+
+  iso <- MinVal(matrices) %>% 
+    mutate(pure_names = gsub("\\..*", "", Names))
+  
+  ziso <- iso %>% mutate(pure_names =  gsub("\\..*", "", Names))%>% 
+    distinct(pure_names, .keep_all = TRUE) %>% 
+    mutate(zIsoPer = round(scale(Values)[,1],2)) %>% 
+    select(-Names)
+  
+  iso <- left_join(iso, ziso) %>% 
+    mutate(IsoPer = round(Values,2),
+           CanonicalName = Names) %>% 
+    select(CanonicalName, IsoPer, zIsoPer)
+    
+  language_data <- left_join(language_data,iso, by = "CanonicalName")
+
+    # language_data$IsoPer <- round(iso$Values,2)
+    # language_data <- language_data %>% 
+    #   mutate(zIsoPer = round(scale(IsoPer)[,1],2))
+    
+    bird_data$IsoPer[match(language_data$CanonicalName, 
+                           bird_data$CanonicalName)] <- 
+      language_data$IsoPer
+    bird_data$zIsoPer[match(language_data$CanonicalName, 
+                           bird_data$CanonicalName)] <- 
+      language_data$zIsoPer
+
+    colnames(matrices) <- language_data$CanonicalName
+    rownames(matrices) <- language_data$CanonicalName
+    
+    # Put the values into a long dataframe
+    per_dist_list <- data.frame(t(combn(names(matrices),2)),
+                              DistPer = t(matrices)[lower.tri(matrices)]) %>% 
+      mutate(Species1 = pmin(X1, X2),
+             Species2 = pmax(X1, X2),
+             Species1FG = data_for_indices$IndexFG[match(Species1, language_data$CanonicalName)],
+             Species2FG = data_for_indices$IndexFG[match(Species2, language_data$CanonicalName)],
+             SameName = ifelse(Species1FG == Species2FG, TRUE, FALSE)) %>% 
+      select(-c(X1, X2, Species1FG, Species2FG))
+    
+    pairwise_list_per[[language]] <- per_dist_list
+    per_dist_matrices[[language]] <- matrices
+    
+    if (language=="Montagnais") {
+      
+      write.csv(matrices, here("data/per-matrix_Innu.csv"))
+    } else {
+    
+    write.csv(matrices, here(paste0("data/per-matrix_", language, ".csv")))
+      
+    }
+}
+
+```
+
+### Get tSNE coordinates
+
+```{r}
+
+bird_data <- bird_data %>% mutate(tSNE1per = NA, tSNE2per = NA)
+
+for (language in languages) {
+  
+  language_data <- bird_data %>% 
+    filter(Language == language) %>% 
+    select(-contains("tSNE"))
+  
+  # I need to take out the duplicate rows and it's kind of tricky because the canonical names are given suffixes based on duplicates over the entire bird dataset. So I am going to remove the suffixes from the rownames, remove duplicates, then transpose the dataframe and do it again.
+  
+  tsne_data <- per_dist_matrices[[language]] %>% 
+    rownames_to_column("name") %>% 
+    mutate(name = str_remove(name, "\\.\\d")) %>% 
+    filter(!duplicated(name)) %>% 
+    column_to_rownames("name") %>% 
+    t() %>% 
+    as.data.frame() %>% 
+    rownames_to_column("name") %>% 
+    mutate(name = str_remove(name, "\\.\\d")) %>% 
+    filter(!duplicated(name)) %>% 
+    column_to_rownames("name")
+    
+  # Perplexity should not be greater than 3 * perplexity < nrow(X) - 1 according to documentation for Rtsne package. So I'm just reverse-engineering the perplexity parameter
+  set.seed(29)
+  tsne_fit <- Rtsne(tsne_data,
+                    perplexity = floor(nrow(tsne_data) - 1) / 3)
+  
+  tsne_layout <- tsne_fit$Y %>% 
+    as.data.frame() %>% 
+    rename(tSNE1per = "V1",
+           tSNE2per = "V2")
+  
+  tsne_data <- data.frame(tsne_layout,
+                          ScientificName2023 = rownames(tsne_data))
+  
+  language_data <- left_join(language_data, tsne_data, relationship = "many-to-one", by = "ScientificName2023")
+  
+  bird_data$tSNE1per[match(
+    language_data$CanonicalName,
+    bird_data$CanonicalName)] <- language_data$tSNE1per
+  
+  bird_data$tSNE2per[match(
+    language_data$CanonicalName,
+    bird_data$CanonicalName)] <- language_data$tSNE2per
+}
+
+```
+
+### Might just calculate some variances while I'm here
+
+```{r}
+
+bird_data$VarPer <- NA
+
+for (language in languages) {
+  
+  # Make a dataframe of centroids for each FG group
+  
+  language_data <- bird_data %>% 
+    filter(Language == language,
+           n>1) %>% 
+    mutate_at(vars(BeakLengthCulmen:Mass), log) %>%  # make all the positively skewed ones normal
+    mutate(HandWingIndex = exp(HandWingIndex)) %>% # un-transform the variable that isn't skewed
+    mutate_at(vars(BeakLengthCulmen:Mass), ~scale(.)[,1])  # scale them all
+
+  centroids <- language_data %>% 
+    pivot_longer(cols = BeakLengthCulmen:Mass,
+                 names_to = "Feature",
+                 values_to = "Values") %>% 
+    
+    # Calculate the centroid for each trait for each FG and save it as a new bird 
+    
+    group_by(Feature, IndexFG) %>% 
+    summarise(Centroid = mean(Values)) %>% 
+    pivot_wider(names_from = "Feature",
+                values_from = "Centroid") %>% 
+    mutate(IndexFG = paste0(IndexFG, ".cen"))
+  
+  # Put the centroid birds back into language_data
+  
+  birds_cens <- language_data %>% 
+    filter(n > 1) %>% 
+    select(IndexFG, BeakLengthCulmen:Mass) %>% 
+    rbind(centroids)
+  
+  # Make a distance matrix of all birds and centroids
+  
+  matrix <- birds_cens %>% 
+    select(-c(IndexFG)) %>% 
+    pdist(metric = "euclidean") %>% 
+    as.data.frame()
+  
+  colnames(matrix) <- birds_cens$IndexFG
+  matrix$IndexFG <- birds_cens$IndexFG
+  
+  # Turn it into a long dataframe and keep only the distances between birds and their own centroids
+  
+  variance <- matrix %>% 
+    pivot_longer(cols = -contains("IndexFG"),
+                 names_to = "Group",
+                 values_to = "Dist") %>% 
+  filter(grepl("\\.cen$", Group) & !grepl("\\.cen$", IndexFG)) %>% 
+    mutate(Group = gsub("\\.cen$", "", Group)) %>% 
+    filter(IndexFG == Group) %>% 
+    group_by(Group)   %>%
+    summarise(Variance = mean(Dist))
+  
+  bird_data <- bird_data %>%
+    mutate(VarPer =
+             ifelse(IndexFG %in% variance$Group,
+                    variance$Variance[match(IndexFG, variance$Group)],
+                    VarPer),
+           # Give monotypic birds a variance of 0
+           VarPer = 
+             ifelse(n == 1, 0, VarPer))
+  }
+
+```
+
+## Phylogenetic Data
+
+### Process Phylogenetic Data
+
+Phylogeny subsets (250 trees)
+
+anindilyakwa - tree-pruner-ee9aeff3-6c7d-4b87-aa87-7d38474286fd - new
+montagnais - tree-pruner-65a824c3-96d0-4874-a14e-5c16cef86174 - good
+rangi - tree-pruner-a6edba71-4114-4d77-a124-33a41b5e040a - good
+saami - tree-pruner-9a0ae6e0-7769-4035-b94d-6990fd7a0130 - good
+tlingit - tree-pruner-d5b77082-3468-46aa-9dfc-1ea52bd48562 - new
+tobelo - tree-pruner-9c9972ae-a991-47a3-9d35-01692750c6e4 - good
+tzeltal - tree-pruner-c45e9238-3a1a-4eaa-a980-b810c0b1954c - good
+zapotec - tree-pruner-1546ad01-71c3-4e2b-a201-11f91ccccd83 - good
+
+```{r}
+
+phy_dist_matrices <- list()
+nexuses <- list()
+
+for (language in languages) {
+  
+  print(language)
+  
+  # import nexuses
+  location <- here(paste0("preprocessing/data/nexus_", str_to_lower(language), ".nex")) 
+  
+  nexus <- read.nexus(location)
+  
+   # turn it into a bunch of matrices
+   phylo_matrix_full <- lapply(nexus, function(tree) cophenetic(tree))
+  
+   # average out the matrices
+   phylo_matrix <- Reduce("+", phylo_matrix_full) / length(phylo_matrix_full)
+  
+   # Make the names in the matrices match the language datasets
+   rownames(phylo_matrix) <- gsub("_", " ", rownames(phylo_matrix))
+   colnames(phylo_matrix) <- gsub("_", " ", colnames(phylo_matrix))
+  
+   # Process tree so it can be visualised later:
+  
+   # create a consensus tree but preserve edge lengths
+   phylo_tree <- consensus.edges(nexus, method = "mean.edge")
+
+   # Drop the last edge length, which doesn't correspond with an edge and starts messing stuff up later
+   phylo_tree$edge.length <- phylo_tree$edge.length[-length(phylo_tree$edge.length)]
+
+   phylo_tree <- chronos(phylo_tree, lambda = 0)
+
+   # Write it so it can be imported directly
+   
+   if (language == "Montagnais") {
+     
+     write.nexus(phylo_tree, file = here("data/phylo-tree_Innu.nex")) 
+   } else {
+
+   write.nexus(phylo_tree, file = here("data/", paste0("phylo-tree_", language, ".nex")))
+     
+   } 
+   
+    phy_dist_matrices[[language]] <- phylo_matrix
+   nexuses[[language]] <- nexus
+  
+}
+
+```
+
+
+```{r eval=FALSE}
+
+montagnais_wrong_names <- nexuses$montagnais$tree_2141$tip.label %>% 
+  as.data.frame() %>% 
+  rename(ScientificNameV3 = ".") %>% 
+  mutate(ScientificNameV3 = gsub("_"," ", ScientificNameV3))
+
+in_data_not_nexus <- setdiff(montagnais$ScientificNameV3, montagnais_wrong_names$ScientificNameV3)
+
+in_nexus_not_data <- setdiff(montagnais_wrong_names$ScientificNameV3,
+                             montagnais$ScientificNameV3)
+
+```
+
+Lengths don't line up:
+Anindilyakwa - 1, because of the double Egretta sacra
+Montagnais - 1, because of double Somateria mollissima
+Rangi - 9 because legitimate duplicates
+Saami - 1 because of double Larus argentatus
+Tobelo - 8 because legitimate duplicates
+Tzeltal - 1 because Aratinga canicularis
+Tlingit is good
+Zapotec is good
+
+### Calculate Phylogenetic Similarity & Isolation
+
+```{r}
+
+pairwise_list_phy <- list()
+matrix2 <- list()
+bird_data$IsoPhy <- NA
+bird_data$zIsoPhy <- NA
+check <- list()
+check_vals <- list()
+check_iso <- list()
+
+for (language in languages) {
+  
+  # Oops I messed up by sometimes having the languages all lowercase 
+  ## Yeah, thanks. This is Future Zoë going and fixing it all.
+  language_data <- bird_data %>% 
+    filter(Language == language)
+  
+  matrix <- as.data.frame(phy_dist_matrices[[language]]) %>% 
+    rownames_to_column(var = "ScientificNameV3")
+  
+  # Deal with duplicate birds
+  
+  duplicates <- language_data[duplicated(language_data$ScientificNameV3),]
+  
+  # Make duplicate rows of the duplicate birds (This will work no matter how many times the bird is duplicated)
+  
+  rows_add <- duplicates %>% 
+    select(ScientificNameV3) %>% 
+    left_join(matrix)
+  
+  matrix <- rbind(matrix, rows_add)
+  
+  duplicate_names <- as.array(duplicates$ScientificNameV3)
+  
+  # Make duplicate columns of the duplicated birds. This won't work if there are more than two of any bird
+  
+  cols_add <- matrix %>% 
+    select(all_of(duplicate_names)) %>% 
+    rename_all(~paste0(.,".1"))
+  
+  # This will add in columns for any bird in the dataset three times
+  
+  double_duplicates <- duplicate_names[duplicated(duplicate_names)]
+  
+  if(length(double_duplicates) != 0) {
+    
+    cols_add <- matrix %>% 
+      select(all_of(double_duplicates)) %>% 
+      rename_all(~paste0(.,".2")) %>% 
+      bind_cols(cols_add)
+  }
+  
+  merge_data <- language_data %>% 
+    mutate(ScientificNameV3 = make.unique(ScientificNameV3)) %>% 
+    select(ScientificNameV3,
+           CanonicalName)
+  
+  # Pop the unique canonical names into the matrix
+  matrix <- bind_cols(matrix, cols_add) %>% 
+    # select(order(colnames(.))) %>% 
+    rename_all(~ ifelse(. %in% merge_data$ScientificNameV3, merge_data$CanonicalName[match(.,merge_data$ScientificNameV3)],.)) %>% 
+    mutate(ScientificNameV3 = make.unique(ScientificNameV3))  %>% 
+   left_join(merge_data, by = "ScientificNameV3") %>% 
+   column_to_rownames(var = "CanonicalName") %>% 
+   select(-ScientificNameV3)
+   
+  # Make sure the columns and rows are ordered the same
+   sort_data <- rownames(matrix)
+   matrix <- matrix[sort_data,sort_data]
+   
+     # write it so it can be downloaded again directly
+   
+   if (language=="Montagnais") {
+     
+     write.csv(matrix, here("data/phylo-matrix_Innu.csv"))
+     
+   } else {
+     
+   write.csv(matrix, here("data/", paste0("phylo-matrix_", language, ".csv")))
+     
+   }
+   
+   check[[language]] <- matrix
+   check_rows <- rownames(matrix) %>% as.data.frame() %>% rename(rows = ".")
+   check_cols <- colnames(matrix) %>% as.data.frame() %>% rename(cols = ".")
+   check_vals[[language]] <- cbind(check_rows,check_cols)  %>% 
+      mutate(Same = ifelse(rows==cols,TRUE,FALSE))
+   
+   iso <- MinVal(matrix)   %>%
+     mutate(Values = as.numeric(Values))
+   
+   check_iso[[language]] <- iso
+   
+   ziso <- iso %>% mutate(pure_names =gsub("\\..*", "", Names)) %>% 
+     distinct(pure_names, .keep_all = TRUE) %>% 
+     mutate(zIsoPhy = round(scale(Values)[,1],2)) %>% 
+     select(-c(Names, Values))
+  
+  iso <- iso %>% 
+    mutate(pure_names = gsub("\\..*", "", Names)) %>% 
+    left_join(ziso, by = "pure_names") %>% 
+    mutate(IsoPhy = round(Values,2),
+           CanonicalName = Names) %>% 
+    select(CanonicalName, IsoPhy, zIsoPhy)
+   
+   language_data$IsoPhy[match(iso$CanonicalName,
+                              language_data$CanonicalName)] <- 
+     iso$IsoPhy
+   
+      language_data$zIsoPhy[match(iso$CanonicalName,
+                              language_data$CanonicalName)] <- 
+     iso$zIsoPhy
+   
+
+    
+    bird_data$IsoPhy[match(language_data$CanonicalName, 
+                           bird_data$CanonicalName)] <- 
+      language_data$IsoPhy
+    
+    bird_data$zIsoPhy[match(language_data$CanonicalName, 
+                           bird_data$CanonicalName)] <- 
+      language_data$zIsoPhy
+  
+  #Turn the matrix into a pairwise list
+  phy_dist_list <- data.frame(t(combn(rownames(matrix),2)),
+                              DistPhy = t(matrix)[lower.tri(matrix)])
+  
+  pairwise_list_phy[[language]] <- phy_dist_list %>% 
+    mutate(Species1 = pmin(X2, X1),
+           Species2 = pmax(X2, X1)) %>% 
+    select(-c(X2, X1))
+  
+}
+
+```
+
+## Taxonomic Similarity 
+### 2023
+
+```{r}
+
+pairwise_list_23 <- list()
+bird_data$Iso23 <- NA
+bird_data$zIso23 <- NA
+
+for (language in languages) {
+  
+  language_data <- bird_data %>% 
+    filter(Language == language)
+  
+  to_compare <- c("Order2023", 
+                  "Family2023", 
+                  "Genus2023", 
+                  "ScientificName2023")
+  
+  similarity_2023 <- TaxSimCalc(language_data, to_compare)
+  
+  matrix23 <- similarity_2023$matrix %>% column_to_rownames("Species1")
+  
+  iso23 <- MinVal(matrix23) %>%
+     mutate(Values = as.numeric(Values))
+   
+     ziso <- iso23 %>% mutate(pure_names =  gsub("\\..*", "", Names)) %>% 
+    distinct(pure_names, .keep_all = TRUE) %>% 
+    mutate(zIso23 = round(scale(Values)[,1],2)) %>% 
+    select(-c(Names, Values))
+  
+  iso23 <- iso23 %>% mutate(pure_names = gsub("\\..*", "", Names)) %>% 
+    left_join( ziso, by = "pure_names") %>% 
+    mutate(Iso23 = round(Values,2),
+           CanonicalName = Names) %>% 
+    select(CanonicalName, Iso23, zIso23)
+  
+  language_data$Iso23[
+    match(language_data$CanonicalName,iso23$CanonicalName)] <- 
+    iso23$Iso23
+  language_data$zIso23[
+    match(language_data$CanonicalName,iso23$CanonicalName)] <- 
+    iso23$zIso23
+  
+  
+    
+  bird_data$Iso23[match(language_data$CanonicalName, 
+                           bird_data$CanonicalName)] <- 
+      language_data$Iso23
+  
+  bird_data$zIso23[match(language_data$CanonicalName, 
+                           bird_data$CanonicalName)] <- 
+      language_data$zIso23  
+
+  pairwise_list_23[[language]] <- similarity_2023$pairs %>% 
+    rename(Dist23 = Dist)
+  
+}
+
+```
+
+### 1974
+
+```{r}
+
+pairwise_list_74 <- list()
+bird_data$Iso74 <- NA
+bird_data$zIso74 <- NA
+
+for (language in languages) {
+  
+  language_data <- bird_data %>% 
+    filter(Language == language) %>% 
+    select(-c(Iso74, zIso74))
+  
+  to_compare <- c("Order1974", 
+                  "Family1974", 
+                  "Genus1974", 
+                  "ScientificName1974")
+  
+  similarity_1974 <- TaxSimCalc(language_data, to_compare)
+  
+  matrix74 <- similarity_1974$matrix %>% column_to_rownames("Species1")
+  
+  iso74 <- MinVal(matrix74) %>%
+     mutate(Values = as.numeric(Values))
+   
+     ziso <- iso74 %>% mutate(pure_names =  gsub("\\..*", "", Names))%>% 
+    distinct(pure_names, .keep_all = TRUE) %>% 
+    mutate(zIso74 = round(scale(Values)[,1],2)) %>% 
+    select(-c(Names, Values))
+  
+  iso74 <- iso74 %>% 
+    mutate(pure_names = gsub("\\..*", "", Names)) %>% 
+    left_join(ziso, by = "pure_names") %>% 
+    mutate(Iso74 = round(Values,2),
+           CanonicalName = Names) %>% 
+    select(CanonicalName, Iso74, zIso74)
+    
+    language_data <- left_join(language_data, iso74, by = "CanonicalName")
+  
+  # language_data$Iso74[match(language_data$CanonicalName,iso74$CanonicalName)] <- 
+  #   iso74$Iso74
+  # language_data$zIso74[match(language_data$CanonicalName,iso74$CanonicalName)] <- 
+  #   iso74$zIso74
+
+  bird_data$Iso74[match(language_data$CanonicalName, 
+                           bird_data$CanonicalName)] <- 
+      language_data$Iso74
+  
+  bird_data$zIso74[match(language_data$CanonicalName, 
+                           bird_data$CanonicalName)] <- 
+      language_data$zIso74
+  
+  pairwise_list_74[[language]] <- similarity_1974$pairs %>% 
+    rename(Dist74 = Dist)
+}
+
+```
+
+## Colour Data
+
+I'm going to do with the colours the same as what Andrea Santangeli et al. did and just keep black, white, yellow, blue, red, and green, and use the sum of the light and dark versions (p. 20 of paper)
+
+
+```{r}
+
+colour_data <- read.csv(here("preprocessing/data/colour_data.csv")) %>% 
+  rename(ScientificName2021 = sciName_ebird2021,
+         cDiversity = n.loci,
+         cElaboration = elaboration,
+         cBlack = black,
+         cWhite = white,
+         cYellow = yellow) %>% 
+  mutate(cRed = redD + redL,
+         cBlue = blueD + blueL,
+         cGreen = greenD + greenL) %>% 
+  group_by(ScientificName2021) %>% 
+  mutate(num = n()) %>% 
+  ungroup() %>% 
+  # If there is more than one listing for a bird, this ditches the measurements taken from the female bird
+  filter(num == 1 | (num > 1 & sex != "female")) %>% 
+  group_by(ScientificName2021) %>% 
+  mutate(num = n()) %>% 
+  ungroup() %>% 
+  filter(num == 1 | (num > 1 & (!is.na(cBlack))) & (sciname_ebird2019 != "Caracara plancus")) %>% 
+  # filter(sex != "female") %>% 
+  select(ScientificName2021,
+         cBlack,
+         cWhite,
+         cYellow,
+         cBlue,
+         cRed,
+         cGreen,
+         cElaboration,
+         cDiversity,
+         sex,
+         sciname_ebird2019)
+
+# They haven't split apart two gull species that ebird 2021 differentiates, I'll just double that guy's row for them both.
+duplicate_row <- colour_data[which(colour_data$ScientificName2021 == "Larus canus"),]
+duplicate_row$ScientificName2021 <- "Larus brachyrhynchus"
+colour_data <- colour_data %>% rbind(duplicate_row)
+
+
+colour_data$ScientificName2021[colour_data$sciname_ebird2019 == "Saltator coerulescens"] <- "Saltator grandis"
+
+bird_data <- bird_data %>% 
+  left_join(colour_data %>% select(-c(sex,sciname_ebird2019)), 
+            by = "ScientificName2021",
+            relationship = "many-to-one") 
+
+```
+
+### Colour similarity
+
+```{r}
+
+pairwise_list_col <- list()
+
+bird_data$IsoCol <- NA
+bird_data$zIsoCol <- NA
+bird_data$zcElaboration <- NA
+bird_data$zcDiversity <- NA
+
+for (language in languages) { 
+  
+  language_data <- bird_data %>% 
+    filter(Language == language) %>% 
+    select(-c(IsoCol, zIsoCol)) %>% 
+    select(CanonicalName,cBlack:cGreen) %>% 
+    filter(complete.cases(.[sapply(., is.numeric)])) %>%
+    mutate_if(is.numeric, ~scale(.)[,1]) #This fixes that pesky problem where it changes the column name when it scales
+  
+  data_for_indices <- bird_data %>% 
+    filter(Language == language)
+  
+  # Make a matrix with euclidean distances between all birds based on their colours
+  matrices <- language_data  %>%
+    select(c(cBlack:cGreen)) %>% 
+    data.matrix() %>% 
+    pdist(metric = "euclidean", p = 2) %>% 
+    as.data.frame()
+  
+  colnames(matrices) <- language_data$CanonicalName
+  rownames(matrices) <- language_data$CanonicalName
+  
+  # Put perceptual isolation values back into main dataframe (The distance between a bird and its closest neighbour) - not sure if I'm using these but I might as well put them in now in case I want them later
+  
+  iso <- MinVal(matrices) %>% 
+    mutate(pure_names = gsub("\\..*", "", Names))
+  
+  ziso <- iso %>% 
+    distinct(pure_names, .keep_all = TRUE) %>% 
+    mutate(zIsoCol = round(scale(Values)[,1],2)) %>% 
+    select(-c(Names, Values))
+  
+  iso <- left_join(iso, ziso, by = "pure_names") %>% 
+    mutate(IsoCol = round(Values,2)) %>% 
+    rename(CanonicalName = Names) %>% 
+    select(CanonicalName, IsoCol, zIsoCol)
+
+  language_data <- left_join(language_data, iso, by = "CanonicalName")
+
+    bird_data$IsoCol[match(language_data$CanonicalName, 
+                           bird_data$CanonicalName)] <- 
+      language_data$IsoCol
+    bird_data$zIsoCol[match(language_data$CanonicalName, 
+                           bird_data$CanonicalName)] <- 
+      language_data$zIsoCol
+    
+    colnames(matrices) <- language_data$CanonicalName
+    rownames(matrices) <- language_data$CanonicalName
+    
+    # Put the values into a long dataframe
+    col_dist_list <- data.frame(t(combn(names(matrices),2)),
+                              DistCol = t(matrices)[lower.tri(matrices)]) %>% 
+      mutate(Species1 = pmin(X1, X2),
+             Species2 = pmax(X1, X2)) %>% 
+    select(-c(X1, X2))
+    
+
+    pairwise_list_col[[language]] <- col_dist_list
+    
+}
+
+for (language in languages) {
+  
+  language_data <- bird_data %>% 
+    filter(Language == language) %>% 
+    mutate(zcDiversity = round(scale(cDiversity)[,1],2),
+           zcElaboration = round(scale(cElaboration)[,1],2))
+  
+  # language_data <- language_data[complete.cases(language_data),]
+  
+  #This feels like a bit of a cowboy way to get the scaled Diversity and Elaboration scores back into the dataset, but it works
+  
+bird_data <- bird_data %>% 
+  mutate(zcDiversity = ifelse(CanonicalName %in% language_data$CanonicalName,
+                              language_data$zcDiversity[match(
+                                bird_data$CanonicalName,
+                                language_data$CanonicalName)],
+                              zcDiversity))
+  bird_data <- bird_data %>% 
+  mutate(zcElaboration = ifelse(CanonicalName %in% language_data$CanonicalName,
+                              language_data$zcElaboration[
+                                match(bird_data$CanonicalName,
+                                      language_data$CanonicalName)],
+                              zcElaboration))
+  
+}
+
+```
+
+## Smoosh all of the similarity lists together
+
+```{r}
+
+bird_similarity <- list()
+
+for (language in languages) {
+  
+  per <- pairwise_list_per[[language]]
+  phy <- pairwise_list_phy[[language]]
+  tax74 <- pairwise_list_74[[language]]
+  tax23 <- pairwise_list_23[[language]]
+  col <- pairwise_list_col[[language]]
+  
+  data <- list(per,
+               phy,
+               tax74,
+               tax23,
+               col)
+  
+  merged_data <- Reduce(function(x, y)
+    merge(x, y,
+          by = c("Species1", "Species2"),
+          all = TRUE),
+    data) %>% 
+    select(-c(starts_with("Scale")))
+  
+  bird_similarity[[language]] <- merged_data
+  
+  if (language=="Montagnais") {
+    
+    write.csv(merged_data, here("data/similarity_Innu.csv"))
+    
+  } else {
+  
+  write.csv(merged_data, here(paste0("data/similarity_", language, ".csv")))
+    
+  }
+}
+
+bird_similarity[["Innu"]] <- bird_similarity[["Montagnais"]]
+
+```
+
+## Calculate variances for phylogenetic
+
+### Variance in phylogenetic space
+
+```{r}
+
+bird_data$VarPhy <- NA
+
+for (language in languages) {
+  
+  language_data <- bird_data %>% 
+    filter(Language == language) %>% 
+    select(-VarPhy)
+    
+  phy_var_data <- bird_similarity[[language]] %>% 
+    filter(SameName == TRUE)  %>% 
+    left_join(language_data %>% select(CanonicalName, IndexFG), 
+              by = c("Species1" = "CanonicalName"),
+              relationship = "many-to-many") %>% 
+    group_by(IndexFG) %>% 
+    mutate(VarPhy = mean(DistPhy))
+  
+  language_data <- language_data %>% 
+    left_join(phy_var_data %>% select(VarPhy, IndexFG),
+              relationship = "many-to-many") %>% 
+    mutate(VarPhy = ifelse(n==1, 0, VarPhy))
+  
+  bird_data <- bird_data %>% 
+    mutate(VarPhy = ifelse(IndexFG %in% language_data$IndexFG,
+                           language_data$VarPhy[match(IndexFG, 
+                                                      language_data$IndexFG)], 
+                           VarPhy))
+  
+  # bird_data$VarPhy <- language_data$VarPhy[match(bird_data$IndexFG, language_data$IndexFG)]
+  
+}
+
+```
+
+# Taxonomic Trees
+
+This makes trees out of the levels of the traditional taxonomies
+
+## 1974 Trees
+
+
+```{r}
+
+tree_74 <- list()
+
+for (language in languages) {
+  
+  language_data <- bird_data %>% 
+    ungroup() %>% 
+    filter(Language == language)
+  
+    # This is to keep the families in a particular order if I want to visualise the tree later
+family_order_74 <- orders_74 %>% 
+  select(Family1974) %>% 
+  filter(Family1974 %in% language_data$Family1974) %>% 
+  mutate(Family1974 = as.factor(Family1974))
+  
+  language_data <- language_data %>% 
+    mutate(Class = "Aves") %>% 
+    select(ScientificName1974,
+           Genus1974,
+           Family1974,
+           Order1974,
+           Class) %>% 
+    distinct(ScientificName1974, .keep_all = TRUE) %>% 
+    mutate_all(as.factor) %>% 
+     arrange(match(Family1974, family_order_74))
+   
+# Make the data into a tree structure based on the levels of the taxonomy
+  
+  tree <- as.phylo(~Class/Order1974/Family1974/Genus1974/ScientificName1974,
+                      data = language_data) %>% 
+    compute.brlen(.25) %>% # Add branch lengths so they can be used later
+    as.ultrametric()
+  
+  tree_74[[language]] <- tree
+  
+  if (language == "Montagnais"){
+    
+         write.nexus(tree, 
+               file = here(paste0("data/tree_74_Innu.nex")))
+  } else {
+  
+     write.nexus(tree, 
+               file = here(paste0("data/tree_74_", language, ".nex")))
+    
+  }
+  }
+
+```
+
+## 2023 Trees
+
+```{r}
+
+tree_23 <- list()
+
+for (language in languages) {
+
+    language_data <- bird_data %>% 
+    ungroup() %>% 
+    filter(Language == language)
+  
+  family_order_23 <- clements_2023 %>% 
+  select(Family2023) %>% 
+  filter(Family2023 %in% language_data$Family2023) %>% 
+  mutate(Family2023 = as.factor(Family2023))
+  
+  language_data <- language_data %>% 
+    mutate(Class = "Aves") %>%
+    group_by(ScientificName2023) %>% 
+    # mutate(Subspecies = case_when(
+    #   n_distinct(IndexFG) > 1 ~ make.unique(ScientificName2023), TRUE ~ ScientificName2023
+    # )) %>% 
+    ungroup() %>% 
+    select(ScientificName2023,
+           Genus2023,
+           Family2023,
+           Order2023,
+           Class) %>% 
+    distinct(ScientificName2023, .keep_all = TRUE) %>% 
+    mutate_all(as.factor) %>% 
+    arrange(match(Family2023, family_order_23))
+  
+  tree <- as.phylo(~Class/Order2023/Family2023/Genus2023/ScientificName2023,
+                   data = language_data) %>% 
+    compute.brlen(1) 
+  # %>% 
+  #   as.ultrametric()
+  
+  tree_23[[language]] <- tree
+  
+  if(language == "Montagnais") {
+    
+    write.nexus(tree, file = here(paste0("data/tree_23_Innu.nex")))
+    
+  } else {
+  
+  write.nexus(tree, file = here(paste0("data/tree_23_", language  , ".nex")))
+    
+  }
+}
+
+```
+
+# Export the data
+
+```{r}
+
+# Change the old name for Innu
+
+bird_data <- bird_data %>% 
+  mutate(Language = ifelse(Language == "Montagnais", "Innu", Language))
+
+write.csv(bird_data,here("data/bird_data.csv")) 
+
+```
+
+# Summary
+
+# For Isolation Data
+
+```{r}
+
+# Summary for all Isolation data
+
+# Select columns that start with "iso"
+iso_columns <- grep("^Iso", names(bird_data), value = TRUE)
+
+# Group by "language" and calculate summary statistics
+summary_iso <- bird_data %>%
+  group_by(Language) %>%
+  add_count(name = "n") %>% 
+  summarise(across(all_of(iso_columns), list(
+    mean = ~mean(., na.rm = TRUE),
+    sd = ~sd(., na.rm = TRUE),
+    min = ~min(., na.rm = TRUE),
+    max = ~max(., na.rm = TRUE)
+  ), .names = "{col}_{fn}"),
+  n = first(n)) %>% 
+  mutate_if(is.numeric, ~round(.,2))
+
+# Take out outliers and duplicates and recalculate stats
+
+duplicates <- bird_data$ScientificName2023[duplicated(bird_data$ScientificName2023)]
+duplicates <- bird_data %>% filter(ScientificName2023 %in% duplicates) %>% 
+  group_by(Language, ScientificName2023) %>% 
+  mutate(number = n()) %>% 
+  filter(number != 1)
+
+bird_data2 <- bird_data %>% 
+  filter(!CanonicalName %in% duplicates$CanonicalName) %>% 
+  filter(ScientificName2023 != "Dromaius novaehollandiae") %>% 
+  filter(ScientificName2023 != "Struthio camelus")
+
+summary_iso2 <- bird_data2 %>% 
+  group_by(Language) %>%
+   add_count(name = "n") %>% 
+  summarise(across(all_of(iso_columns), list(
+    mean = ~mean(., na.rm = TRUE),
+    sd = ~sd(., na.rm = TRUE),
+    min = ~min(., na.rm = TRUE),
+    max = ~max(., na.rm = TRUE)
+  ), .names = "{col}_{fn}"),
+  n = first(n)) %>% 
+  mutate_if(is.numeric, ~round(.,2)) %>% 
+  mutate(Language = paste0(Language, "_filtered"))
+
+cols <- c(summary_iso$Language, summary_iso2$Language)
+
+summary_iso_full <- rbind(summary_iso, summary_iso2) %>% 
+  as.data.frame() %>% 
+  t() %>% 
+  as.data.frame()
+
+colnames(summary_iso_full) <- cols
+
+summary_iso_full <- summary_iso_full[,order(names(summary_iso_full))]
+
+ # write.csv(summaryfull, here("output/SummaryTable.csv"))
+
+```
+
+# For Distance Data
+
+```{r}
+
+summary_dist <- data.frame(matrix(nrow = 20))
+
+for (language in languages) {
+  
+  language_data <- bird_similarity[[language]] 
+  
+  # Calculate summary statistics
+  summary_lang <- language_data %>%
+  summarise(across(where(is.numeric), list(
+    mean = ~mean(., na.rm = TRUE),
+    sd = ~sd(., na.rm = TRUE),
+    min = ~min(., na.rm = TRUE),
+    max = ~max(., na.rm = TRUE)), 
+    .names = "{col}_{fn}")) %>% 
+  mutate_if(is.numeric, ~round(.,2)) %>% 
+    t() %>% 
+    as.data.frame() %>% 
+    rename_with(~ language, .cols = 1)
+  
+  summary_dist <- bind_cols(summary_dist, summary_lang)
+  
+  summary_lang2 <- language_data %>% 
+    filter(Species1 %in% bird_data2$CanonicalName & 
+             Species2 %in% bird_data$CanonicalName) %>% 
+    summarise(across(where(is.numeric), list(
+      mean = ~mean(., na.rm = TRUE),
+      sd = ~sd(., na.rm = TRUE),
+      min = ~min(., na.rm = TRUE),
+      max = ~max(., na.rm = TRUE)),
+      .names = "{col}_{fn}")) %>% 
+    mutate_if(is.numeric, ~round(.,2)) %>% 
+    t() %>% 
+    as.data.frame() %>% 
+    rename_with(~ paste0(language, "_filtered"))
+  
+ 
+    summary_dist <- bind_cols(summary_dist, summary_lang2)
+  
+}
+
+summary_dist <- summary_dist %>% 
+  rename_with(~ gsub("Montagnais", "Innu", .))
+
+summary_full <- summary_dist %>% 
+  select(-1) %>% 
+  rename_all(~str_to_title(.)) %>% 
+  rbind(summary_iso_full) %>% 
+  subset(!rownames(.) == "Language")
+
+fil_col <- grep("_filtered$", colnames(summary_full), value = TRUE)
+
+for (col in fil_col) {
+  
+  non_fil_col <- sub("_filtered$", "", col)
+  
+  if (all(summary_full[[col]] == summary_full[[non_fil_col]], na.rm = TRUE)) {
+    summary_full[[col]] <- NULL
+  }
+  
+}
+
+ write.csv(summary_full, here("output/SummaryTable.csv"))
+
+```

@@ -1,0 +1,133 @@
+ 4   BUTEO               AUGUR               ACCIPITR
+ 2   TERATHOPIUS         ECAUDATUS
+ 2   AQUILA              RAPAX
+ 2   CIRCAETUS           GALLICUS
+ 2   MILVUS              MIGRANS
+     CIRCUS              RANIVORUS
+                         MACROURUS
+     NECROSYRTES         MONACHUS
+ 2   FALCO               BIARMICUS           FALCON
+                         CUVIERII
+ 3   SAGITTARIUS         SERPENTARIUS        SAGITTARI
+ 3   CICONIA             ABDIMII             CICONI
+ 3   BALEARICA           PAVONINA            GRU
+ 2   THRESKIORNIS        AETHIOPICA          THRESKIORNITH
+     MYCTERIA            IBIS                CICONI
+ 2   ARDEA               CINEREA             ARDE
+                         MELANOCEPHALA
+                         PURPUREA
+ 2   EGRETTA             ALBA
+                         INTERMEDIA
+                         GARZETTA
+     BUBULCUS            IBIS
+ 2   BOSTRYCHIA          HAGEDASH            THRESKIORNITH
+ 2   SCOPUS              UMBRETTA            SCOP
+ 2   PLECTROPTERUS       GAMBENSIS           ANAT
+     CAIRINA             MOSCHATA
+     ALOPOCHEN           AEGYPTIACUS
+ 2   SARKIDIORNIS        MELANOTOS
+     ALOPOCHEN           AEGYPTIACUS
+ 2   ANAS                ERYTHRORHYNCHA
+     FULICA              CRISTATA            RALL
+     PORPHYRIO           PORPHYRIO
+ 2   CHARADRIUS          TRICOLLARIS         CHARADRI
+                         PECUARIUS
+                         HIATICULA
+                         DUBIUS
+     CALIDRIS            ALPINA              SCOLOPAC
+     TRINGA              HYPOLEUCOS
+                         GLAREOLA
+ 2   VANELLUS            ARMATUS             CHARADRI
+                         CORONATUS
+ 3   CURSORIUS           CHALCOPTERUS        GLAREOL
+ 2   CAPRIMULGUS         FOSSII              CAPRIMULG
+ 2   BUBO                AFRICANUS           STRIG
+ 2   X                   X                   X   CHIROPTERA
+ 3   SPREO               SUPERBUS            STURN
+ 3   LANIUS              COLLARIS
+ 3   CENTROPUS           SUPERCILIOSUS       CUCUL
+ 3   LANIARIUS           FUNEBRIS            LANI
+ 3   CORVUS              ALBUS               CORV
+                         ALBICOLLIS
+ 3   LYBIUS              LEUCOCEPHALUS       CAPITON
+ 3   OENA                CAPENSIS            COLUMB
+ 3   TRERON              CALVA
+ 2   STREPTOPELIA        DECIPIENS
+                         SEMITORQUATA
+ 1
+ 1   COLUMBA             GUINEA
+ 1   STREPTOPELIA        SENEGALENSIS
+ 3   HIRUNDO             RUSTICA             HIRUNDIN
+                         LUCIDA
+                         SMITHII
+                         DAURICA
+                         SENEGALENSIS
+                         ABYSSINICA
+                         GRISEOPYGA
+                         FULIGULA
+     RIPARIA             PALUDICOLA
+                         CINCTA
+     DELICHON            URBICA
+     PSALIDOPROCNE       PRISTOPTERA
+                         ALBICEPS
+     APUS                APUS                APOD
+                         AFFINIS
+                         CAFFER
+                         HORUS
+     TACHYMARPTIS        MELBA
+     CYPSIURUS           PARVUS
+ 3   X                   X                   X
+ 3   PRIONOPS            PLUMATA             PRIONOP
+ 3   FRANCOLINUS         AFER                PHASIAN
+ 3   NUMIDA              MELEAGRIS           NUMID
+ 3   STRUTHIO            CAMELUS             STRUTHION
+ 3   VIDUA               FISCHERI            PLOCE
+     COLIUS              STRIATUS            COLI
+ 3
+ 3   PLOCEUS             JACKSONI            PLOCE
+ 2   ANTHUS              NOVAESEELANDIAE     MOTACILL
+     MOTACILLA           FLAVA
+ 2   PYCNONOTUS          BARBATUS            PYCNONOT
+ 2   EREMOPTERIX         LEUCOPAREIA         ALAUD
+ 2   CISTICOLA           ARIDULA             MUSCICAP
+ 2   MIRAFRA             RUFACINNAMONEA      ALAUD
+ 2   MOTACILLA           AGUIMP              MOTACILL
+ 2   EUPLECTES           AXILLARIUS          PLOCE
+                         ORIX
+                         GIEROWII
+                         CAPENSIS
+ 2   QUELEA              QUELEA
+ 1   HYPOCHERA           X
+ 1
+ 2
+     LAGONOSTICTA        SENEGALA            ESTRILD
+ 2
+     URAEGINTHUS         ANGOLENSIS
+ 2   VIDUA               MACROURA            PLOCE
+                         FISCHERI
+ 2                       HYPOCHERINA
+                         PARADISEA
+ 2
+ 2   CISTICOLA           CHINIANA            MUSCICAP
+ 2   URAEGINTHUS         IANTHINOGASTER      ESTRILD
+     PYTILIA             AFRA
+ 2   PRINIA              SUBFLAVA            MUSCICAP
+ 2   EMBERIZA            TAHAPISI            EMBERIZ
+ 2
+ 2   SERINUS             ATROGULARIS         FRINGILL
+ 2   NECTARINIA          SENEGALINSIS        NECTARINI
+                         KILIMENSIS
+                         PULCHELLA
+                         BIFASCIATA
+                         MARIQUENSIS
+                         VENUSTA
+                         AMETHYSTINA
+     ANTHREPTES          COLLARIS
+                         ORIENTALIS
+ 2   PASSER              GRISEUS             PLOCE
+ 2   SPOROPIPES          FRONTALIS
+ 3   CHARADRIUS          TRICOLLARIS         CHARADRI
+                         HIATICULA
+     CALIDRIS            MINUTA              SCOLOPAC
+     TRINGA              GLAREOLA
+ 3   GALLUS              GALLUS              PHASIAN

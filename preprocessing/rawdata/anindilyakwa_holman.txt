@@ -1,0 +1,188 @@
+ 4   SULA                LEUCOGASTER         SUL
+ 2   FREGATA             ARIEL               FREGAT
+ 22  PANDION             HALIAETUS           PANDION
+ 2   HALIASTUR           INDUS               ACCIPITR
+ 2   HALIAEETUS          LEUCOGASTER
+ 22  HYDROPROGNE         CASPIA              LAR
+     STERNA              BERGII
+ 2                       HIRUNDO
+                         BENGALENSIS
+                         DOUGALLI
+                         SUMATRANA
+     GELOCHELIDON        NILOTICA
+ 2   STERNA              ALBIFRONS
+ 2                       ANAETHETUS
+     ANOUS               STOLIDUS
+     STERNA              LEUCOPTERA
+ 2   LARUS               NOVAEHOLLANDIAE
+ 3   PELECANUS           CONSPICILLATUS      PELECAN
+ 22  ANHINGA             MELANOGASTER        ANHING
+ 2   PHALACROCORAX       CARBO               PHALACROCORAC  
+                         MELANOLEUCOS
+                         SULCIROSTRIS
+                         VARIUS
+ 3   HAEMATOPUS          OSTRALEGUS          HAEMATOPOD
+ 1                       FULIGINOSUS
+ 3   BURHINUS            NEGLECTUS           BURHIN
+ 22  NUMENIUS            MADAGASCARIENSIS    SCOLOPAC
+                         PHAEOPUS
+                         MINUTUS
+ 2   PLEGADIS            FALCINELLUS         PLATALE
+ 22  CHARADRIUS          LESCHENAULTII       CHARADRI
+                         MONGOLUS
+                         RUFICAPILLUS
+                         VEREDUS
+     ARENARIA            INTERPRES           SCOLOPAC
+     TRINGA              BREVIPES       
+                         HYPOLEUCOS
+                         NEBULARIA
+                         STAGNATILIS
+                         TEREK
+     GALLINAGO           HARDWICKII
+     LIMOSA              LAPPONICA
+     CALIDRIS            ACUMINATA
+                         ALBA
+                         CANUTUS
+                         FERRUGINEA
+                         RUFICOLLIS
+     STILTIA             ISABELLA            GLAREOL
+     MEGALURUS           TIMORIENSIS         SYLVI
+ 3   XENORHYNCHUS        ASIATICUS           CICONI
+ 2   GRUS                RUBICUNDUS          GRU
+                         ANTIGONE
+ 22  EULABEORNIS         CASTANEOVENTRIS     RALL
+ 2   HIMANTOPUS          HIMANTOPUS          RECURVIROSTR
+ 2   VANELLUS            MILES               CHARADRI
+ 22  TADORNA             RADJAH              ANAT
+ 2   ANAS                SUPERCILLOSA
+ 1                       GIBBERIFRONS           
+     DENDROCYGNA         ARCUATA
+                         EYTONI
+     NETTATUS            PULCHELLUS
+     TACHYBAPTUS         NOVAEHOLLANDIAE     PODICIPED
+ 2   GALLINULA           TENEBROSA           RALL
+ 2   ANSERANAS           SEMIPALMATA         ANAT
+ 2   PLATALEA            FLAVIPES            PLATALE
+                         REGIA
+     THRESKIORNIS        MOLUCCA
+ 22  ARDEA               NOVAEHOLLANDIAE     ARDE
+     NYCTICORAX          CALEDONICUS
+     IXOBRYCHUS          MINUTUS
+     DUPETOR             FLAVICOLLIS
+ 22  BUTORIDES           STRIATUS
+ 2   ARDEA               SUMATRANA
+ 2   EGRETTA             SACRA
+ 2                       ALBA
+                         GARZETTA
+                         INTERMEDIA
+                         SACRA
+ 2   ARDEA               PACIFICA
+                         PICATA
+ 3   ACCIPITER           FASCIATUS           ACCIPITR
+                         CIRRHOCEPHALUS
+     AVICEDA             SUBCRISTA
+     CIRCUS              ASSIMILIS
+     ELANUS              NOTATUS
+     MILVUS              MIGRANS
+     FALCO               BERIGORA            FALCON
+                         CENCHROIDES
+                         LONGIPENNIS
+                         PEREGRINUS
+     AEGOTHELES          CRISTATUS           AEGOTHEL
+ 2   HALIASTUR           SPHENURUS           ACCIPITR
+     HIERAAETUS          MORPHNOIDES    
+     LOPHOICTINIA        ISURA
+     FALCO               SUBNIGER            FALCON
+ 2   AQUILA              AUDAX               ACCIPITR
+ 26  NINOX               NOVAESEELANDIAE     STRIG
+ 2   PODARGUS            STRIGOIDES          PODARG
+ 2   CAPRIMULGUS         GUTTATUS            CAPRIMULG
+                         MACRURUS               
+ 2   TYTO                ALBA                TYTON
+ 26  CHALCOPHAPS         INDICA              COLUMB
+     PHAPS               CHALCOPTERA
+     PTILINOPUS          REGINA
+ 2   GEOPELIA            STRIATA
+                         HUMERALIS
+                         CUNEATA
+ 2   COTURNIX            YPSILOPHORUS        PHASIAN
+                         CHINENSIS
+     TURNIX              MACULOSA            TURNIC
+                         CASTANOTA              
+ 2   DUCULUS             SPILORRHOA          COLUMB
+ 26  PHILEMON            ARGENTICEPS         MELIPHAG
+                         BUCEROIDES
+                         CITREOGULARIS
+ 2   ORIOLUS             FLAVOCINCTUS        ORIOL
+                         SAGITTATUS
+     SPHECOTHERES        VIRIDIS
+     CORACINA            TENUIROSTRIS        CAMPEPHAG
+     LALAGE              SUEURII
+                         LEUCOMELA
+     CUCULUS             SATURATUS           CUCUL
+ 2   CHLAMYDERA          NUCHALIS            PARADISAE
+ 2   PITTA               IRIS                PITT
+ 2   DICRURUS            HOTTENTOTTUS        DICRUR
+ 2   CORACINA            NOVAEHOLLANDIAE     CAMPEPHAG
+                         PAPUENSIS
+ 26  MYIAGRA             ALECTO              MUSCICAP
+                         INQUIETA
+                         RUBECULA
+                         RUFICOILIS
+     RHIPIDURA           LEUCOPHRYS
+                         FULIGINOSA
+                         RUFIFRONS
+                         RUFIVENTRIS
+     CUCULUS             PYRRHOPHANUS        CUCUL
+ 2   POMATOSTOMUS        TEMPORALIS          TIMALI
+ 26  LICHENOSTOMUS       UNICOLOR            MELIPHAG
+                         VIRESCENS
+     LICHMERA            INDISTINCTA
+     MELITHREPTUS        ALBOGULARIS
+     MYZOMELA            ERYTHROCEPHALA
+                         OBSCURA
+     RAMSAYORNIS         FASCIATUS
+     CONOPOPHILA         ALBOGULARIS
+     GERYGONE            CHLORONOTA          ACANTHIZ
+                         LEVIGASTER
+                         MAGNIROSTRIS
+                         OLIVACEA
+     SMICRORNIS          BREVIROSTRIS
+ 2   COLLURICINCLA       HARMONICA           MUSCICAP
+                         MEGARHYNCHA
+     CUCULUS             VARIOLOSUS          CUCUL
+ 26  CRACTICUS           NIGROGULARIS        CRACTIC
+     GYMNORHINA          TIBICEN
+ 2   GRALLINA            CYANOLEUCA          GRALLIN
+ 26  CENTROPUS           PHASIANINUS         CUCUL
+ 2   MEGAPODIUS          FREYCINET           MEGAPODI
+ 2   EUDYNAMYS           SCOLOPACEA          CUCUL
+ 2   SCYTHROPS           NOVAEHOLLANDIAE       
+ 26  CACATUA             GALERITA            CACATU
+                         SANGUINEA
+ 2   CALYPTORHYNCHUS     MAGNIFICUS
+ 2   APROSMICTUS         ERYTHROPTERUS       PSITTAC
+     TRICHOGLOSSUS       CHLOROLEPIDOTUS     LORI
+     PSITTEUTELES        VERSICOLOR
+ 2   TRICHOGLOSSUS       RUBRITORQUIS
+ 2   BURHINUS            MAGNIROSTRIS        BURHIN
+ 2   CORVUS              ORRU                CORV
+ 26  DACELO              LEACHII             ALCEDIN
+ 2   CEYX                AZUREUS                
+                         PUSILLUS
+     HALCYON             CHLORIS
+                         MACLEAYII
+                         PYRRHOPYGIA
+                         SANCTA
+ 2   MEROPS              ORNATUS             MEROP
+ 2   PARDALOTUS          STRIATUS            PARDALOT
+ 2   ARTAMUS             LEUCORHYNCHUS       ARTAM
+                         MINOR  
+ 26  POEPHILA            BICHENOVII          PLOCE
+                         GUTTATA
+     NEOCHMIA            RUFICAUDA
+                         PHAETON
+     LONCHURA            CASTANEOTHORAX
+     MALURUS             MELANOCEPHALUS      MALUR
+ 2   CHRYSOCOCCYX        BASALIS             CUCUL
+                         MALAYANUS

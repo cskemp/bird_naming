@@ -1,0 +1,1796 @@
+---
+title: "Plots"
+output: html_notebook
+---
+
+# Setup
+
+```{r}
+
+rm(list = ls())
+
+if (!requireNamespace("renv", quietly = TRUE)) install.packages("renv")
+renv::init()
+
+library(tidyverse)
+library(here)
+library(ape)
+library(tidytree)
+library(ggtree)
+library(ggplot2)
+library(gridExtra)  # To put plots into a grid
+library(patchwork)  # Also to put plots into grids. I'm not sure which one I actually ended up using
+library(ggh4x)      # This helps bend ggplot to my will
+library(ggnewscale) # This allows for multiple scales for the same aesthetic
+library(GGally)     # For ggpairs
+library(Rtsne)
+library(phytools)
+library(pals)       # nerdy colour palettes
+library(forcats)
+library(scales)
+library(MASS)       # For nb regression lines on plots
+
+set.seed(302)
+
+select <- dplyr::select
+
+languages <- c("Anindilyakwa",
+               "Innu",
+               # "Rangi",
+               "Saami",
+               "Tlingit",
+               "Tobelo",
+               "Tzeltal",
+               "Zapotec")
+
+languages_plus <- c("Anindilyakwa",
+               "Innu",
+               # "Rangi",
+               "Saami",
+               "Tlingit",
+               "Tobelo",
+               "Tzeltal",
+               "Zapotec",
+               "All")
+
+colour_pairs <- list(
+  Anindilyakwa = c("#ff1493", "#8b0a50"),       #deeppink
+  Innu = c("#ff3030", "#cd2626"),         #firebrick
+  Saami = c("#ff7f00", "#cd6600"),              #darkorange
+  Tlingit = c("#FFD700", "#cdad00"),              #gold
+  Tobelo = c("#00ee76", "#008b45"),            #springgreen
+  # Tobelo = c("#00e5ee", "#00c5cd"),             #turquoise
+  Tzeltal = c("#1e90ff", "#104e8b"),            #dodgerblue
+  Zapotec = c("#bf3eff", "#68228b"),             #darkorchid
+  All = c( "#b39bc9", "#675875")
+  )
+
+colour_1 <- sapply(colour_pairs, `[`, 1)
+colour_2 <- sapply(colour_pairs, `[`, 2)
+
+```
+
+# Import data
+
+```{r}
+
+# Import similarity data and take out duplicates then re-scale everything else
+
+bird_similarity <- list()
+
+for (language in languages) {
+  
+  file_path <- here("data", paste0("similarity_", language, ".csv"))
+  similarity <- read.csv(file = file_path) %>% 
+    select(-X) %>% 
+    mutate(Language = language) %>% 
+    # change names so I can identify duplicates
+    mutate_at(vars(contains("Species")),
+              ~gsub("\\..*", "", .)) %>% 
+    # make sure that the pairs are always identifiable as the same pairs (I did this when I created the dataset but doing it again just in case)
+    mutate(s1 = pmin(Species1,Species2),
+           s2 = pmax(Species1,Species2)) %>% 
+    select(-contains("Species")) %>% 
+    rename(Species1 = s1,
+           Species2 = s2) %>% 
+    # Put the TRUE values before the FALSE ones so they will be the ones that remain when I remove duplicates
+    arrange(desc(SameName)) %>% 
+    # filter out duplicated pairs
+    distinct(Species1, Species2, .keep_all = TRUE) %>% 
+    #filter out birds pairing with themselves
+    filter(Species1 != Species2) %>% 
+    select(-contains("zDist")) %>% 
+    mutate_at(vars(starts_with("Dist")), list(z = ~scale(.)[,1])) %>% 
+    rename_at(vars(ends_with("_z")), ~sub("(.*)_z$", "z\\1", .))
+  
+  result <- length(which(duplicated(similarity[,c("Species1","Species2")])))
+    
+      if (result == 0) {
+    message("No duplicates remain in ", language)
+      } else {
+        
+        message("Oh no,", language, "still has duplicates!")
+      }
+  
+  bird_similarity[[language]] <- similarity
+
+}
+
+# Make a master dataset with similarity of everything together 
+
+all_sim <- reduce(bird_similarity, rbind)
+
+all_similarity <- all_sim %>% 
+  mutate(Language = "All")
+
+all_similarity <- rbind(all_sim, all_similarity) %>% 
+  mutate(Language = factor(Language))
+
+# Import bird isolation data, take out duplicates
+
+bird_data <- read.csv(here("data/bird_data.csv")) %>% 
+  filter(Language %in% languages) %>% 
+  group_by(Language) %>% 
+  arrange(n) %>% 
+  distinct(ScientificName2023, .keep_all = TRUE) %>% 
+  select(-starts_with("zIso")) %>% 
+  mutate_at(vars(starts_with("Iso")), list(z = ~scale(.)[,1])) %>% 
+  rename_at(vars(ends_with("_z")), ~sub("(.*)_z$", "z\\1", .)) %>% 
+  ungroup()
+  
+all_data <- bird_data %>% 
+  mutate(Language = "All")
+
+all_data <- rbind(bird_data,all_data) %>% 
+  mutate(Language = factor(Language))
+
+# old_data <- read.csv(here("data/old_bird_data.csv"))
+
+```
+
+# Descriptive Stats
+
+## Correlations between similarity predictors
+
+```{r cache = TRUE}
+
+correlation_plots <- list()
+
+  facet_labels <- c(
+  "zDist74" = "1974",
+  "zDist23" = "2023",
+  "zDistPhy" = "Phy",
+  "zDistPer" = "Per"
+  # ,
+  # "zDistCol" = "Col"
+)
+
+for (language in languages) {
+  
+  print(language)
+  
+  language_data <- bird_similarity[[language]]
+  cols <- grep("^z", names(language_data), value = TRUE)
+  range <-  range(language_data[,cols], na.rm = TRUE)
+  colours <- colour_pairs[[language]]
+  
+  plot <- ggpairs(language_data,
+                  columns = cols,
+                  mapping = aes(colour = SameName,
+                                alpha = .6,
+                                size = SameName,
+                                shape = SameName),
+                  labeller = as_labeller(facet_labels),
+                  lower = list(
+                    continuous = wrap("points",
+                                      position = position_jitter(height = .4,
+                                                                 width = .4))),
+                  diag = list(continuous = wrap("densityDiag",
+                                              colour = "black",
+                                              linewidth = .1)),
+                  upper = list(continuous = wrap("cor", 
+                                                 size = 3,
+                                                 digits = 2))
+                  ) +
+    theme_bw() +
+    theme(plot.background = element_rect(fill = "white"),
+          panel.background = element_rect(fill = "white"),
+          panel.grid = element_blank(),
+          axis.text.x = element_blank(),
+          axis.text.y = element_blank(),
+          axis.ticks = element_blank(),
+          panel.spacing = unit(0.1, "lines")
+        ) +
+    scale_colour_manual(values = c(colours[1], "black")) +
+    scale_fill_manual(values = c(colours[1], "black")) +
+    scale_size_manual(values = c(.01, .5)) +
+    scale_shape_manual(values = c(16, 17))
+    
+  correlation_plots[[language]] <- plot
+  
+  ggsave(here(paste0("output/pairs_plot_", language, ".png")),
+       plot,
+       width = 5,
+       height = 4,
+       dpi = 300)
+  
+}
+
+correlation_plots[["Anindilyakwa"]]
+
+```
+
+
+## Distributions of predictors
+
+### Isolation predictors
+
+```{r cache = TRUE}
+
+iso_plot <- all_data %>% 
+  select(CanonicalName, Language, contains("zIso"), -zIsoCol) %>% 
+  pivot_longer(cols = contains("zIso"),
+               names_to = "Variable",
+               values_to = "Value") %>% 
+  ggplot(mapping = aes(Value,
+                       fill = Language)) +
+  geom_density() +
+  scale_fill_manual(values = colour_1) +
+  facet_grid2(Variable ~ factor(Language, levels = languages_plus),
+              scales = "free",
+              independent = "x",
+              strip = strip_themed(
+                background_x = elem_list_rect(fill = alpha(colour_1, .5)))) +
+  theme_bw() +
+  theme(axis.text.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks = element_blank(),
+        legend.position = "none",
+        panel.spacing = unit(0, "lines"),
+        panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(),
+        strip.background.y = element_rect(fill = "white")) +
+  labs(x = NULL,
+       y = NULL,
+       title = "Density plots for Isolation Values")
+
+ggsave(here("output/iso_plot.png"),
+         iso_plot,
+         width =15,
+         height = 10,
+         dpi = 500)
+
+iso_plot
+  
+
+```
+
+## Distributions of AVONET variables
+
+```{r cache = TRUE}
+
+avo_plot <- all_data %>% 
+  select(CanonicalName, Language, BeakLengthCulmen:Mass) %>% 
+  rename_with(~gsub("([a-z])([A-Z])", "\\1 \\2", .), BeakLengthCulmen:Mass) %>%
+  pivot_longer(cols = "Beak Length Culmen": Mass,
+               names_to = "Variable",
+               values_to = "Value") %>% 
+  ggplot(mapping = aes(Value, 
+                       # colour = Language,
+                       fill = Language)) +
+  geom_density() +
+    scale_fill_manual(values = colour_1) +
+  facet_grid2(Variable ~ factor(Language, levels = languages),
+              scales = "free",
+              independent = "all",
+              strip = strip_themed(
+                background_x = elem_list_rect(fill = alpha(colour_1, .5)))) +
+  theme_bw() +
+  theme(axis.text.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks = element_blank(),
+        legend.position = "none",
+        panel.spacing = unit(0, "lines"),
+        panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(),
+        strip.background.y = element_rect(fill = "white")) +
+  labs(x = NULL,
+       y = NULL,
+       title = "Density plots for AVONET variables with independent scales")
+
+
+  ggsave(here("output/avo_plot.png"),
+         avo_plot,
+         width =10,
+         height = 15,
+         dpi = 500)
+
+avo_plot
+
+```
+
+## Distributions of AVONET variables - fixed scales
+
+```{r cache = TRUE}
+
+avo_plot_2_data <- all_data %>% 
+  filter(zIsoPer < 8) %>% 
+  select(CanonicalName, Language, BeakLengthCulmen:Mass) %>% 
+  group_by(Language) %>% 
+  mutate(across(BeakLengthCulmen:Mass, list(z = ~scale(.)[,1]))) %>%
+  ungroup()%>% 
+  select(-c(BeakLengthCulmen:Mass)) %>% 
+  rename_with(~gsub("_z","", .), BeakLengthCulmen_z:Mass_z)%>% 
+  rename_with(~gsub("([a-z])([A-Z])", "\\1 \\2", .), BeakLengthCulmen:Mass) 
+
+ranges <- avo_plot_2_data %>% 
+  summarise(across("Beak Length Culmen":Mass, 
+                   list(min = ~min(., na.rm = TRUE),
+                        max = ~max(., na.rm = TRUE)))) %>% 
+  mutate(Language = NA)
+
+ranges_full <- data.frame()
+
+for (language in languages_plus) {
+  
+  lang <- str_to_title(language)
+  ranges_lang <- ranges %>% mutate(Language = lang)
+  ranges_full <- rbind(ranges_full, ranges_lang)
+  
+}
+
+ranges_full <- ranges_full %>% 
+  pivot_longer(cols = -Language,
+               names_to = "Variable",
+               values_to = "Value") %>% 
+  mutate(Variable = gsub("_.*", "", Variable))
+  
+avo_plot_2_data_long <- avo_plot_2_data %>%
+    pivot_longer(cols = "Beak Length Culmen": Mass,
+               names_to = "Variable",
+               values_to = "Value")
+
+  avo_plot_2 <- avo_plot_2_data_long %>% 
+    ggplot(mapping = aes(Value, 
+                       # colour = Language,
+                       fill = Language)) +
+    geom_density() +
+    scale_fill_manual(values = colour_1) +
+    geom_point(data = ranges_full, 
+               aes(x = Value, y = 0), alpha = 0)  +
+    # This bit of ridiculosity is just so I can fix the x-scales across rows 
+  facet_grid2(Variable ~ factor(Language, levels = languages_plus),
+              scales = "free",
+              independent = "x",
+              strip = strip_themed(
+                background_x = elem_list_rect(fill = alpha(colour_1, .5)))) +
+  theme_bw() +
+  theme(
+    axis.text.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks = element_blank(),
+        legend.position = "none",
+        panel.spacing = unit(0, "lines"),
+        panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(),
+        strip.background.y = element_rect(fill = "white")) +
+  labs(x = NULL,
+       y = NULL,
+       title = "Density plots for AVONET variables with fixed x scales across rows")
+
+  ggsave(here("output/avo_plot_2.png"),
+         avo_plot_2,
+         width =10,
+         height = 15,
+         dpi = 500)
+
+avo_plot_2
+
+```
+
+# Analysis 2: Predicting name-sharing
+
+## Violin plots individual predictors
+
+```{r cache = TRUE}
+
+plot_data <- all_similarity %>% 
+  pivot_longer(cols = c(zDistPer,
+                        zDistPhy,
+                        # zDist23,
+                        zDist74),
+               values_to = "Value",
+               names_to = "Variable") %>% 
+  mutate(SameName = ifelse(SameName == TRUE,
+                           "yes",
+                           "no"),
+         Variable = case_when(
+           Variable == "zDistPer" ~ "Perceptual",
+           Variable == "zDistPhy" ~ "Phylogenetic",
+           Variable == "zDist74" ~ "1974 Traditional",
+           # Variable == "zDist23" ~ "2023 Traditional",
+           TRUE ~ Variable
+         ))
+
+plot_violin2 <- plot_data %>% 
+  ggplot(mapping = aes(factor(SameName, levels = c("yes","no")), Value,
+                       colour = Language)) +
+  geom_point(position = position_jitter(width = 0.4, 
+                                             height = 0.4), 
+                  size = 0.01, 
+                  alpha = 0.7,
+                  aes(colour = Language)) +
+   scale_colour_manual(values = colour_1) +
+  new_scale_color() +
+  geom_violin(fill = "white",
+              alpha = .5,
+              aes(colour = Language)) +
+  
+  scale_colour_manual(values = colour_2) +
+  facet_grid2(factor(Variable, 
+                     levels = c("1974 Traditional",
+                                # "2023 Traditional",
+                                "Phylogenetic",
+                                "Perceptual")) ~ 
+                       factor(Language, 
+                              levels = languages_plus),
+              scales = "free", 
+              independent = "y",
+              strip = strip_themed(
+     background_x = elem_list_rect(fill = alpha(colour_1, .5)))) +
+# Customise the number of integer breaks - this argument is life changing and I am obsessed with it.
+  scale_y_continuous(breaks = breaks_pretty(n = 5, min.n = 1),  
+                     labels = label_number(accuracy = 1)) +
+  theme_bw() +
+  theme(legend.position = "none",
+        strip.background.y = element_rect(fill = "white"),
+        panel.spacing.x=unit(.1, "lines")) +
+  ylab("Value of distance predictor") +
+  xlab("Is the bird pair given the same name?")
+  
+  plot_violin2
+  
+    ggsave(here("output/violin_LR.png"),
+         plot_violin2,
+         width = 8,
+         height = 5,
+         dpi = 300)
+
+
+```
+
+# Analysis 3a: Predicting singleton categories
+
+## Violin plots for logistic regression 
+
+```{r cache = TRUE}
+
+vars <- c("zIso74", 
+          # "zIso23",
+          "zIsoPhy", 
+          "zIsoPer")
+
+labels <- c("1974 Traditional", 
+            # "2023 Traditional",
+            "Phylogenetic", 
+            "Perceptual")
+
+plot_data <- all_data %>% 
+  mutate(Monotypic = ifelse(
+    n == 1, "yes", "no"
+  )) %>%
+  select(Language, Monotypic, all_of(vars)) %>% 
+  pivot_longer(cols = all_of(vars),
+               names_to = "pred",
+               values_to = "value") %>% 
+      mutate(pred = case_when(
+    pred == "zIso74" ~ "1974 Traditional",
+    # pred == "zIso23" ~ "2023 Traditional",
+    pred == "zIsoPer" ~ "Perceptual",
+    pred == "zIsoPhy" ~ "Phylogenetic",
+    TRUE ~ pred  # Default to keep original value if no match
+  ))
+
+violin_2 <- plot_data %>%
+  ggplot(mapping = aes(factor(Monotypic, levels = c("yes", "no")), value, colour = Language, fill = Language)) +
+  geom_point(position = position_jitter(width = 0.4),
+             size = 0.5) +
+  scale_colour_manual(values = colour_1) +
+  new_scale_color() +
+  # geom_boxplot(alpha = .5,
+  #              outlier.shape = 21,
+  #              fill = "white",
+  #              aes(colour = Language)) +
+  geom_violin(alpha = .5,
+              fill = "white",
+              aes(colour = Language))+
+  scale_colour_manual(values = colour_2) +
+  facet_grid2(factor(pred, levels = labels) ~
+                factor(Language, levels = languages_plus),
+              scales = "free",
+              independent = "y",
+              strip = strip_themed(
+                background_x = elem_list_rect(fill = alpha(colour_1, .5)))) +
+  theme_bw() +
+  theme(legend.position = "none",
+        strip.background.y = element_rect(fill = "white")) +
+  ylab("Value of Isolation Predictor") + 
+  xlab("Is the bird the only member of its category?") +
+  theme(panel.spacing.x=unit(.1, "lines"))
+
+ggsave(here("output/violin_monotypic.png"),
+       violin_2,
+       width = 9,
+       height = 5,
+       dpi = 300)
+
+violin_2
+
+```
+
+# Analysis 3b: Predicting companion count
+
+## Predictions from models
+These predictions come from nb models, with predictions from the truncated NB models added to see how they perform when not considering the monotypic birds
+
+At the moment the predictions have the emu taken out. Unless I have changed it but not changed this line.
+
+```{r cache = TRUE}
+
+# This is the long skinny version of the plot
+
+# Import prediction data for negative binomial models (full data)
+preds_nb <- read_csv(here("data/Predictions_nb.csv")) %>% 
+  # pivot_longer(cols = "-2":"3",
+  #              names_to = "value",
+  #              values_to = "n") %>%
+  mutate(name = case_when(
+    Predictor == "zIso74" ~ "1974 Traditional",
+    Predictor == "zIsoPer" ~ "Perceptual",
+    Predictor == "zIsoPhy" ~ "Phylogenetic",
+    TRUE ~ Predictor)) %>% 
+  mutate(value = as.numeric(value),
+         n = as.numeric(n),
+         group = "All data")
+
+# Import prediction data for truncated negative binomial models (n=1 observations removed from the data)
+preds_tnb <- read_csv(here("data/Predictions_tnb.csv")) %>% 
+  filter(Model == "pred_trunc" | str_detect(Model, "CI")) %>% 
+  # pivot_longer(cols = "-2":"3",
+  #              names_to = "value",
+  #              values_to = "n") %>%
+  mutate(name = case_when(
+    Predictor == "zIso74" ~ "1974 Traditional",
+    Predictor == "zIsoPer" ~ "Perceptual",
+    Predictor == "zIsoPhy" ~ "Phylogenetic",
+    TRUE ~ Predictor)) %>% 
+  mutate(value = as.numeric(value),
+         n = as.numeric(n),
+         # n = n + 1, # this is to put it back on the same scale. (not necessary with the truncated model)
+         group = "Monotypic removed")
+
+preds <- rbind(preds_nb, preds_tnb)
+
+all_data <- bird_data %>% 
+  mutate(Language = "All")
+
+plot_data <- bird_data %>% 
+  rbind(all_data)%>% 
+  select(zIso74,
+    zIsoPhy,
+    zIsoPer,
+    CanonicalName, 
+    n, 
+    Language) %>%
+  # filter(zIsoPer<10) %>%  # take emu out
+  pivot_longer(cols = c(
+    zIso74,
+    zIsoPhy,
+    zIsoPer
+  )) %>% 
+  mutate(name = case_when(
+    name == "zIso74" ~ "1974 Traditional",
+    name == "zIsoPer" ~ "Perceptual",
+    name == "zIsoPhy" ~ "Phylogenetic",
+    TRUE ~ name  # Default to keep original value if no match
+  ))
+
+# This is for ggh4x to set the limits of the facets separately
+facet_limits <- plot_data %>%
+  group_by(Language) %>%
+  summarise(y_min = min(0), y_max = max(n)-1) %>% 
+  arrange(factor(Language, levels = languages))
+
+scales_list <- facet_limits %>%
+  mutate(
+    # There is a better way of doing this but I didn't know it at the time so I am just leaving it because it works fine.
+    scale = map2(y_min, 
+                 y_max, 
+                 ~scale_y_continuous(limits = c(.x, .y),
+                                     breaks = seq(0, .y, by = ifelse(
+                                       .y > 11, 3,
+                                       ifelse(
+                                         .y > 5.1,
+                                           2, 1
+                                         )
+                                       )
+                                     )))
+  ) %>%
+  pull(scale) %>%
+  setNames(facet_limits$Language)
+
+# This is to plot the error bars
+confints_all <- preds %>% 
+  filter(group == "All data") %>% 
+  mutate(Model = ifelse(str_detect(Model, "CI"), Model, "Mean")) %>% 
+  pivot_wider(names_from = Model,
+              values_from = n) %>% 
+  filter(complete.cases(.))
+
+confints_nomono <- preds %>% 
+  filter(group == "Monotypic removed") %>% 
+  mutate(Model = ifelse(str_detect(Model, "CI"), Model, "Mean")) %>% 
+  pivot_wider(names_from = Model,
+              values_from = n) %>% 
+  filter(complete.cases(.))
+
+plot_preds <- plot_data %>% 
+  mutate(n = n - 1) %>%   # to make the nb the same as in the analysis - shifting it to start at 0
+  ggplot(mapping = aes(y = (n),
+                       x = value, 
+                       fill = Language)) +
+
+  geom_point(shape = 21,
+             stroke = NA,
+             size = .7,
+             position = position_jitter(width = 0.25, height = 0.08)) +
+  facet_grid2(factor(Language, levels = languages_plus)
+              ~ factor(name, levels = c("1974 Traditional",
+                                        "Phylogenetic",
+                                        "Perceptual")),
+              scales = "free", 
+              independent = "x",
+              # labeller = facet_labeller,
+              strip = strip_themed(
+     background_y = elem_list_rect(fill = alpha(colour_1, .5)))) +
+  scale_colour_manual(values = colour_2) +
+  theme_bw()  +
+  scale_fill_manual(values = colour_1) +
+  labs(x = "Isolation value",
+       y = "Companion count") +
+  facetted_pos_scales(y = scales_list) +
+  new_scale_color() +
+  geom_ribbon(data = confints_all,
+              alpha = .3,                
+              aes(fill = Language,
+                  y = Mean,
+                  ymin = CI_lower,
+                  ymax = CI_upper)) +
+  geom_line(data = preds %>% filter(!str_detect(Model, "CI")),
+            aes(colour = Language,
+                group = group,
+                linetype = factor(group, 
+                                  levels = c("Monotypic removed", 
+                                             "All data")))) +
+  scale_colour_manual(values = colour_2) +
+  geom_errorbar(data = confints_nomono,
+                size = 0.2,
+                aes(y = Mean,
+                    ymin = CI_lower,
+                    ymax = CI_upper,
+                    x = value,
+                    colour = Language,
+                    width = .2)) +
+  theme(legend.position = "none",
+        legend.title = element_blank(),
+        panel.spacing = unit(0, "lines"),
+        strip.background.x = element_rect(fill = "white")) +
+  guides(colour = FALSE, fill = FALSE) +
+  scale_x_continuous(labels = label_number(accuracy = 1))
+
+  ggsave(here("output/scatter_preds.png"),
+         plot_preds,
+         width = 4,
+         height = 8,
+         dpi = 500)
+
+plot_preds
+
+```
+
+```{r cache = TRUE}
+
+# This is the wide version of the plots
+
+# maybe a bit of a neater way to do it
+
+# Import prediction data
+preds_nb <- read_csv(here("data/Predictions_nb.csv")) %>% 
+  # pivot_longer(cols = "-2":"3",
+  #              names_to = "value",
+  #              values_to = "n") %>%
+  mutate(name = case_when(
+    Predictor == "zIso74" ~ "1974 Traditional",
+    Predictor == "zIsoPer" ~ "Perceptual",
+    Predictor == "zIsoPhy" ~ "Phylogenetic",
+    TRUE ~ Predictor)) %>% 
+  mutate(value = as.numeric(value),
+         n = as.numeric(n),
+         group = "All data")
+
+preds_tnb <- read_csv(here("data/Predictions_tnb.csv")) %>% 
+  filter(Model == "pred_trunc" | str_detect(Model, "CI")) %>% 
+  # pivot_longer(cols = "-2":"3",
+  #              names_to = "value",
+  #              values_to = "n") %>%
+  mutate(name = case_when(
+    Predictor == "zIso74" ~ "1974 Traditional",
+    Predictor == "zIsoPer" ~ "Perceptual",
+    Predictor == "zIsoPhy" ~ "Phylogenetic",
+    TRUE ~ Predictor)) %>% 
+  mutate(value = as.numeric(value),
+         n = as.numeric(n),
+         # n = n + 1, #this is to put it back on the same scale (not necessary with the truncated model)
+         group = "Monotypic removed")
+
+preds <- rbind(preds_nb, preds_tnb)
+
+all_data <- bird_data %>% 
+  mutate(Language = "All")
+
+plot_data <- bird_data %>% 
+  rbind(all_data)%>% 
+  select(zIso74,
+    zIsoPhy,
+    zIsoPer,
+    CanonicalName, 
+    n, 
+    Language) %>%
+  # filter(zIsoPer<10) %>%  # take emu out
+  pivot_longer(cols = c(
+    zIso74,
+    zIsoPhy,
+    zIsoPer
+  )) %>% 
+  mutate(name = case_when(
+    name == "zIso74" ~ "1974 Traditional",
+    name == "zIsoPer" ~ "Perceptual",
+    name == "zIsoPhy" ~ "Phylogenetic",
+    TRUE ~ name  # Default to keep original value if no match
+  ))
+
+# This is for ggh4x to set the limits of the facets separately
+facet_limits <- plot_data %>%
+  group_by(Language) %>%
+  summarise(y_min = min(0), y_max = max(n)-1) %>% 
+  arrange(factor(Language, levels = languages))
+
+scales_list <- facet_limits %>%
+  mutate(
+    scale = map2(y_min, 
+                 y_max, 
+                 ~scale_y_continuous(limits = c(.x, .y),
+                                     breaks = seq(0, .y, by = ifelse(
+                                       .y > 11, 3,
+                                       ifelse(
+                                         .y > 5.1,
+                                           2, 1
+                                         )
+                                       )
+                                     )))
+  ) %>%
+  pull(scale) %>%
+  setNames(facet_limits$Language)
+
+# This is to plot the error bars
+
+confints_all <- preds %>% 
+  filter(group == "All data") %>% 
+  mutate(Model = ifelse(str_detect(Model, "CI"), Model, "Mean")) %>% 
+  pivot_wider(names_from = Model,
+              values_from = n) %>% 
+  filter(complete.cases(.))
+
+confints_nomono <- preds %>% 
+  filter(group == "Monotypic removed") %>% 
+  mutate(Model = ifelse(str_detect(Model, "CI"), Model, "Mean")) %>% 
+  pivot_wider(names_from = Model,
+              values_from = n) %>% 
+  filter(complete.cases(.))
+
+
+
+first_half <- languages_plus[1:(length(languages_plus)/2)]
+second_half <- languages_plus[(length(languages_plus)/2+1):length(languages_plus)]
+
+colour_1_2 <- colour_1[(length(colour_1)/2+1):length(colour_1)]
+
+
+scales_list_2 <- scales_list[(length(scales_list)/2+1):length(scales_list)]
+
+
+plot_preds_1 <- plot_data %>% 
+  filter(Language %in% first_half) %>% 
+  mutate(n = n-1) %>%   # to make the nb the same as in the analysis - shifting it to start at 0
+  ggplot(mapping = aes(y = (n),
+                       x = value, 
+                       fill = Language)) +
+  geom_point(shape = 21,
+             stroke = NA,
+             size = .7,
+             position = position_jitter(width = 0.25, height = 0.08))+
+  facet_grid2(factor(Language, levels = first_half)
+              ~ factor(name, levels = c("1974 Traditional",
+                                        "Phylogenetic",
+                                        "Perceptual")),
+              scales = "free", 
+              independent = "x",
+              # labeller = facet_labeller,
+              strip = strip_themed(
+     background_y = elem_list_rect(fill = alpha(colour_1, .5))))+
+  scale_colour_manual(values = colour_2) +
+  theme_bw()  +
+  scale_fill_manual(values = colour_1) +
+  labs(x = "Isolation value",
+       y = "Companion count")+
+   facetted_pos_scales(
+    y = scales_list
+  ) +
+  new_scale_color() +
+    geom_ribbon(data = confints_all %>% filter(Language %in% first_half),
+                  alpha = .3,
+              aes(fill = Language,
+                  y = Mean,
+                  ymin = CI_lower,
+                  ymax = CI_upper)) +
+  geom_line(data = preds %>% filter(!str_detect(Model, "CI") & Language %in% first_half),
+            aes(colour = Language,
+                group = group,
+                linetype = factor(group, levels = c("Monotypic removed", "All data"))))+
+  scale_colour_manual(values = colour_2) +
+  geom_errorbar(data = confints_nomono %>% filter(Language %in% first_half),
+                size = 0.2,
+                aes(y = Mean,
+                    ymin = CI_lower,
+                    ymax = CI_upper,
+                    x = value,
+                    colour = Language,
+                    width = .2)) +
+  theme(legend.position = "none",
+        legend.title = element_blank(),
+        panel.spacing = unit(0, "lines"),
+        strip.background.x = element_rect(fill = "white"),
+        plot.margin = unit(c(.5,0,.5,.5), "cm")) +
+  guides(colour = FALSE, fill = FALSE) +
+  scale_x_continuous(labels = label_number(accuracy = 1))
+
+# Second plot
+
+plot_preds_2 <- plot_data %>% 
+  filter(Language %in% second_half) %>% 
+  mutate(n = n-1) %>%   # to make the nb the same as in the analysis - shifting it to start at 0
+  ggplot(mapping = aes(y = (n),
+                       x = value, 
+                       fill = Language)) +
+
+  geom_point(shape = 21,
+             stroke = NA,
+             size = .7,
+             position = position_jitter(width = 0.25, height = 0.08))+
+  facet_grid2(factor(Language, levels = second_half)
+              ~ factor(name, levels = c("1974 Traditional",
+                                        "Phylogenetic",
+                                        "Perceptual")),
+              scales = "free", 
+              independent = "x",
+              # labeller = facet_labeller,
+              strip = strip_themed(
+     background_y = elem_list_rect(fill = alpha(colour_1_2, .5))))+
+  scale_colour_manual(values = colour_2) +
+  theme_bw()  +
+  scale_fill_manual(values = colour_1) +
+  labs(x = "Isolation value",
+       y = element_blank())+
+   facetted_pos_scales(
+    y = scales_list_2
+  ) +
+  new_scale_color() +
+    geom_ribbon(data = confints_all %>% filter(Language %in% second_half),
+                  alpha = .3,
+              aes(fill = Language,
+                  y = Mean,
+                  ymin = CI_lower,
+                  ymax = CI_upper)) +
+  geom_line(data = preds %>% 
+              filter(!str_detect(Model, "CI") & Language %in% second_half),
+            aes(colour = Language,
+                group = group,
+                linetype = factor(group, levels = c("Monotypic removed", "All data"))))+
+  scale_colour_manual(values = colour_2) +
+  geom_errorbar(data = confints_nomono %>% filter(Language %in% second_half),
+                size = 0.2,
+                aes(y = Mean,
+                    ymin = CI_lower,
+                    ymax = CI_upper,
+                    x = value,
+                    colour = Language,
+                    width = .2)) +
+  theme(legend.position = "none",
+        legend.title = element_blank(),
+        panel.spacing = unit(0, "lines"),
+        strip.background.x = element_rect(fill = "white"),
+        plot.margin = unit(c(.5,.5,.5,-0.3), "cm")) +
+  guides(colour = FALSE, fill = FALSE) +
+  scale_x_continuous(labels = label_number(accuracy = 1))
+
+plot_preds_2
+
+both_plots <- list(plot_preds_1, plot_preds_2)
+
+all_plots_together <- 
+  wrap_plots(both_plots, ncol = 2)
+
+all_plots_together
+
+  ggsave(here("output/scatter_preds_patchwork.png"),
+         all_plots_together,
+         width = 8,
+         height = 5,
+         dpi = 500)
+
+```
+
+## Scatterplot of all languages together
+
+```{r cache = TRUE}
+
+# Perceptual isolation plot with all languages
+
+mega_plot_per <- bird_data %>% 
+  filter(Language %in% languages) %>% 
+  mutate(n = n - 1) %>% 
+  filter(zIsoPer < 8) %>%
+  ggplot(aes(y = n, 
+             x = zIsoPer, 
+             fill = Language, 
+             colour = Language)) +
+  geom_point(shape = 21,
+             stroke = NA,
+             alpha = .6,
+             position = position_jitter(width = 0.25, height = 0.1))+
+  scale_fill_manual(values = colour_1) +
+  geom_smooth(method = "glm.nb",
+              se = FALSE,
+              # fullrange = TRUE,
+              aes(group = Language))+
+  scale_colour_manual(values = colour_2)+
+  theme_bw() +
+  theme(
+    # legend.position = "bottom",
+    legend.position = "none",
+        aspect.ratio = 1/2) +
+  labs(y = "Number of birds sharing a category",
+       x = "Perceptual Isolation")
+
+mega_plot_per
+
+# Phylogenetic isolation plot with all languages
+
+mega_plot_phy <- bird_data %>% 
+  mutate(n = n - 1) %>% 
+  filter(zIsoPer<8) %>% 
+  ggplot(aes(y = n,
+             x = zIsoPhy, 
+             fill = Language, 
+             colour = Language)) +
+  geom_point(shape = 21,
+             stroke = NA,
+             alpha = .6,
+             position=position_jitter(width=0.25, height=0.1)) +
+  scale_fill_manual(values = colour_1) +
+  geom_smooth(method = "glm.nb",
+              se = FALSE,
+              # fullrange = TRUE,
+              aes(group = Language)) +
+  scale_colour_manual(values = colour_2) +
+  theme_bw() +
+  theme(legend.position = "none",
+        aspect.ratio = 1/2) +
+  labs(y = "Number of birds sharing a category",
+       x = "Phylogenetic Isolation")
+
+mega_plot_phy
+
+# Traditional plot with all languages 
+
+mega_plot_74 <- bird_data %>% 
+  mutate(n = n - 1) %>% 
+  # filter(zIsoPer < 8) %>% 
+  ggplot(aes(y = n,
+             x = zIso74, 
+             fill = Language, 
+             colour = Language)) +
+  geom_point(shape = 21,
+             stroke = NA,
+             alpha = .6,
+             position = position_jitter(width = 0.25, height = 0.25))+
+  scale_fill_manual(values = colour_1) +
+  geom_smooth(method = "glm.nb",
+              se = FALSE,
+              # fullrange = TRUE,
+              aes(group = Language))+
+  scale_colour_manual(values = colour_2)+
+  theme_bw() +
+  theme(legend.position = "none",
+        aspect.ratio = 1/2) +
+  labs(x = "Number of birds sharing a category",
+       y = "1974 Traditional Isolation")
+mega_plot_74
+
+facet_labels <- c(
+  "zIso74" = "1974 Traditional",
+  "zIsoPer" = "Perceptual",
+  "zIsoPhy" = "Phylogenetic"
+)
+mega_plot_74
+
+# Traditional plot again but unscaled because I reckon it's better
+
+mega_plot_74_unsc <- bird_data %>% 
+  mutate(n = n - 1) %>% 
+  # filter(zIsoPer < 8) %>%
+  ggplot(aes(y = n,
+             x = Iso74, 
+             fill = Language, 
+             colour = Language)) +
+  geom_point(shape = 21,
+             stroke = NA,
+             position = position_jitter(width = 0.2, height = 0.2),
+             alpha = .6
+             )+
+  scale_fill_manual(values = colour_1) +
+  geom_smooth(method = "glm.nb",
+              se = FALSE,
+              # fullrange = TRUE,
+              aes(group = Language))+
+  scale_colour_manual(values = colour_2)+
+  theme_bw() +
+  theme(legend.position = "none",
+        aspect.ratio = 2/1) +
+  labs(y = "Number of birds sharing a category",
+       x = "1974 Traditional Isolation")
+mega_plot_74_unsc
+
+facet_labels <- c(
+  "zIso74" = "1974 Traditional",
+  "zIsoPer" = "Perceptual",
+  "zIsoPhy" = "Phylogenetic"
+)
+
+facet_labeller <- function(variable,value){
+  return(facet_labels[value])
+}
+
+x_range <- range(bird_data %>% 
+                     filter(zIsoPer < 8) %>%
+                     select(zIso74, zIsoPhy,zIsoPer) %>% 
+                     unlist(), na.rm = TRUE)
+x_ranges <- bird_data %>%
+  ungroup() %>% 
+  select(zIso74, zIsoPhy, zIsoPer) %>% 
+  filter(zIsoPer < 8)%>%
+  pivot_longer(cols = starts_with("z")) %>% 
+  group_by(name) %>%
+  summarise(x_min = floor(min(value, na.rm = TRUE)),  # Example: using floor for x_min
+            x_max = ceiling(max(value, na.rm = TRUE)))
+
+x_mins <- x_ranges$x_min
+x_maxs <- x_ranges$x_max
+
+# This is to force the lines to be plotted in a particular order, so the shortest ones are on top and therefore easier to see
+line_order <- bird_data %>% group_by(Language) %>% 
+  slice_max(n, with_ties = FALSE) %>% 
+  arrange(desc(n)) %>% 
+  pull(Language)
+
+# This is to make the breaks at 0 and then every multiple of 2 and -2 and allowing it to vary between facets
+custom_breaks <- function(x) {
+  min_val <- floor(min(x, na.rm = TRUE) / 2) * 2
+  max_val <- ceiling(max(x, na.rm = TRUE) / 2) * 2
+  seq(min_val, max_val, by = 2)
+}
+
+# Facetted plot with all the languages
+
+mega_plot <- bird_data %>% 
+  mutate(n = n - 1) %>% 
+  ungroup() %>% 
+  mutate(Language = factor(Language)) %>%
+  mutate(Language = fct_relevel(Language, line_order)) %>% 
+  mutate(forlegend = -50,
+         forscale = 1) %>% 
+  filter(zIsoPer < 8) %>%
+  select(CanonicalName, 
+         n, 
+         Language, 
+         zIso74, 
+         zIsoPhy,
+         zIsoPer,
+         forlegend,
+         forscale) %>% 
+  pivot_longer(cols = starts_with("z")) %>% 
+  arrange(match(Language, as.factor(line_order))) %>% 
+  mutate(Language = as.factor(Language)) %>% 
+  
+  # The plot
+  ggplot(aes(y = n, 
+             x = value)) +
+  
+  # Points 
+  geom_point(aes(colour = Language),
+             shape = 21,
+             fill = NA,
+             # alpha = .6,
+             position = position_jitter(width = 0.25, height = 0.22),
+             show.legend = FALSE,
+             stroke = .3) +
+
+# For colourblind-friendly plot comment out the next line and comment back in the following line after that
+
+  scale_colour_manual(values = colour_1) +
+  # scale_colour_viridis_d() +
+  
+  # Lines
+  new_scale_color() +
+  geom_smooth(method = "glm.nb",
+              se = FALSE,
+              # fullrange = TRUE,
+              aes(group = Language,
+                  colour = Language),
+              linewidth = .3,
+              show.legend = FALSE) +
+
+    scale_colour_manual(values = colour_2) +
+  theme_bw() +
+  theme(
+    # legend.position = "bottom",
+        aspect.ratio = 2/1,
+        strip.background.x = element_rect(fill = "white")) +
+  facet_grid(cols = vars(name),
+             labeller = facet_labeller,
+             scales = "free") +
+
+  
+  # I just really want the points to be sitting in front of the lines on the legend, and this is the only way I can figure out how to do it, although I feel like a barbarian doing it like this. Totally worth it though.
+  # new_scale_color() +
+  geom_line(aes(forscale, forlegend, colour = Language, group = Language)) +
+  
+# For colourblind-friendly plot comment out the next four lines and comment back in the next line
+  scale_colour_manual(values = colour_2,
+                       breaks = sort(bird_data$Language),
+                       labels = sort(bird_data$Language),
+                       name = "Language") +
+  # scale_colour_viridis_d() +
+  
+  new_scale_color() +
+  geom_point(aes(forscale, forlegend, colour = Language),  
+             shape = 21,
+             fill = NA) +
+  
+# For colourblind-friendly plot comment out the next four lines and comment back in the next line
+  scale_colour_manual(values = colour_1,
+                      breaks = sort(bird_data$Language),
+                      labels = sort(bird_data$Language),
+                      name = "Language")  +
+   # scale_colour_viridis_d() +
+
+
+   scale_x_continuous(breaks = custom_breaks) +
+  scale_y_continuous(limits = c(0, NA),
+                     minor_breaks = seq(0, 
+                                        ceiling(max(bird_data$n)), 
+                                        by = 1)) +
+  labs(y = "Number of birds in category",
+       x = NULL) 
+
+  ggsave(here("output/scatter_mega.png"),
+         mega_plot,
+         width =9,
+         height = 5.5,
+         dpi = 500)
+
+mega_plot
+
+```
+
+# Scaled tSNE plots
+
+```{r cache = TRUE}
+
+tSNEplotsPer <- list()
+
+for (language in languages) {
+  
+  colour_pair <- colour_pairs[[language]]
+  
+  language_data <- bird_data %>% 
+    filter(Language == language & !is.na(tSNE1per)) %>% 
+    mutate(IndexFG = ifelse(n == 1, "Monotypic", IndexFG),
+           IndexFG = factor(IndexFG),
+           VarPer = ifelse(IndexFG == "Monotypic", max(VarPer) +1, VarPer)) # easy hack to make sure Monotypic is last facet plotted
+
+  plot <- ggplot() +
+    geom_point(data = language_data[,c("tSNE1per","tSNE2per")],
+               aes(tSNE1per,tSNE2per),
+               colour = "grey89",
+               size = 0.8,
+               alpha = 0.6) +
+    geom_point(data = language_data,
+               aes(tSNE1per, tSNE2per),
+               size = 1.0,
+               colour = colour_pair[2]) +
+    facet_wrap(~fct_reorder(IndexFG,VarPer),  ### This was the problem, it was ordered by VarPhy instead of VarPer. I've fixed it, now it needs to go into the paper
+               ncol = 6) +
+    theme(legend.position = NULL) +
+    labs(title = NULL,x = NULL, y = NULL, ) +
+    theme_bw() +
+    theme(strip.background = element_rect(
+      fill = alpha(colour_pair[1], 
+                   alpha = 0.7)),
+          axis.text.x = element_blank(),
+          axis.text.y = element_blank(),
+          axis.ticks = element_blank(),
+          panel.grid = (element_blank()))
+  
+    tSNEplotsPer[[language]] <- plot
+    
+}
+
+tSNEplotsPer[["All"]] <- NULL
+  
+
+
+invisible(lapply(tSNEplotsPer, print))
+
+  ggsave(here("output/tSNE_plot_Anindilyakwa.png"),
+         tSNEplotsPer[["Anindilyakwa"]],
+         width = 8,
+         height = 8,
+         dpi = 500)
+
+    ggsave(here("output/tSNE_plot_Innu.png"),
+         tSNEplotsPer[["Innu"]],
+         width = 8,
+         height = 6.66666,
+         dpi = 500)
+
+        # ggsave(here("output/tSNE_plot_Rangi.png"),
+        #  tSNEplotsPer[["Rangi"]],
+        #  width = 8,
+        #  height = 5.333,
+        #  dpi = 500)
+
+        ggsave(here("output/tSNE_plot_Saami.png"),
+         tSNEplotsPer[["Saami"]],
+         width = 8,
+         height = 2.6666,
+         dpi = 500)
+
+        ggsave(here("output/tSNE_plot_Tlingit.png"),
+         tSNEplotsPer[["Tlingit"]],
+         width = 8,
+         height = 5.3333,
+         dpi = 500)
+
+        ggsave(here("output/tSNE_plot_Tobelo.png"),
+         tSNEplotsPer[["Tobelo"]],
+         width = 8,
+         height = 6.6666666,
+         dpi = 500)
+
+        ggsave(here("output/tSNE_plot_Tzeltal.png"),
+         tSNEplotsPer[["Tzeltal"]],
+         width = 8,
+         height = 8,
+         dpi = 500)
+
+  ggsave(here("output/tSNE_plot_Zapotec.png"),
+         tSNEplotsPer[["Zapotec"]],
+         width = 8,
+         height = 5.33,
+         dpi = 500)
+
+
+
+
+```
+
+# tSNE plot for the paper
+
+This is the same tSNE plot from before but with the actual language names put back in. It was hard and annoying. I don't really want to do it again for all of the other languages.
+
+```{r eval = FALSE}
+
+anindilyakwa_waddy <- read.csv(here("preprocessing/data/anindilyakwa_waddy.csv")) %>% 
+  mutate(CommonNameOG = ifelse(CommonNameWaddy == "",
+                               CommonName,
+                               CommonNameWaddy),
+         ScientificNameOG = ifelse(ScientificNameWaddy == "", 
+                                   ScientificName, 
+                                   ScientificNameWaddy)) %>% 
+  rename(FolkGeneric = LanguageName) %>% 
+  group_by(FolkGeneric) %>% 
+  mutate(n = n()) %>% 
+  ungroup() %>% 
+  filter(ScientificName != "Egretta sacra" | FolkGeneric != "amarrirla/amarrarla")
+
+anindilyakwa_data <- bird_data %>% 
+  filter(Language == "Anindilyakwa") %>% 
+  left_join(anindilyakwa_waddy %>% 
+  select(ScientificName,
+         FolkGeneric),
+            by = c("ScientificName2023" = "ScientificName"),
+            keep = FALSE) %>% 
+  mutate(FolkGeneric = ifelse(is.na(FolkGeneric),
+                              anindilyakwa_waddy$FolkGeneric[
+                                match(CommonName, anindilyakwa_waddy$CommonName)],
+                              FolkGeneric),
+         FolkGeneric = ifelse(is.na(FolkGeneric),
+                              anindilyakwa_waddy$FolkGeneric[
+                                match(ScientificName1974, anindilyakwa_waddy$ScientificName)],
+                              FolkGeneric),
+         FolkGeneric = ifelse(is.na(FolkGeneric),
+                              anindilyakwa_waddy$FolkGeneric[
+                                match(ScientificName2021, anindilyakwa_waddy$ScientificName)],
+                              FolkGeneric),
+         FolkGeneric = ifelse(is.na(FolkGeneric),
+                              anindilyakwa_waddy$FolkGeneric[
+                                match(ScientificNameV3, anindilyakwa_waddy$ScientificName)],
+                              FolkGeneric),
+         FolkGeneric = ifelse(is.na(FolkGeneric),
+                              anindilyakwa_waddy$FolkGeneric[
+                                match(CommonName, anindilyakwa_waddy$CommonNameWaddy)],
+                              FolkGeneric)) %>% 
+  select(-X)
+
+anindilyakwa_data$FolkGeneric[
+  anindilyakwa_data$ScientificName2023=="Cacomantis pallidus"] <- 
+  "duwendira"
+
+anindilyakwa_data$FolkGeneric[
+  anindilyakwa_data$ScientificName2023=="Megapodius reinwardt"] <- 
+  "yinikaburra"
+
+anindilyakwa_data$FolkGeneric[
+  anindilyakwa_data$ScientificName2023=="Sphecotheres vieilloti"] <- 
+  "dijuwarra"
+
+anindilyakwa_data$FolkGeneric[
+  anindilyakwa_data$ScientificName2023=="Circus approximans"] <- 
+  "yinikarrka/yinumabar.darra"
+
+colour_pair <- colour_pairs[["Anindilyakwa"]]
+  
+anindilyakwa_data_plot <- anindilyakwa_data %>% 
+  filter(!is.na(tSNE1per)) %>% 
+  mutate(FolkGeneric = ifelse(n == 1, "Singleton", FolkGeneric),
+         FolkGeneric = sub("\\/.*", "", FolkGeneric),
+         FolkGeneric = factor(FolkGeneric),
+         VarPer = ifelse(FolkGeneric == "Singleton", max(VarPer) + 1000, VarPer)) # easy hack to make sure Monotypic is last facet plotted
+
+plot <- ggplot() +
+  geom_point(data = anindilyakwa_data_plot[,c("tSNE1per","tSNE2per")],
+             aes(tSNE1per,tSNE2per),
+             colour = "grey89",
+             size = 0.8,
+             alpha = 0.6) +
+  geom_point(data = anindilyakwa_data_plot,
+             aes(tSNE1per, tSNE2per),
+             size = 1.0,
+             colour = colour_pair[2]) +
+  facet_wrap(~fct_reorder(FolkGeneric, VarPer),
+               ncol = 4) +
+    theme(legend.position = NULL) +
+    labs(title = NULL,x = NULL, y = NULL, ) +
+    theme_bw() +
+    theme(strip.background = element_rect(
+      fill = alpha(colour_pair[1], 
+                   alpha = 0.7)),
+          axis.text.x = element_blank(),
+          axis.text.y = element_blank(),
+          axis.ticks = element_blank(),
+          panel.grid = (element_blank()))
+  
+plot
+    
+  ggsave(here("output/tSNE_plot_Anindilyakwa_named.png"),
+         plot,
+         width = 5.1,
+         height = 7,
+         dpi = 500)
+
+  plot2 <-  plot + facet_wrap(~fct_reorder(FolkGeneric, VarPer),
+               ncol = 8)
+  
+  ggsave(here("output/tSNE_plot_Anindilyakwa_named_vertical.png"),
+         plot2,
+         width = 10,
+         height = 4,
+         dpi = 500)
+
+```
+
+# Visualising Phylogenetic Trees
+
+This plots the trees, and I was just noodling around with something that lets you quickly see how the trees interact with the taxonomies (taxonomic and Western Scientific)
+
+```{r cache = TRUE}
+
+# Some functions:
+
+## This one identifies monophyletic Folk Genera - that is, those where everything in the FG shares a common ancestor and there are no other descendants of the ancestor that do not appear in the FG)
+
+check_monophyly <- function(tree, language_data) {
+  
+  FGs <- unique(language_data$IndexFG)
+  mono_results <- data.frame(FG = character, 
+                             Monophyletic = logical(), 
+                             stringsAsFactors = FALSE)
+  
+  for (fg in FGs) {
+    
+    species <- language_data$ScientificNameV3[language_data$IndexFG == fg]
+    is_mono <- is.monophyletic(tree, species)
+    mono_results <- rbind(mono_results, data.frame(IndexFG = fg, Monophyletic = is_mono))
+  }
+  
+  return(mono_results)
+}
+
+## This one identifies the most recent common ancestor node for a FG then returns all of the descendant nodes from that node. Not 100% sure if I actually use this anymore, it was mostly to colour branches all the same for monophyletic FGs
+
+family_tree <- function(tree, mono_results, tree_data) {
+  
+  tree_data <- tree_data %>% mutate(Orders = NA, Families = NA)
+  ancestors <- c()
+  
+  for (group in unique(mono_results$IndexFG)) {
+    
+    if (any(tree_data$ColGroup == group, na.rm = TRUE)) {
+      
+      species <- tree_data %>% filter(IndexFG == group) %>% pull(label)
+      
+      if (length(species) > 1) {
+      ancestor <- getMRCA(tree, species)
+      descendents <- getDescendants(tree, ancestor)
+      
+      tree_data <- tree_data %>% mutate(ColGroup = ifelse(is.na(ColGroup) & node %in% descendents, group, ColGroup ))
+      ancestors <- c(ancestors, ancestor)
+      
+      }
+    }
+    }
+  
+  orders <- c()
+    for (group in unique(tree_data$Order2023)) {
+    
+      species <- tree_data %>% filter(Order2023 == group) %>% pull(label)
+      
+      if (length(species) > 0) {
+      ancestor <- getMRCA(tree, species)
+      orders <- c(orders, ancestor)
+      
+    }
+    }
+  
+  families <- c()
+  
+      for (group in unique(tree_data$Family2023)) {
+    
+      species <- tree_data %>% filter(Family2023 == group) %>% pull(label)
+      
+      if (length(species) > 0) {
+      ancestor <- getMRCA(tree, species)
+      families <- c(families, ancestor)
+      
+    }
+  }
+  
+  return(list(tree_data = tree_data, 
+              ancestors = ancestors, 
+              orders = orders, 
+              families = families))
+}
+
+tree_plots <- list()
+
+for (language in languages) {
+  
+  tree <- read.nexus(here(paste0("data/phylo-tree_", language, ".nex")))
+  tree$tip.label <- gsub("_", " ", tree$tip.label)
+  colour <- colour_pairs[[language]]
+  
+  language_data <- bird_data %>% filter(Language == str_to_title(language))
+  
+  # Identify monophyletic FGs
+  
+  mono_lang <- check_monophyly(tree, language_data)
+  
+  language_data <- language_data %>% 
+    left_join(mono_lang) %>% 
+    mutate(ColGroup = ifelse(!Monophyletic,"NonMono",ifelse(n==1,"MonoTypic",IndexFG))) %>% 
+    mutate(Monotypic = ifelse(n == 1, "Monotypic", NA),
+           Point = ifelse(is.na(Monotypic) & !Monophyletic, IndexFG,NA)) %>% 
+    select(CanonicalName,
+           ScientificNameV3,
+           IndexFG,
+           Family2023,
+           Order2023,
+           n,
+           ColGroup,
+           Monophyletic,
+           Monotypic,
+           Point)
+  
+  # Do I need this?
+  mono_species <- language_data %>% 
+    filter(Monophyletic & n != 1) %>% 
+    select(ScientificNameV3) %>% 
+    as_tibble()
+  
+  tree_data <- as_tibble(tree) %>% 
+    left_join(language_data, by = c("label" = "ScientificNameV3")) %>% 
+    group_by(node)
+  
+  familytree <- family_tree(tree, mono_lang, tree_data)
+  
+  ancestors <- familytree$ancestors
+  language_data <- familytree$tree_data
+  orders <- familytree$orders
+  families <- familytree$families
+  
+  tree_plot <- ggtree(tree) %<+% language_data +
+    aes(colour = Monotypic) +
+    scale_colour_manual(values = colour[2], na.value = "black") +
+    geom_tiplab(aes(label = CanonicalName)) +
+    theme(legend.position = "none") +
+  ## This bit highlights any folk generic category that has a most recent common ancestor whose children all belong to the same FG group.
+    # geom_hilight(mapping = aes(subset = node %in% ancestors),
+    #              fill = colour[1],
+    #              alpha = .3) +
+  ## This puts coloured dots on the tips where the colours indicate birds in the same folk generic group.
+    # new_scale_colour() +
+    # geom_tippoint(aes(
+    #   colour = Point,
+    #   shape = is.na(Point))) +
+    # scale_colour_manual(values = unname(alphabet())) +
+    # scale_shape_manual(values = c("TRUE" = NULL, "FALSE" = 19)) +
+ ## This part is just a fun thing I was playing with that marks the MRCA for each family and order. It's cool to look at!
+    # geom_nodepoint(mapping = aes(subset = node %in% orders),
+    #                shape = 1,
+    #                colour = "darkviolet",
+    #                size = 3) +
+    # geom_nodepoint(mapping = aes(subset = node %in% families),
+    #                shape = 8,
+    #                colour = "green4",
+    #                size = 2) +
+    scale_x_continuous(expand = expansion(mult = 0.3))
+  
+  tree_plots[[language]] <- tree_plot
+  
+  ggsave(here(paste0("output/tree_", language, ".pdf")),
+         tree_plot,width=13,height=20)
+
+}
+
+```
+
+# Little plots for paper
+
+This is all the code for the little plots in the plot with all the bird pictures in it in the paper. I recently added the Brahminy Kite in but I don't think I'll use this version.
+
+### Subset of birds to keep
+
+```{r}
+
+tokeep <- c("Haliastur sphenurus",
+            "Haliastur indus",
+            "Lophoictinia isura",
+            "Falco subniger",
+            "Hieraaetus morphnoides",
+            "Falco berigora",
+            "Pandion haliaetus",
+            "Aprosmictus erythropterus",
+            "Ceyx azureus",
+            "Dromaius novaehollandiae",
+            "Chroicocephalus novaehollandiae",
+            "Gymnorhina tibicen")
+
+meta <- bird_data %>% 
+  filter(Language == "Anindilyakwa" &
+           ScientificName2023 %in% tokeep) %>% 
+  mutate(FG = ifelse(
+    IndexFG == "Ani.36",
+    "eagle",
+    "noteagle"
+  ))
+  
+```
+
+### Phylogenetic
+
+```{r cache = TRUE}
+
+# This stops an error from happening
+nodeid.tbl_tree <- utils::getFromNamespace("nodeid.tbl_tree", "tidytree")
+rootnode.tbl_tree <- utils::getFromNamespace("rootnode.tbl_tree", "tidytree")
+offspring.tbl_tree <- utils::getFromNamespace("offspring.tbl_tree", "tidytree")
+offspring.tbl_tree_item <- utils::getFromNamespace(".offspring.tbl_tree_item", "tidytree")
+child.tbl_tree <- utils::getFromNamespace("child.tbl_tree", "tidytree")
+parent.tbl_tree <- utils::getFromNamespace("parent.tbl_tree", "tidytree")
+
+
+anindilyakwa_tree <- read.nexus(file = here("data/phylo-tree_anindilyakwa.nex"))
+
+anindilyakwa_tree$tip.label <- gsub("_", " ", anindilyakwa_tree$tip.label)
+
+subsetPhy <- drop.tip(anindilyakwa_tree,
+                   anindilyakwa_tree$tip.label[
+  -match(meta$ScientificNameV3, anindilyakwa_tree$tip.label)])
+
+metaPhy <- meta %>% 
+  select(ScientificNameV3, CommonName, FG)
+
+phylo_tree_plot <- 
+  ggtree(subsetPhy, ladderize = FALSE)%<+% 
+  metaPhy +
+  geom_tiplab(aes(label = CommonName), size = 1.5) +
+  geom_tippoint(aes(colour = FG, shape = FG, size = FG)) +
+  scale_colour_manual(values = c("orange", "white")) +
+  scale_shape_manual(values = c(18, 20)) +
+  scale_size_manual(values = c(1.5, 1)) +
+  labs(title = "Anindilyakwa Phylogenetic") +
+  theme(legend.position = "none") +
+  coord_cartesian(xlim = c(0,1.5))
+
+ggsave(here("output/si_anindilyakwa_phylo_plot.png"),
+       phylo_tree_plot,
+       width = 4.1,
+       height = 4.5,
+       dpi = 300)
+
+phylo_tree_plot
+
+```
+
+
+### Clements 23
+
+```{r cache = TRUE}
+
+# For this one I have to create a new tree because dropping tips is doing something weird to the tree.
+
+# Import data
+
+clements_2023 <- read.csv(here("preprocessing/data/clements_2023.csv"))
+
+family_order74 <- read.csv(here("preprocessing/data/clements_1974_orders.csv"))
+
+  family_order23 <- clements_2023 %>% 
+    mutate(Family2023 = str_trim(str_extract(family,"\\b\\w+"))) %>% 
+    select(Family2023) %>% 
+    filter(Family2023 %in% meta$Family2023) %>% 
+    mutate(Family2023 = as.factor(Family2023))
+  
+  meta23 <- meta %>% 
+    mutate(Class = "Aves") %>% 
+    select(ScientificName2023,
+           Genus2023,
+           Family2023,
+           Order2023,
+           Class) %>% 
+    mutate_all(as.factor) %>% 
+    arrange(match(Family2023, family_order23$Family2023))
+  
+  tree23 <- as.phylo(~Class/Order2023/Family2023/Genus2023/ScientificName2023,
+                        data = meta23) %>% 
+    compute.brlen(.2) %>% 
+    as.ultrametric()
+  
+  # Had to bully some things into doing my bidding. It's not dodgy
+  
+  # tree23$edge.length[10] <- tree23$edge.length[10] + .4
+  tree23$edge.length[12] <- tree23$edge.length[12] + .4
+  # tree23$edge.length[1] <- tree23$edge.length[1] + .2
+  # tree23$edge.length[2] <- tree23$edge.length[2] + .2
+  # tree23$edge.length[4] <- tree23$edge.length[4] + .2
+  # tree23$edge.length[6] <- tree23$edge.length[6] + .2
+  # tree23$edge.length[7] <- tree23$edge.length[7] + .2
+  # tree23$edge.length[8] <- tree23$edge.length[8] + .2
+  # tree23$edge.length[9] <- tree23$edge.length[9] + .2
+  tree23$edge.length[13:14] <- tree23$edge.length[13:14] - .4
+
+meta23 <- meta %>% 
+  arrange(match(Family2023, family_order23$Family2023)) %>% 
+  select(ScientificName2023,
+         CommonName,
+         FG)
+
+clements_23_tree_plot <- 
+  ggtree(tree23, ladderize = FALSE) %<+%
+  meta23 +
+  geom_tiplab(aes(label = CommonName), size = 1.5) +
+  geom_tippoint(aes(colour = FG, shape = FG, size = FG)) +
+  scale_colour_manual(values = c("orange", "white")) +
+  scale_shape_manual(values = c(18, 20)) +
+  scale_size_manual(values = c(1.5, 1)) +
+  labs(title = "Anindilyakwa Taxonomic 2023") +
+  theme(legend.position = "none") +
+  coord_cartesian(xlim = c(0,1.5))
+
+ggsave(here("output/si_anindilyakwa_23_plot.png"),
+       clements_23_tree_plot,
+       width = 4.1,
+       height = 4.5,
+       dpi = 300)
+
+clements_23_tree_plot
+
+```
+
+### Clements 74
+
+Here's the same taxonomic tree for the 1974 Clements 
+
+```{r cache = TRUE}
+
+# This is to put the birds in the right order in the tree
+family_order74 <- family_order74 %>% 
+  filter(Family %in% meta$Family1974)
+
+  meta74 <- meta %>% 
+    mutate(Class = "Aves") %>% 
+    select(ScientificName1974,
+           Genus1974,
+           Family1974,
+           Order1974,
+           Class) %>% 
+    mutate_all(as.factor) %>% 
+    arrange(match(Family1974, family_order74$Family))
+  
+  tree74 <- as.phylo(~Class/Order1974/Family1974/Genus1974/ScientificName1974,
+                        data = meta74) %>% 
+    compute.brlen(.2) %>% 
+    as.ultrametric()
+
+
+  tree23$edge.length[12] <- tree23$edge.length[12] + .4
+  tree23$edge.length[13:14] <- tree23$edge.length[13:14] - .4
+
+meta74 <- meta %>% 
+  arrange(match(Family1974, family_order74$Family)) %>% 
+  select(ScientificName1974,
+         CommonName,
+         FG)
+  
+clements_74_tree_plot <- 
+  ggtree(tree74, ladderize = FALSE) %<+%
+  meta74 +
+  geom_tiplab(aes(label = CommonName), size = 1.5) +
+  geom_tippoint(aes(colour = FG, shape = FG, size = FG)) +
+  scale_colour_manual(values = c("orange", "white")) +
+  scale_shape_manual(values = c(18, 20)) +
+  scale_size_manual(values = c(1.5, 1)) +
+  labs(title = "Anindilyakwa Taxonomic 1974") +
+  theme(legend.position = "none") +
+  coord_cartesian(xlim = c(0,1.5))
+
+ggsave(here("output/anindilyakwa_74_plot.png"),
+       clements_74_tree_plot,
+       width = 4.1,
+       height = 4.5,
+       dpi = 300)
+
+clements_74_tree_plot
+
+```

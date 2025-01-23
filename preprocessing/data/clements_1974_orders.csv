@@ -1,0 +1,174 @@
+﻿Group,Order,Family
+PENGUINS (18),Sphenisciformes,Spheniscidae
+OSTRICH (1),Struthioniformes,Struthionidae
+RHEAS (2),Rheiformes,Rheidae
+CASSOWARIES (3),Casuariiformes,Casuariidae
+EMU (1),Casuariiformes,Dromaiidae
+KIWIS (3),Apterygiformes,Apterygidae
+TINAMOUS (45),Tinamiformes,Tinamidae
+LOONS (4),Gaviiformes,Gaviidae
+GREBES (19),Podicipediformes ,Podicipedidae
+ALBATROSS (13),Procellariiformes ,Diomedeidae
+SHEARWATERS (61),Procellariiformes ,Procellariidae
+STORM-PETRELS (20),Procellariiformes ,Hydrobatidae
+DIVING-PETRELS (5),Procellariiformes ,Pelecanoididae
+TROPICBIRDS (3),Pelecaniformes,Phaethontidae
+PELICANS (8),Pelecaniformes,Pelecanidae
+BOOBIES (9),Pelecaniformes,Sulidae
+CORMORANTS (29),Pelecaniformes,Phalacrocoracidae
+ANHINGAS (4),Pelecaniformes,Anhingidae
+FRIGATEBIRDS (5),Pelecaniformes,Fregatidae
+HERONS (67),Ciconiiformes,Ardeidae
+BOAT-BILLED HERON (1),Ciconiiformes,Cochleariidae
+WHALE-HEADED STORK (1),Ciconiiformes,Balaenicipitidae
+HAMMERHEAD (1),Ciconiiformes,Scopidae
+STORKS (18),Ciconiiformes,Ciconiidae
+IBIS (30),Ciconiiformes,Threskiornithidae
+FLAMINGOS (5),Ciconiiformes,Phoenicopteridae
+SCREAMERS (3),Anseriformes,Anhimidae
+DUCKS AND GEESE (157),Anseriformes,Anatidae
+AMERICAN VULTURES (7),Falconiformes,Cathartidae
+SECRETARY BIRD (1),Falconiformes,Sagittariidae
+HAWKS (226),Falconiformes,Accipitridae
+OSPREY (1),Falconiformes,Pandionidae
+FALCONS (63),Falconiformes,Falconidae
+MEGAPODES (16),Galliformes,Megapodiidae
+CURASSOWS (44),Galliformes,Cracidae
+GROUSE (18),Galliformes,Tetraonidae
+PHEASANTS (181),Galliformes,Phasianidae
+GUINEAFOWL (8),Galliformes,Numididae
+TURKEYS (2),Galliformes,Meleagrididae
+HOATZIN (1),Galliformes,Opisthocomidae
+MESITES (3),Gruiformes,Mesoenatidae
+HEMIPODES (16),Gruiformes,Turnicidae
+COLLARED-HEMIPODE (1),Gruiformes,Pedionomidae
+CRANES (15),Gruiformes,Gruidae
+LIMPKIN (1),Gruiformes,Aramidae
+TRUMPETERS (3),Gruiformes,Psophiidae
+RAILS (130),Gruiformes,Rallidae
+FINFEET (3),Gruiformes,Heliornithidae
+KAGU (1),Gruiformes,Rhynchochetidae
+SUNBITTERN (1),Gruiformes,Eurypygidae
+SERIEMAS (2),Gruiformes,Cariamidae
+BUSTARDS (25),Gruiformes,Otididae
+JACANAS (8),Charadriiformes,Jacanidae
+PAINTED-SNIPE (2),Charadriiformes,Rostratulidae
+OYSTERCATCHERS (7),Charadriiformes,Haematopodidae
+PLOVERS (70),Charadriiformes,Charadriidae
+SANDPIPERS (76),Charadriiformes,Scolopacidae
+AVOCETS AND STILTS (9),Charadriiformes,Recurvirostridae
+PHALAROPES (3),Charadriiformes,Phalaropodidae
+CRAB PLOVER (1),Charadriiformes,Dromadidae
+THICK-KNEES (8),Charadriiformes,Burhinidae
+PRATINCOLES (17),Charadriiformes,Glareolidae
+SEEDSNIPE (4),Charadriiformes,Thinocoridae
+SHEATHBILLS (2),Charadriiformes,Chionididae
+SKUAS (4),Charadriiformes,Stercorariidae
+GULLS (88),Charadriiformes,Laridae
+SKIMMERS (3),Charadriiformes,Rynchopidae
+AUKS (22),Charadriiformes,Alcidae
+SANDGROUSE (16),Columbiformes,Pteroclidae
+PIGEONS AND DOVES (297),Columbiformes,Columbidae
+PARROTS (327),Psittaciformes,Psittacidae
+TURACOS (23),Musophagiformes,Musophagidae
+CUCKOOS (132),Cuculiformes,Cuculidae
+BARN OWLS (9),Strigiformes,Tytonidae
+OWLS (125),Strigiformes,Strigidae
+OILBIRD (1),Caprimulgiformes,Steatornithidae
+FROGMOUTHS (12),Caprimulgiformes,Podargidae
+POTOOS (6),Caprimulgiformes,Nyctibiidae
+OWLET-FROGMOUTHS (6),Caprimulgiformes,Aegothelidae
+NIGHTJARS (72),Caprimulgiformes,Caprimulgidae
+SWIFTS (73),Apodiformes,Apodidae
+CRESTED-SWIFTS (4),Apodiformes,Hemiprocnidae
+HUMMINGBIRDS (308),Apodiformes,Trochilidae
+COLIES (6),Coliiformes,Coliidae
+TROGONS (36),Trogoniformes,Trogonidae
+KINGFISHERS (91),Coraciiformes,Alcedinidae
+TODIES (5),Coraciiformes,Todidae
+MOTMOTS (8),Coraciiformes,Momotidae
+BEE-EATERS (25),Coraciiformes,Meropidae
+ROLLERS (16),Coraciiformes,Coraciidae
+CUCKOO-ROLLER (1),Coraciiformes,Leptosomatidae
+HOOPOES (2),Coraciiformes,Upupidae
+WOODHOOPOES (7),Coraciiformes,Phoeniculidae
+HORNBILLS (50),Coraciiformes,Bucerotidae
+JACAMARS (15),Piciformes,Galbulidae
+PUFFBIRDS (31),Piciformes,Bucconidae
+BARBETS (81),Piciformes,Capitonidae
+HONEYGUIDES (15),Piciformes,Indicatoridae
+TOUCANS (39),Piciformes,Ramphastidae
+WOODPECKERS (212),Piciformes,Picidae
+WRYNECKS (2),Piciformes,Jyngidae
+BROADBILLS (14),Passeriformes,Eurylaimidae
+WOODCREEPERS (48),Passeriformes,Dendrocolaptidae
+OVENBIRDS (215),Passeriformes,Furnariidae
+ANTBIRDS (218),Passeriformes,Formicariidae
+ANTPIPITS (10),Passeriformes,Conopophagidae
+TAPACULOS (28),Passeriformes,Rhinocryptidae
+COTINGAS (96),Passeriformes,Cotingidae
+MANAKINS (56),Passeriformes,Pipridae
+TYRANT FLYCATCHERS (344),Passeriformes,Tyrannidae
+SHARPBILL (1),Passeriformes,Oxyruncidae
+PLANTCUTTERS (3),Passeriformes,Phytotomidae
+PITTAS (23),Passeriformes,Pittidae
+NEW ZEALAND WRENS (3),Passeriformes,Acanthisittidae
+FALSE SUNBIRDS (4),Passeriformes,Philepittidae
+LYREBIRDS (2),Passeriformes,Menuridae
+SCRUB-BIRDS (2),Passeriformes,Atrichornithidae
+LARKS (78),Passeriformes,Alaudidae
+SWALLOWS (81),Passeriformes,Hirundinidae
+CUCKOO-SHRIKES (74),Passeriformes,Campephagidae
+DRONGOS (22),Passeriformes,Dicruridae
+ORIOLES (28),Passeriformes,Oriolidae
+CROWS AND JAYS (110),Passeriformes,Corvidae
+BELLMAGPIES (15),Passeriformes,Cracticidae
+MUDNEST-BUILDERS (4),Passeriformes,Grallinidae
+BOWERBIRDS (19),Passeriformes,Ptilonorhynchidae
+BIRDS OF PARADISE (42),Passeriformes,Paradisaeidae
+TITMICE (62),Passeriformes,Paridae
+NUTHATCHES (22),Passeriformes,Sittidae
+AUSTRALIAN NUTHATCHES (20),Passeriformes,Neosittidae
+CORAL-BILLED NUTHATCH (1),Passeriformes,Hyposittidae
+CREEPERS (6),Passeriformes,Certhidae
+BABBLERS (261),Passeriformes,Timaliidae
+BULBULS (124),Passeriformes,Pycnonotidae
+PARROTBILLS (19),Passeriformes,Paradoxornithidae
+WRENTIT (1),Passeriformes,Chamaeidae
+LEAFBIRDS (14),Passeriformes,Irenidae
+DIPPERS (5),Passeriformes,Cinclidae
+WRENS (67),Passeriformes,Troglodytidae
+MOCKINGBIRDS (35),Passeriformes,Mimidae
+THRUSHES (312),Passeriformes,Turdidae
+WREN-THRUSH (1),Passeriformes,Zeledoniidae
+OLD-WORLD WARBLERS (422),Passeriformes,Sylviidae
+OLD-WORLD FLYCATCHERS (322),Passeriformes,Muscicapidae
+HEDGE-SPARROWS (12),Passeriformes,Prunellidae
+PIPITS (54),Passeriformes,Motacillidae
+WAXWINGS (3),Passeriformes,Bombycillidae
+SILKY-FLYCATCHERS (4),Passeriformes,Ptilogonatidae
+HYPOCOLIUS (1),Passeriformes,Hypocoliidae
+PALMCHAT (1),Passeriformes,Dulidae
+WOOD-SWALLOWS (9),Passeriformes,Artamidae
+VANGA-SHRIKES (12),Passeriformes,Vangidae
+SHRIKES (79),Passeriformes,Laniidae
+HELMET-SHRIKES (7),Passeriformes,Prionopidae
+WATTLEBIRDS (2),Passeriformes,Callaeidae
+STARLINGS (109),Passeriformes,Sturnidae
+HONEY-EATERS (177),Passeriformes,Meliphagidae
+SUNBIRDS (121),Passeriformes,Nectariniidae
+HYLIA (2),Passeriformes,Hyliadae
+FLOWERPECKERS (58),Passeriformes,Dicaeidae
+WHITE-EYES (90),Passeriformes,Zosteropidae
+PEPPER-SHRIKES (2),Passeriformes,Cyclarhidae
+SHRIKE-VIREOS (4),Passeriformes,Vireolaniidae
+VIREOS (43),Passeriformes,Vireonidae
+HAWAIIAN HONEYCREEPERS (17),Passeriformes,Drepaniidae
+HONEYCREEPERS (40),Passeriformes,Coerebidae
+AMERICAN WOOD-WARBLERS (114),Passeriformes,Parulidae
+TROUPIALS (94),Passeriformes,Icteridae
+SWALLOW-TANAGER (1),Passeriformes,Tersinidae
+TANAGERS (215),Passeriformes,Thraupidae
+PLUSH-CAPPED FINCH (1),Passeriformes,Catamblyrhynchidae
+WEAVERBIRDS (301),Passeriformes,Ploceidae
+FINCHES (459),Passeriformes,Fringillidae

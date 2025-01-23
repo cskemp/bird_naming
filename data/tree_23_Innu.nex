@@ -1,0 +1,207 @@
+#NEXUS
+[R-package APE, Mon Jan 20 14:27:13 2025]
+
+BEGIN TAXA;
+	DIMENSIONS NTAX = 97;
+	TAXLABELS
+		Gavia immer
+		Gavia stellata
+		Morus bassanus
+		Nannopterum auritum
+		Phalacrocorax carbo
+		Botaurus lentiginosus
+		Anser caerulescens
+		Anas rubripes
+		Anas acuta
+		Anas crecca
+		Spatula discors
+		Bucephala clangula
+		Bucephala islandica
+		Aythya collaris
+		Aythya marila
+		Aythya affinis
+		Clangula hyemalis
+		Histrionicus histrionicus
+		Somateria mollissima
+		Somateria spectabilis
+		Melanitta perspicillata
+		Melanitta deglandi
+		Melanitta americana
+		Mergus serrator
+		Mergus merganser
+		Branta canadensis
+		Branta bernicla
+		Larus argentatus
+		Larus hyperboreus
+		Larus marinus
+		Larus glaucoides
+		Rissa tridactyla
+		Sterna hirundo
+		Sterna paradisaea
+		Stercorarius pomarinus
+		Alca torda
+		Uria lomvia
+		Uria aalge
+		Alle alle
+		Cepphus grylle
+		Fratercula arctica
+		Charadrius semipalmatus
+		Charadrius vociferus
+		Pluvialis dominica
+		Calidris melanotos
+		Calidris minutilla
+		Numenius phaeopus
+		Actitis macularius
+		Tringa solitaria
+		Tringa melanoleuca
+		Phalaropus lobatus
+		Phalaropus fulicarius
+		Gallinago delicata
+		Buteo lagopus
+		Haliaeetus leucocephalus
+		Circus hudsonius
+		Pandion haliaetus
+		Falco columbarius
+		Bubo scandiacus
+		Bubo virginianus
+		Aegolius funereus
+		Surnia ulula
+		Asio flammeus
+		Strix varia
+		Canachites canadensis
+		Bonasa umbellus
+		Lagopus muta
+		Lagopus lagopus
+		Megaceryle alcyon
+		Picoides arcticus
+		Picoides dorsalis
+		Colaptes auratus
+		Empidonax flaviventris
+		Empidonax traillii
+		Setophaga magnolia
+		Setophaga petechia
+		Eremophila alpestris
+		Tachycineta bicolor
+		Riparia riparia
+		Perisoreus canadensis
+		Corvus corax
+		Corvus brachyrhynchos
+		Poecile hudsonicus
+		Sitta canadensis
+		Euphagus carolinus
+		Quiscalus quiscula
+		Pinicola enucleator
+		Loxia leucoptera
+		Loxia curvirostra
+		Acanthis flammea
+		Zonotrichia leucophrys
+		Zonotrichia albicollis
+		Passerella iliaca
+		Regulus satrapa
+		Plectrophenax nivalis
+		Turdus migratorius
+		Chordeiles minor
+	;
+END;
+BEGIN TREES;
+	TRANSLATE
+		1	Gavia immer,
+		2	Gavia stellata,
+		3	Morus bassanus,
+		4	Nannopterum auritum,
+		5	Phalacrocorax carbo,
+		6	Botaurus lentiginosus,
+		7	Anser caerulescens,
+		8	Anas rubripes,
+		9	Anas acuta,
+		10	Anas crecca,
+		11	Spatula discors,
+		12	Bucephala clangula,
+		13	Bucephala islandica,
+		14	Aythya collaris,
+		15	Aythya marila,
+		16	Aythya affinis,
+		17	Clangula hyemalis,
+		18	Histrionicus histrionicus,
+		19	Somateria mollissima,
+		20	Somateria spectabilis,
+		21	Melanitta perspicillata,
+		22	Melanitta deglandi,
+		23	Melanitta americana,
+		24	Mergus serrator,
+		25	Mergus merganser,
+		26	Branta canadensis,
+		27	Branta bernicla,
+		28	Larus argentatus,
+		29	Larus hyperboreus,
+		30	Larus marinus,
+		31	Larus glaucoides,
+		32	Rissa tridactyla,
+		33	Sterna hirundo,
+		34	Sterna paradisaea,
+		35	Stercorarius pomarinus,
+		36	Alca torda,
+		37	Uria lomvia,
+		38	Uria aalge,
+		39	Alle alle,
+		40	Cepphus grylle,
+		41	Fratercula arctica,
+		42	Charadrius semipalmatus,
+		43	Charadrius vociferus,
+		44	Pluvialis dominica,
+		45	Calidris melanotos,
+		46	Calidris minutilla,
+		47	Numenius phaeopus,
+		48	Actitis macularius,
+		49	Tringa solitaria,
+		50	Tringa melanoleuca,
+		51	Phalaropus lobatus,
+		52	Phalaropus fulicarius,
+		53	Gallinago delicata,
+		54	Buteo lagopus,
+		55	Haliaeetus leucocephalus,
+		56	Circus hudsonius,
+		57	Pandion haliaetus,
+		58	Falco columbarius,
+		59	Bubo scandiacus,
+		60	Bubo virginianus,
+		61	Aegolius funereus,
+		62	Surnia ulula,
+		63	Asio flammeus,
+		64	Strix varia,
+		65	Canachites canadensis,
+		66	Bonasa umbellus,
+		67	Lagopus muta,
+		68	Lagopus lagopus,
+		69	Megaceryle alcyon,
+		70	Picoides arcticus,
+		71	Picoides dorsalis,
+		72	Colaptes auratus,
+		73	Empidonax flaviventris,
+		74	Empidonax traillii,
+		75	Setophaga magnolia,
+		76	Setophaga petechia,
+		77	Eremophila alpestris,
+		78	Tachycineta bicolor,
+		79	Riparia riparia,
+		80	Perisoreus canadensis,
+		81	Corvus corax,
+		82	Corvus brachyrhynchos,
+		83	Poecile hudsonicus,
+		84	Sitta canadensis,
+		85	Euphagus carolinus,
+		86	Quiscalus quiscula,
+		87	Pinicola enucleator,
+		88	Loxia leucoptera,
+		89	Loxia curvirostra,
+		90	Acanthis flammea,
+		91	Zonotrichia leucophrys,
+		92	Zonotrichia albicollis,
+		93	Passerella iliaca,
+		94	Regulus satrapa,
+		95	Plectrophenax nivalis,
+		96	Turdus migratorius,
+		97	Chordeiles minor
+	;
+	TREE * UNTITLED = [&U] ((1:1,2:1)Gavia:1,(3:1,(4:1,5:1)Phalacrocoracidae:1)Suliformes:1,6:1,(7:1,(8:1,9:1,10:1)Anas:1,11:1,(12:1,13:1)Bucephala:1,(14:1,15:1,16:1)Aythya:1,17:1,18:1,(19:1,20:1)Somateria:1,(21:1,22:1,23:1)Melanitta:1,(24:1,25:1)Mergus:1,(26:1,27:1)Branta:1)Anatidae:1,(((28:1,29:1,30:1,31:1)Larus:1,32:1,(33:1,34:1)Sterna:1)Laridae:1,35:1,(36:1,(37:1,38:1)Uria:1,39:1,40:1,41:1)Alcidae:1,((42:1,43:1)Charadrius:1,44:1)Charadriidae:1,((45:1,46:1)Calidris:1,47:1,48:1,(49:1,50:1)Tringa:1,(51:1,52:1)Phalaropus:1,53:1)Scolopacidae:1)Charadriiformes:1,((54:1,55:1,56:1)Accipitridae:1,57:1)Accipitriformes:1,58:1,((59:1,60:1)Bubo:1,61:1,62:1,63:1,64:1)Strigidae:1,(65:1,66:1,(67:1,68:1)Lagopus:1)Phasianidae:1,69:1,((70:1,71:1)Picoides:1,72:1)Picidae:1,((73:1,74:1)Empidonax:1,(75:1,76:1)Setophaga:1,77:1,(78:1,79:1)Hirundinidae:1,(80:1,(81:1,82:1)Corvus:1)Corvidae:1,83:1,84:1,(85:1,86:1)Icteridae:1,(87:1,(88:1,89:1)Loxia:1,90:1)Fringillidae:1,((91:1,92:1)Zonotrichia:1,93:1)Passerellidae:1,94:1,95:1,96:1)Passeriformes:1,97:1)Aves;
+END;

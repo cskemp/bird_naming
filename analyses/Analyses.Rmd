@@ -1,0 +1,3012 @@
+---
+title: "Analyses"
+output:
+  pdf_document: default
+  html_notebook: default
+---
+
+# Setup
+
+```{r}
+
+rm(list = ls())
+
+# Load required libraries
+library(tidyverse)
+library(here)
+library(ape)
+library(tidytree)
+library(castor)
+library(phylobase)
+library(testthat)
+library(kableExtra)
+library(ggtree)
+library(car)
+library(MuMIn)
+library(glmmTMB)
+library(DHARMa)
+library(performance)
+library(lme4)
+library(coin)
+library(rdist)
+library(apaTables)
+library(bbmle)
+library(janitor)      # for turning a row into column names
+library(MASS)
+
+# set options
+options(na.action = "na.omit")
+select <- dplyr::select
+drop.tip <- ape::drop.tip
+summarise <- dplyr::summarise
+
+set.seed(302)
+
+languages <- c("Anindilyakwa",
+               "Innu",
+               # "Rangi",
+               "Saami",
+               "Tlingit",
+               "Tobelo",
+               "Tzeltal",
+               "Zapotec")
+
+languages_plus <- c(languages,
+               "All")
+
+colour_pairs <- list(
+  Anindilyakwa = c("#ffe0f1", "#ff1493"),       #deeppink
+  Innu = c("#fae2e2", "#cd2626"),         #firebrick
+  Saami = c("#ffe7d7", "#cd6600"),              #darkorange
+  Tlingit = c("#fff9d7", "#cdad00"),              #gold
+  Tobelo = c("#d7ffeb", "#00ee76"),            #springgreen
+  # Tobelo = c("#00e5ee", "#00c5cd"),             #turquoise
+  Tzeltal = c("#e2f1ff", "#1e90ff"),            #dodgerblue
+  Zapotec = c("#f7e6ff", "#bf3eff"),             #darkorchid
+  All = c( "#e8e0ef", "#675875")                 #plummy
+  )
+
+```
+
+# Descriptive Stats
+
+## Shapiro tests for AVONET variables
+
+```{r}
+
+bird_data <- read.csv(here("data/bird_data.csv"))%>% 
+  filter(Language %in% languages)
+
+
+Shapiro <- bird_data %>%
+  select(Language, BeakLengthCulmen:Mass) %>%
+  filter(complete.cases(.[sapply(., is.numeric)])) %>%
+  group_by(Language) %>%
+  summarise(across(BeakLengthCulmen:Mass, ~ shapiro.test(.)$p.value, .names = "{.col}"))
+
+
+
+```
+
+# Analysis 1: Hunn Correspondence Measure
+
+Use Hunn's measure to compare folk categories with Clements 1974 and Clements 2023 taxonomies
+
+## Define Functions
+
+```{r}
+
+format_nicely <- function(x) {
+  sapply(x, function(val) {
+    if (abs(val) < 1 | abs(val) == 0) {
+      no_0 <- formatC(val, format = "f", digits = 2)
+      sub("^0+", "", no_0)
+    } else {
+      no_0 <- formatC(val, format = "f", digits = 0)
+      sub("^0+", "", no_0)
+    }
+  })
+}
+
+# initial downward pass described by Hunn
+hunn_phase1 <- function(currnode, p4, members) {
+  
+  # Identify the descendants of the node in the tree
+  ds <- descendants(p4, currnode)  
+  
+  # Identify which descendants are in the FG group
+  ds_members <- intersect(ds, members)  
+  
+  # If none of the FG group members are in this node, return NULL
+  if ( length(ds_members) == 0 ) {  
+    return(NULL)
+    
+    # if all of the FG members are in the current node, return the node
+  } else if ( length(ds) == length(ds_members) ) { 
+    return(currnode)
+  }
+  
+  # Initialise empty result
+  result <- NULL  
+  
+  # recursively apply the function to each child of the current node
+  for (c in children(p4, currnode)) {
+    result <- union(result, hunn_phase1(c, p4, members))  
+  }
+  return(result)
+}
+
+
+# compute dissimilarity of members of FG with respect to phylogeny p
+hunn_match_members <- function(p, members) {
+  
+  # If there is only one thing in the FG group, its dissimilarity is 0
+  if ( length(members) == 1 ) {
+    return(0)
+  }
+  p4 <- as(p, "phylo4")
+  r <-  rootNode(p4)
+  phase1 <- hunn_phase1(r, p4, members)
+  
+  # if the result from initial downward pass is 1, the taxon perfectly matches a taxon in the traditional taxonomy. 
+  if ( length(phase1) == 1 ) {
+    return(0)  
+    
+  } else {
+    
+    # Identify most recent common ancestor of nodes that contain members of the taxon
+    lcd  <- phylobase::MRCA(p4, phase1)
+    lcds <- rep(lcd, length(phase1))
+    # Get pairwise distances between all nodes that contain members of the taxon, and return the longest one.
+    pwds <- get_pairwise_distances(p, 
+                                   phase1, 
+                                   lcds, 
+                                   as_edge_counts = FALSE, 
+                                   check_input = TRUE)
+    return(max(pwds))
+  }
+}
+
+# Get the scores for the entire taxonomy - which categories 
+score_tree <- function(l_tree, data, special_cases) {
+  l_tree_tidy <- l_tree %>% 
+    as.treedata() %>% 
+    as_tibble()
+  
+  l_names <- data %>% 
+    rename(label = "canonical_name") %>% 
+    left_join(l_tree_tidy, by = "label")
+  
+  expect_equal(nrow(l_names), nrow(data))
+  
+  l_members <- l_names %>% 
+    group_by(IndexFG) %>% 
+    summarise(node_indices = list(unique(node))) 
+  
+  l_hunnscores <- l_members %>% 
+    mutate(hunn_score = map_dbl(node_indices, ~hunn_match_members(l_tree, .x))) %>%  
+    # Special cases for overdifferentiated birds
+    mutate(hunn_score = ifelse(IndexFG %in% special_cases$IndexFG,
+           hunn_score + 1,
+           hunn_score)) %>% 
+    arrange(desc(hunn_score))
+  
+  avg_score <-  mean(l_hunnscores$hunn_score) 
+  zero_propn <- sum(l_hunnscores$hunn_score == 0) / nrow(l_hunnscores)
+  #browser()
+  return( list(avg_score, zero_propn, l_hunnscores) )
+}
+
+# compute measure for 23 and 74 trees for language THIS_LANGUAGE
+process_language <- function(this_language, bird_data) {
+  
+  print(this_language)
+  this_language_title <- str_to_title(this_language)
+  
+  treepath_74 <-  here("data", paste0("tree_74_", this_language, ".nex"))
+  treepath_23 <-  here("data", paste0("tree_23_", this_language, ".nex"))
+  
+  l_data <- bird_data %>% 
+    filter(Language == {{this_language_title}}) 
+  
+  special_cases <- l_data %>% 
+    group_by(ScientificName2023) %>% 
+    filter(n() > 1)
+
+  l_74_raw <- read.nexus(file = treepath_74)
+   l_74 <- as.ultrametric(compute.brlen(l_74_raw, 1)) %>%
+    normalise_lengths() %>%
+     standardise_names(l_data, ScientificName1974)
+  
+  l_74$root.edge = find_root(l_74)
+  d_74 <- as_tibble(l_74)
+  plot_74 <- ggtree(l_74)
+  
+  l_23_raw <- read.nexus(file = treepath_23)
+  l_23 <- as.ultrametric(compute.brlen(l_23_raw, 1))  %>%
+     normalise_lengths()
+  l_23$root.edge = find_root(l_23)
+  d_23 <- as_tibble(l_23)
+  plot_23 <- ggtree(l_23)
+  
+  plot_all <-  plot_74 + plot_23
+  show(plot_all)
+  
+  labs_all <- tibble(canonical_name = tip.label(l_74), tree = "74")  %>% 
+    bind_rows( tibble(canonical_name = tip.label(l_23), tree = "23") )
+  
+  labs_wide <- labs_all %>% 
+    pivot_wider(names_from = tree, values_from = tree)
+  
+  # should be no missing labels from 23 tree
+  expect_equal(sum(is.na(labs_wide$`23`)), 0)
+  
+  labs_shared <- labs_all %>% 
+    group_by(canonical_name) %>% 
+    summarise(count = n()) 
+  
+  l_74 <- l_74 %>% normalise_avg_dist()
+  l_23 <- l_23 %>% normalise_avg_dist()
+  
+  if (1) { # plot trees after distance normalization
+  plot_74 <- ggtree(l_74)
+  plot_23 <- ggtree(l_23)
+  plot_all <- plot_74 + plot_23
+  show(plot_all)
+  }
+  
+  data_74 <- labs_shared %>%  
+    filter(count == 2) %>%  # each species in labs_shared appears only in l_23 or in both l_74 and l_23
+    left_join(l_data, by = "canonical_name") %>% 
+    select(canonical_name, IndexFG)
+  
+  data_23 <- labs_shared %>%  
+    left_join(l_data, by = "canonical_name") %>% 
+    select(canonical_name, IndexFG)
+  
+  score_74 <- score_tree(l_74, data_74, special_cases)
+  score_23 <- score_tree(l_23, data_23, special_cases)
+  
+  # This returns a tibble containing the scores for how similar the folk taxonomies are to the traditional scientific ones
+  scores <- tibble(tree = c("74", "23"), 
+                   avg_score = c(score_74[[1]], 
+                                 score_23[[1]]), 
+                   zero_propn = c(score_74[[2]], 
+                                  score_23[[2]]), 
+                   category_scores = c(list(score_74[[3]]), 
+                                       list(score_23[[3]])))
+  
+return(scores)
+}
+
+standardise_names <- function(tree, fulldata, currname) {
+  label_map <- fulldata %>% 
+    mutate(old = {{currname}}) %>% 
+    select(old, canonical_name) 
+  
+  newlabel <-  tibble(old = tree$tip.label) %>%
+    left_join(label_map, by = "old") %>% 
+    # when there are duplicate values of old, keep first row only. If the duplicates have the same folk labels, it doesn't matter which row we pick, so the approach here is if. If the duplicates have different folk labels we'll need to handle them as a special case. The cases in manual_check_needed should be inspected to see if there are any that need special treatment. 
+    distinct(old, .keep_all = TRUE)
+    
+  expect_equal(nTips(tree), nrow(newlabel))
+
+  tree$tip.label = newlabel$canonical_name
+  return(tree)
+}
+
+normalise_lengths <- function(tree) {
+  max_height <- max(get_all_distances_to_root(tree))
+  tree$edge.length = tree$edge.length / 5 
+  return(tree)
+}
+
+normalise_avg_dist<- function(tree) {
+  #ds <- get_all_pairwise_distances(tree)
+  #avg_dist <- mean(ds[lower.tri(ds)])
+  
+  # normalize average distance between tips
+  #tree$edge.length = tree$edge.length / avg_dist 
+  
+  # make all branches uniform
+  tree$edge.length = tree$edge.length / tree$edge.length
+  return(tree)
+}
+
+```
+
+## Run Analysis
+
+
+```{r run_analysis}
+
+all_scores <- tibble(language = c("anindilyakwa",
+               "innu",
+               # "rangi",
+               "saami",
+               "tlingit",
+               "tobelo",
+               "tzeltal",
+               "zapotec"))
+
+bird_data <- bird_data %>% 
+  mutate(canonical_name = str_remove(ScientificName2023, "\\.\\d"))
+
+# canonical names for this notebook are based on ScientificName2023. Here we identify cases that may require manual attention. These include cases where folk names are overdifferentiated with respect to ScientificName2023, or cases where two species with different canonical names have the same ScientificName1974 label
+
+manual_check_needed <- bird_data %>% 
+  group_by(Language, canonical_name) %>% 
+  mutate(n_canonical = n()) %>% 
+  ungroup() %>% 
+  group_by(Language, ScientificName1974) %>% 
+  mutate(n_74 = n()) %>% 
+  filter(n_74 > 1 | n_canonical > 1 | is.na(ScientificName1974))
+
+# After checking the manual_check_needed, if all the birds are fine, change the number below to the number of rows in manual_check_needed then run this chunk again
+expect_equal(nrow(manual_check_needed), 25)
+
+all_scores <- all_scores %>% 
+  mutate(s = purrr::map(language, ~process_language(.x, bird_data))) %>% 
+  unnest(s)
+
+all_scores %>% 
+  select(-category_scores) %>% 
+  kable() %>% 
+  kable_styling()
+
+score_plot <- all_scores %>% 
+  mutate(tree= factor(tree, levels = c("74", "23")))  %>% 
+  ggplot(aes(x=tree, y = avg_score)) +
+  geom_col() +
+  facet_wrap(~language)
+
+show(score_plot)
+
+
+```
+
+## Comparing 1974 and 2023 trees
+
+```{r 74_vs_23_a}
+compare_74_23_long <- all_scores %>% 
+  unnest(category_scores) %>% 
+  filter(tree == "74" | tree == "23") %>% 
+  select(language, tree, IndexFG, hunn_score) 
+
+compare_74_23_wide <- compare_74_23_long %>% 
+  pivot_wider(values_from = hunn_score, names_from=tree) %>% 
+  mutate(diff_74_23 = `74`- `23`) 
+
+diff_counts <- compare_74_23_wide %>% 
+  group_by(language) %>% 
+  summarise(better_74 = sum(diff_74_23 < 0), better_23 = sum(diff_74_23 > 0), .groups = "drop" )
+
+differences <- compare_74_23_wide %>% 
+  filter(diff_74_23 != 0) %>% 
+  arrange(diff_74_23)
+
+differences %>% 
+   kable() %>% 
+   kable_styling()
+
+
+```
+
+The differences table shows all folk categories with different scores for the 1974 and 2023 taxonomies. For Anindilyakwa 4 folk categories "improve" and 5 "get worse" as we move from the 1974 to the 2023 taxonomies. For Tlingit, 2 categories get worse and no categories improve. For Zapotec, one category improves and no categories get worse.
+
+```{r 74_vs_23_b}
+
+summary_74_23 <- compare_74_23_long %>% 
+  group_by(language, tree) %>% 
+  summarise(n = n(), zero_propn = sum(hunn_score == 0), avg_score = mean(hunn_score), .groups = "drop")  %>% 
+  left_join(diff_counts, by = "language") %>% 
+  mutate(avg_score = round(avg_score, 3)) %>% 
+  mutate(n_improve = if_else(tree == "74", better_74, better_23)) %>% 
+  select(-better_74, -better_23) %>% 
+  arrange(language, desc(tree))
+
+summary_74_23 %>% 
+  kable() %>% 
+  kable_styling()
+
+```
+The summary table shows the number of categories with dissimilarity of 0 -- ie the number that match the scientific taxonomy perfectly. It also includes the average dissimilarity for each language with respect to each taxonomy, and the number of categories that match one taxonomy better than the other taxonomy.
+
+## Get confidence intervals
+
+```{r}
+compute_bstrap_mean <- function(d)  {
+  out <- d %>% 
+    group_by(language, tree) %>% 
+    slice_sample(prop=1, replace=TRUE) %>% 
+    summarise(mean_score = mean(hunn_score), .groups = "drop")
+}
+
+bstrap <- tibble(n = 1:10000) %>% 
+  mutate(samp = purrr::map(n, ~compute_bstrap_mean(compare_74_23_long)))  %>% 
+  unnest(samp) %>% 
+  group_by(language, tree) %>% 
+  dplyr::summarise(low_95 = quantile(mean_score, 0.025), high_95 = quantile(mean_score, 0.975), median = quantile(mean_score, 0.5), .groups = "drop") %>% 
+  arrange(language, desc(tree))
+
+bstrap %>% 
+   kable() %>% 
+   kable_styling()
+
+```
+
+The bootstrap table shows bootstrapped confidence intervals on the average dissimilarity for each language and taxonomy. These intervals are very wide, which means that the differences in average dissimilarity across taxonomies are not statistically significant.
+
+## Make a nice table
+
+```{r}
+
+table_hunn <- summary_74_23 %>% 
+  left_join(bstrap, by = c("language", "tree")) %>% 
+  mutate(prop = zero_propn/n) %>% 
+  mutate_if(is.numeric, round, 2) %>% 
+  mutate(language = make.unique(language)) %>% 
+  select(language, tree, n, prop, avg_score, n_improve, low_95, high_95) %>% 
+  t() %>% 
+  as.data.frame() %>% 
+  row_to_names(row_number = 1) %>% 
+  filter(rownames(.) != "median") %>% 
+  mutate_all(as.numeric) %>% 
+  mutate(all = ifelse(row.names(.) %in% c("n", "n_improve"), 
+                    rowSums(select(., !contains(".")), na.rm = TRUE), 
+                    rowMeans(select(., !contains(".")), na.rm = TRUE))) %>% 
+  mutate(all.1 = ifelse(row.names(.) %in% c("n", "n_improve"), 
+                    rowSums(select(., contains(".")), na.rm = TRUE), 
+                    rowMeans(select(., contains(".")), na.rm = TRUE))) %>% 
+  mutate_all(~format_nicely(.))
+
+
+
+
+rownames_hunn <- c("Tax.",
+                   "$n$",
+                   "$prop\\textsubscript0$",
+                   "$D$",
+                   "$Imp.$",
+                   "CI lower",
+                   "CI upper")
+
+kable_hunn <- 
+  table_hunn
+
+rownames(kable_hunn) <- rownames_hunn
+
+kable_hunn <- kable_hunn %>% 
+  kable(col.names = NULL,
+        format = "latex",
+        escape = FALSE,
+        align = c(rep("c", 14)),
+                booktabs = TRUE,
+                caption = "Comparison between folk taxonomies and 1974 and 2023 Clements taxonomies",
+                label = "table:hunn") %>% 
+  kable_styling(latex_options = c("hold_position",
+                                    "scale_down")) %>% 
+  column_spec(2:ncol(table_hunn), width = ".75cm") %>%  
+  add_header_above(c(" " = 1, 
+                     "Anindilyakwa" = 2,
+                     "Innu" = 2,
+                     "Saami" = 2,
+                     "Tlingit" = 2,
+                     "Tobelo" = 2,
+                     "Tzeltal" = 2,
+                     "Zapotec" = 2,
+                     "All" = 2),
+                   underline = FALSE)
+
+kable_hunn <- gsub("0\\.", ".", kable_hunn)
+
+write.csv(table_hunn, file = here("output/HunnCorrespondenceTable.csv"))
+write_lines(kable_hunn, here("output/HunnCorrespondenceTable.tex"))
+
+table_hunn
+
+```
+
+# Analysis 2: Predicting name-sharing
+
+## Define functions
+
+```{r}
+
+# Function to round everything to 2 digits, unless it's smaller than .01
+
+format_sensibly <- function(x) {
+  sapply(x, function(val) {
+    if (abs(val) < 0.01) {
+      return("<.01")
+    } else {
+      no_0 <- formatC(val, format = "f", digits = 2)
+      sub("^0+", "", no_0)
+    }
+  })
+}
+
+# Make fractional rankings to identify pairs of birds that sit differently in each of the spaces/taxonomies
+
+frac_rank <- function(x) {
+  if (all(is.na(x))) {
+    return(rep(NA, length(x)))
+  }
+  rank_x <- rank(x, na.last = "keep")
+  frac_rank <- ave(rank_x, 
+                   rank_x, 
+                   FUN = function(y) mean(y, na.rm = TRUE))
+  return(frac_rank)
+}
+
+```
+
+## Import Datasets
+
+```{r}
+
+bird_sim <- list()
+
+for (language in languages) {
+  
+  file_path <- here("data", paste0("similarity_", language, ".csv"))
+  similarity <- read.csv(file = file_path) %>% 
+    select(-X) 
+
+  # pop them all in a big list
+  bird_sim[[str_to_title(language)]] <- similarity
+  
+}
+
+### Take out duplicates
+# when I created these datasets I put all of the duplicates in. This analysis is at the level of western scientific species so there shouldn't be duplicates of pairs of birds species, so I need to take them out but keep the ones where the names are the same.
+
+bird_similarity <- list()
+
+for (language in languages) {
+  
+  language_data <- bird_sim[[language]]
+  
+  language_data_filtered <- language_data %>% 
+    # change names so I can identify duplicates
+    mutate_at(vars(contains("Species")),
+              ~gsub("\\..*", "", .)) %>% 
+    # make sure that the pairs are always identifiable as the same pairs (I did this when I created the dataset but doing it again just in case)
+    mutate(s1 = pmin(Species1,Species2),
+           s2 = pmax(Species1,Species2)) %>% 
+    select(-contains("Species")) %>% 
+    rename(Species1 = s1,
+           Species2 = s2) %>% 
+    # Put the TRUE values before the FALSE ones so they will be the ones that remain when I remove duplicates
+    arrange(desc(SameName)) %>% 
+    # filter out duplicated pairs
+    distinct(Species1, Species2, .keep_all = TRUE) %>% 
+    #filter out birds pairing with themselves
+    filter(Species1 != Species2) %>% 
+    select(-contains("zDist")) %>% 
+    mutate_at(vars(starts_with("Dist")), list(z = ~scale(.)[,1])) %>% 
+    rename_at(vars(ends_with("_z")), ~sub("(.*)_z$", "z\\1", .))
+  
+  result <- length(which(duplicated(language_data_filtered[, c("Species1","Species2")])))
+    
+      if (result == 0) {
+    message("No duplicates remain in ", language)
+      } else {
+        
+        message("Oh no,", language, "still has duplicates!")
+      }
+  
+  bird_similarity[[language]] <- language_data_filtered
+
+}
+
+```
+
+## Correlations between dist measures
+
+```{r}
+
+cor_tables <- list()
+
+for (language in languages) {
+  
+  language_data <- bird_similarity[[language]] %>% 
+    select(zDist74,
+           zDist23,
+           zDistPhy,
+           zDistPer) %>% 
+    # This seems a bit silly but I want to be able to reorder them easily later
+    rename(a74 = zDist74,
+           b23 = zDist23,
+           cPhy = zDistPhy,
+           dPer = zDistPer)
+  
+  
+cors <- cor(language_data) %>% 
+  as.data.frame() %>% 
+  rename_with(~ paste0(.,language)) %>% 
+  mutate_all(round,2)
+
+cors[upper.tri(cors,diag=TRUE)] <- ""
+cors <- cors[-1,-4]
+cor_tables[[language]] <- cors
+
+}
+
+cor_table <- reduce(cor_tables,cbind) %>% 
+  select(order(colnames(.))) %>% 
+  mutate(across(everything(), as.numeric)) %>% 
+  mutate(a74zzAverage = rowMeans(select(., starts_with("a")), na.rm = FALSE)) %>% 
+  mutate(b23zzAverage = rowMeans(select(., starts_with("b")), na.rm = FALSE)) %>% 
+  mutate(cPhyzzAverage = rowMeans(select(., starts_with("c")), na.rm = FALSE)) %>% 
+  select(order(colnames(.))) %>% 
+  mutate_if(is.numeric,round,2)
+
+row.names(cor_table) <- gsub("a|b|c|d", "", row.names(cor_table))
+
+latex_table <- cor_table %>% 
+  kable(format = "latex",
+        align = c(rep("c", 24)),
+        booktabs = TRUE,
+        linesep = "",
+        escape = FALSE,
+        caption = "Correlations for distance variables",
+        label = "table:corrsDist")  %>% 
+    kable_styling(latex_options = c("hold_position",
+                                    "scale_down"),
+
+                  position = "center") %>% 
+     add_header_above(c(" " = 1, 
+                        "74" = 8,
+                        "23" = 8,
+                        "Phy" = 8),
+                      line = FALSE) %>% 
+  row_spec(0, angle = 90) %>% 
+  column_spec(2:21, width = ".3cm")
+  
+
+latex_table <- gsub("a74", "", latex_table)
+latex_table <- gsub("b23", "", latex_table)
+latex_table <- gsub("cPhy", "", latex_table)
+latex_table <- gsub("0\\.", ".", latex_table)
+latex_table <- gsub("zz", "", latex_table)
+latex_table <- gsub("NA", "", latex_table)
+
+writeLines(latex_table, here("output/CorrsDist.tex"))
+
+```
+
+## Run Analysis
+
+Logistic regressions with whether or not pairs of birds share names as the outcome variable, and phylogenetic similarity, perceptual similarity, and proximity in traditional scientific taxonomies (from 1974 and 2023) as predictors
+
+Before I was doing the logistics regressions with glm. But you can't do an MLM with glm, so I had to use glmmtmb. So now I am re-running all of the models to use the same package. This will make a table with the BICs and coefficients for each variable in each model (but with 23 omitted from the multi-variable models), and also for MLMs with random effect for Language.
+
+```{r}
+
+variables <- c("zDist74", "zDistPhy", "zDistPer")
+AllVals <- data.frame(Model = character(),
+                  Variable = character(),
+                  Statistic = character(),
+                  All = numeric())
+LanguageVals <- list()
+models_lr <- list()
+VIFs_lr <- list()
+
+# make all possible combinations of variables
+combinations <- unlist(
+  lapply(1:length(variables),
+         function(i) combn(1:length(variables),i,simplify = FALSE)),
+  recursive = FALSE)
+
+# Paste them into formulas
+formulas_mlm <- sapply(combinations, function(i)
+  as.formula(paste("SameName ~", 
+                   paste(variables[i], collapse = "+"), 
+                   "+ (1 | Language)")))
+formulas_mlm <- c(as.formula("SameName ~ zDist23 + (1 | Language)"),
+                  formulas_mlm) # add the 23 model
+formulas_mlm <- c(as.formula("SameName ~ (1 | Language)"), 
+                  formulas_mlm)  # Add the null model
+
+# Get data for MLM
+model_data <- bind_rows(bird_similarity, .id = "Language") %>% 
+  mutate(Language = as.factor(Language))
+
+models_mlm <- list()
+  for (formula in formulas_mlm) {
+    
+      if (as.character(formula)[3] == "(1 | Language)") {
+    model_name <- "null"
+  } else {
+    model_name <- as.character(formula)[3] %>% 
+      str_remove_all(., "\\s*\\+\\s*\\(1 \\| Language\\)") %>% 
+      str_remove_all(., "^.*~\\s*") %>% 
+      str_replace_all(., "zDist", "") %>% 
+      gsub(" ", "", .)
+  }
+
+     model <-  glmmTMB(formula,
+                   data = model_data,
+                   family = "binomial")
+     
+    models_mlm[[paste0(model_name)]] <- model
+  }
+  
+  models_lr[["All"]] <- models_mlm
+
+# Get BICs and coefficients for MLM
+for (i in seq_along(models_mlm)) {
+  
+  thisModel <- names(models_mlm)[i]
+  
+  BIC <- BIC(models_mlm[[i]])
+  
+  Data <- data.frame(Model = c(thisModel),
+                     Variable = "",
+                     Statistic = c("BIC"),
+                     All = c(BIC)) %>% 
+    mutate(Model = gsub("zDist", "", Model),
+           Model = gsub(" + (1 | Language)", "", Model))
+  
+  Coeffs <- as.data.frame(coeffs(models_mlm[[i]])) %>% 
+    rownames_to_column(var = "Variable") %>% 
+    filter(!str_detect(Variable, "Int")) %>% 
+    mutate(Variable = str_extract(Variable, "(?<=\\().*?(?=\\))"),
+           Variable = gsub("zDist", "", Variable),
+           Statistic = "β",
+           Model = thisModel) %>% 
+    rename_with(~ ifelse(str_detect(.x, "coeffs"), "All", .x)) %>% 
+    select(Model, Variable, Statistic, All)
+  
+  thing <- rbind(Data, Coeffs)
+  
+  AllVals <- rbind(AllVals, thing)
+  
+}
+
+# Make Formulas for logistic regressions for all languages
+formulas <- sapply(combinations, function(i)
+  as.formula(paste("SameName ~", 
+                   paste(variables[i], collapse = "+"))))
+formulas <- c(as.formula("SameName ~ zDist23"), formulas) # add the 23 model
+formulas <- c(as.formula("SameName ~ 1"), formulas)  # Add the null model
+
+# Fit models for all languages
+for (language in names(bird_similarity)) {
+  
+  language_data <- bird_similarity[[language]] %>%
+    select(Species1,
+           Species2,
+           SameName,
+           zDist74,
+           zDist23,
+           zDistPer,
+           zDistPhy) %>% 
+    filter(complete.cases(.[sapply(., is.numeric)]))
+  
+  models <- list()
+  
+  for (formula in formulas) {
+    
+    if(as.character(formula)[3] == 1) {
+      model_name <- "null"
+    } else {
+      model_name <- as.character(formula)[3] %>% 
+        gsub("zDist", "", .) %>% 
+        gsub(" ", "", .)
+    }
+    
+     model <-  glmmTMB(formula,
+                   data = language_data,
+                   family = "binomial")
+     
+    models[[paste0(model_name)]] <- model
+    
+  }
+  
+  models_lr[[language]] <- models
+  
+  languageVals <- tibble(Model = character(),
+                         Variable = character(),
+                         Statistic = character(),
+                         !!paste0(language) := numeric())
+
+# Get BICs and coefficients
+for (i in seq_along(models)) {
+  
+  thisModel <- names(models)[i]
+
+  BIC <- BIC(models[[i]])
+  
+  Data <- tibble(Model = c(thisModel),
+                 Variable = "",
+                 Statistic = c("BIC"),
+                 !!paste0(language) := BIC) %>% 
+    mutate(Model = gsub("zDist", "", Model))
+  
+  Coeffs <- as.data.frame(coeffs(models[[i]])) %>% 
+    rownames_to_column(var = "Variable") %>% 
+    filter(!str_detect(Variable, "Int")) %>% 
+    mutate(Variable = str_extract(Variable, "(?<=\\().*?(?=\\))"),
+           Variable = gsub("zDist", "", Variable),
+           Statistic = "β",
+           Model = thisModel) %>% 
+    rename_with(~ ifelse(str_detect(.x, "coeffs"), paste0(str_to_title(language)), .x))
+  
+  thing <- rbind(Data, Coeffs)
+  
+  languageVals <- rbind(languageVals, thing)
+  
+}
+  
+  # get VIFs
+  
+  fullmodel <- models[["74+Phy+Per"]]
+  
+  vif <- check_collinearity(fullmodel)  %>%
+    select(Term, VIF) %>%
+    mutate(VIF = round(VIF, 2)) %>%
+    rename(!!language := VIF,
+           Variable = Term)
+  
+  VIFs_lr[[language]] <- vif
+  
+  
+  
+  LanguageVals[[str_to_title(language)]] <- languageVals 
+  
+}
+
+# Make a nice table for VIFs then export it as LaTeX and csv
+
+vif_table_lr <- reduce(VIFs_lr,
+                  left_join,
+                  by = "Variable") %>% 
+  mutate(Variable = gsub("zDist", "", Variable)) %>% 
+  column_to_rownames("Variable")
+
+latex_vifs_lr <- kable(vif_table_lr,
+                      format = "latex",
+                      align = c(rep("c", 7)),
+                      booktabs = TRUE,
+                      linesep = "",
+                      escape = FALSE,
+                      caption = "Variance inflation factors for logistic regressions predicting name sharing") %>% 
+    kable_styling(latex_options = c("hold_position"))
+
+  writeLines(latex_vifs_lr, here("output/VIFs_LR.tex"))
+  
+  write.csv(vif_table_lr, file = here("output/VIFs_LR.csv"))
+  
+# Make a nice table for BICs and coefficients and export it as LaTeX and BIC
+
+table1 <- reduce(LanguageVals, 
+                  left_join, 
+                  by = c("Model", "Variable", "Statistic")) %>% 
+  left_join(AllVals,
+            by = c("Model", "Variable", "Statistic"))
+
+# Find the smallest BIC value
+ small_bic <- table1 %>% 
+   filter(Statistic == "BIC") %>% 
+   select(-c(Variable, Model, Statistic)) %>% 
+   summarise(across(everything(), \(x) min(x, na.rm = TRUE)))
+   # summarise(across(everything(), min, na.rm = TRUE))
+ 
+ # Now minus the smallest value from everything to get Delta BIC
+ 
+ table1 <- table1 %>% 
+   rename_with(str_to_title) %>%
+   mutate(across(names(small_bic), 
+                 ~ if_else(Statistic == "BIC", 
+                           . - small_bic[[cur_column()]], 
+                           .)),
+          Model = gsub(" ", "", Model))%>% 
+   mutate_if(is.numeric, round, 2) %>% 
+   filter(!is.na(Variable))
+ 
+ # make the table pretty for the paper
+ latex_table <- table1 %>% 
+   # First, this bit makes the best model overall be bolded with a shaded background (this version of this is slightly lazy because it doesn't deal with the problem of the best model overall being a single predictor model, but only because it didn't have to at this stage. Later I deal with this.)
+   mutate(across(names(colour_pairs), 
+                 ~ ifelse(. <= 2 & Statistic == "BIC", 
+                          cell_spec(as.character(.), "latex", 
+                                    bold = TRUE, 
+                                    background =
+                                      colour_pairs[[cur_column()]][1]), 
+                          as.character(.)))) %>% 
+   # Find the best model of the single predictor models and makes it bold and coloured
+   group_by(Model) %>% 
+   mutate(n = n()) %>% 
+   ungroup()%>% 
+   mutate(across(
+    names(colour_pairs), 
+    ~ {
+      # Identify the smallest BIC in single predictor models
+      min_value <- min(as.numeric(.)[Statistic == "BIC" & n == 2], 
+                       na.rm = TRUE)
+      max_value <- min_value + 2
+      # Identify the smallest BIC and anything within 2 of the smallest
+      ifelse(as.numeric(.) >= min_value & 
+               as.numeric(.) <= max_value & 
+               Statistic == "BIC" & 
+               n == 2,
+             # make them pretty
+             cell_spec(as.character(.), 
+                       "latex", 
+                       bold = TRUE,
+                       color = colour_pairs[[cur_column()]][2]),
+             as.character(.))
+    }
+  ))
+ %>% 
+   group_by(Model) %>% 
+   mutate(Model = ifelse(row_number() == 1,
+                         Model,
+                         "")) %>% 
+      ungroup() %>% 
+      select(-n) %>% 
+     mutate(Statistic = ifelse(Statistic=="BIC", 
+                               "$\\Delta BIC$", 
+                               "$\\beta$")) %>% 
+     rename(" " = Model,
+            "  " = Variable,
+            "   " = Statistic) %>% 
+     kable(format = "latex",
+           align = c("l", "l", "l", "c", "c", "c", "c", "c", "c", "c", "c", "c"),
+           booktabs = TRUE,
+           linesep = "",
+           escape = FALSE,
+           caption = "Results table for logistic regressions",
+           label = "table:resultsLR") %>% 
+    kable_styling(latex_options = c("hold_position")) %>% 
+     add_header_above(c("Model" = 1, 
+                        "Pred." = 1,
+                        "Stat." = 1,
+                        "Language" = 8)) %>% 
+     pack_rows("Null Model", 1,1,
+               latex_align = "c",
+               hline_before = FALSE,
+               hline_after = TRUE,
+               indent = FALSE,
+               bold = FALSE,
+               latex_gap_space = "0.0em") %>% 
+     pack_rows("Single Predictor Models", 2, 9,
+               latex_align = "c",
+               hline_before = TRUE,
+               hline_after = TRUE,
+               indent = FALSE,
+               bold = FALSE,
+                latex_gap_space = "0.0em") %>% 
+     pack_rows("Two Predictor Models", 10, 18,
+               latex_align = "c",
+               hline_before = TRUE,
+               hline_after = TRUE,
+               indent = FALSE,
+               bold = FALSE,
+               latex_gap_space = "0.0em") %>% 
+     pack_rows("Full Model", 19,22,
+               latex_align = "c",
+               hline_before = TRUE,
+               hline_after = TRUE,
+               indent = FALSE,
+               bold = FALSE,
+               latex_gap_space = "0.0em")
+   
+    writeLines(latex_table, here("output/ResultsTableLR.tex"))
+ 
+    best_models_lr <- table1 %>% 
+      filter(Statistic == "BIC") %>% 
+      pivot_longer(cols = !c(Model, Variable, Statistic),
+                   names_to = "Language",
+                   values_to = "BIC") %>% 
+      select(-Statistic)    %>%
+      mutate(BIC = as.numeric(BIC)) %>% 
+      filter(BIC <= 2)    %>% 
+      select(Model, Language)
+
+```
+
+Every model with predictors outperforms the null model.
+Best single predictor model is 1974 traditional taxonomy in every language except for Tzeltal, where the 2023 traditional taxonomy is the best.
+
+Two predictor models - weirdly, per+23 beats per+74 in a few languages (Rangi, Tobelo, Tzeltal)
+
+For Tzeltal, we still include 74 (rather than 23) in the full model
+
+Best full model (after pulling out 23):
+Per+74 for Anindilyakwa and Tzeltal (But for Tzeltal Per + 23 is better)
+Phy+74 for Innu and Saami
+Full model for the rest (for Rangi the Per+Phy+23 model is better than Per+Phy+74, for Tobelo they're basically the same)
+
+## Get predictions from best models
+
+```{r}
+
+ languages_plus <- c(languages, "All")
+
+variables <- c("zDist74", "zDistPer", "zDistPhy")
+# all_models <- list()
+constant_values <- list(zDist74 = 0, zDistPer = 0, zDistPhy = 0)
+values <- c(-3, -2, -1, 0, 1, 2)
+all_predictions <- list()
+
+for (language in languages_plus) {
+  
+  if (language == "All") {
+    language_data <- model_data
+  } else {
+    language_data <- bird_similarity[[language]]
+  }
+
+# Find the best model
+language_models <- models_lr[[language]]
+best_model_index <- best_models_lr$Model[
+  best_models_lr$Language == language & best_models_lr$Model != "null"]
+best_model <- language_models[best_model_index]
+
+  language_predictions <- list()
+
+# Make an empty dataframe to put predictions into
+predictions_df <- data.frame(Language = character(),
+                             Model = character(),
+                             Predictor = character(),
+                             `-3sd` = numeric(),
+                             `-2sd` = numeric(),
+                             `-1sd` = numeric(),
+                             `Mean` = numeric(),
+                             `+1sd` = numeric(),
+                             `+2sd` = numeric(),
+                               stringsAsFactors = FALSE,
+                             check.names = FALSE)
+  
+
+  for (i in seq_along(best_model)) {
+    model <- best_model[[i]]
+    model_name <- best_model_index[i]
+    pred_vars <- all.vars(formula(model))[-1] 
+    
+    for (var in pred_vars) {
+      
+      if (var == "Language"){
+        return(NULL)
+      } else {
+      # Create a newdata dataframe with the correct number of rows
+      newdata <- data.frame(matrix(rep(NA, length(pred_vars) * length(values)),
+                                   nrow = length(values), 
+                                   ncol = length(pred_vars)))
+      colnames(newdata) <- pred_vars
+      # Assign the constant values to all predictors
+      for (pred_var in pred_vars) {
+        newdata[[pred_var]] <- constant_values[[pred_var]]
+      }
+      }
+      
+      # Vary the current predictor variable
+      newdata[[var]] <- values
+      
+      # Make predictions
+      predictions <- format_sensibly(predict(model,
+                                     type = "response",
+                                   newdata = newdata,
+                                   re.form = NA))
+      
+      # Combine model name, predictor name, and predictions into columns
+      temp_df <- data.frame(Language = language,
+                            Model = model_name,
+                            Predictor = var,
+                            `-3sd` = predictions[1],
+                            `-2sd` = predictions[2],
+                            `-1sd` = predictions[3],
+                            `Mean` = predictions[4],
+                            `+1sd` = predictions[5],
+                            `+2sd` = predictions[6],
+                            stringsAsFactors = FALSE,
+                            check.names = FALSE)
+      
+      #mash them into a dataframe together
+      predictions_df <- rbind(predictions_df, temp_df)
+    }
+  }
+  
+ all_predictions[[language]] <- predictions_df
+ 
+}
+
+# I do not know why but the last one won't go into the list. This should make it do so.
+ all_predictions[[language]] <- predictions_df
+
+ # Make a table with all predictions
+table_lr_preds <- reduce(all_predictions, rbind) %>% 
+  # Only keep the one with the most predictors 
+  filter(!(Language == "Tlingit" & Model == "74+Per")) %>% 
+  select(-Model) %>% 
+  mutate(Predictor = gsub("zDist","",Predictor)) %>% 
+  group_by(Language) %>% 
+  mutate(Language = ifelse(row_number()==1,
+                           Language,
+                           ""))
+
+   latex_preds <- table_lr_preds %>%
+     rename(" " = Language,
+            "  " = Predictor) %>%
+     kable(format = "latex",
+           align = c("l", "l", "c", "c", "c", "c", "c", "c", "c"),
+           booktabs = TRUE,
+           linesep = "",
+           escape = FALSE,
+           caption = "The effects of predictors on pairs of birds sharing a name",
+           label = "table:predsLR") %>%
+     kable_styling(latex_options = c("hold_position", "scale_down")) %>%
+     add_header_above(c("Language" = 1, "Predictor" = 1, "Value of Predictor" = 6))
+
+    writeLines(latex_preds, here("output/PredictionsLR.tex"))
+
+```
+
+### Predictions for paper
+
+```{r}
+
+# little eagle & black falcon
+
+raptors_preds <- bird_similarity[["Anindilyakwa"]] %>% 
+  filter((Species1 == "Hieraaetus morphnoides" & 
+            Species2 == "Falco subniger") | (Species2 == "Hieraaetus morphnoides" & 
+            Species1 == "Falco subniger"))
+
+raptors_preds_74 <- predict(models_lr[["Anindilyakwa"]][["74"]],
+                            raptors_preds,
+                            type = "response")
+
+raptors_preds_74Per <- predict(models_lr[["Anindilyakwa"]][["74+Per"]],
+                            raptors_preds,
+                            type = "response")
+
+print(c(raptors_preds_74,raptors_preds_74Per))
+
+```
+
+
+# Mismatches between different measures
+
+This shows us the areas of greatest mismatch between each of the measures
+
+```{r}
+
+Mismatches <- list()
+MismatchesSN <- list()
+
+for(language in names(bird_similarity)) {
+  
+  language_data = bird_similarity[[language]]
+  
+  language_data <- language_data %>% 
+    # make fractional rankings for all of the distance measures
+    mutate(across(starts_with("Dist"), 
+                  ~frac_rank(.), 
+                  .names = "rank{substr(col, 5, nchar(col))}")) %>% 
+    rowwise() %>% 
+    mutate(comp74per = abs(rank74 - rankPer),
+           comp74phy = abs(rank74 - rankPhy),
+           compperphy = abs(rankPer - rankPhy),
+           compave = mean(c(comp74per, 
+                            comp74phy, 
+                            compperphy)),
+           comptax = abs(rank74 - rank23)) %>% 
+    ungroup() %>% 
+    arrange(desc(compave)) %>% 
+    mutate(rank = row_number())
+  
+  Mismatches[[language]] <- language_data
+  
+  MismatchesSN[[language]] <- language_data %>% 
+    filter(SameName == TRUE)
+
+}
+
+```
+
+# Analysis 3a: Predicting singleton categories
+
+## Prepare dataset
+
+```{r}
+
+# Make subset of data - take out duplicate birds for each language, keeping in each case the bird in the smallest category. Then scale the isolation variables.
+
+bird_data2 <- bird_data %>% 
+  group_by(Language) %>% 
+  arrange(by = n) %>% 
+  distinct(ScientificName2023, .keep_all = TRUE) %>% 
+  # re-scale everything
+  select(-starts_with("zIso")) %>% 
+  mutate_at(vars(starts_with("Iso")), list(z = ~scale(.)[,1])) %>% 
+  rename_at(vars(ends_with("_z")), ~sub("(.*)_z$", "z\\1", .)) %>% 
+  ungroup()
+
+```
+
+## Correlations between Isolation measures
+
+```{r}
+
+cor_tables_2 <- list()
+
+for (language in languages) {
+  
+    language_data <- bird_data2 %>% 
+      filter(Language == language) %>% 
+    select(zIso74,
+           zIso23,
+           zIsoPhy,
+           zIsoPer) %>% 
+    # This seems a bit silly but I want to be able to reorder them easily later
+    rename(a74 = zIso74,
+           b23 = zIso23,
+           cPhy = zIsoPhy,
+           dPer = zIsoPer)
+  
+cors <- cor(language_data) %>% 
+  as.data.frame() %>% 
+  rename_with(~ paste0(.,language)) %>% 
+  mutate_all(round,2)
+
+cors[upper.tri(cors,diag=TRUE)] <- ""
+cors <- cors[-1,-4]
+cor_tables_2[[language]] <- cors
+
+}
+
+cor_table_2 <- reduce(cor_tables_2,cbind) %>% 
+  select(order(colnames(.))) %>% 
+  mutate(across(everything(), as.numeric)) %>% 
+  mutate(a74zzAverage = rowMeans(select(., starts_with("a")), na.rm = FALSE)) %>% 
+  mutate(b23zzAverage = rowMeans(select(., starts_with("b")), na.rm = FALSE)) %>% 
+  mutate(cPhyzzAverage = rowMeans(select(., starts_with("c")), na.rm = FALSE)) %>% 
+  select(order(colnames(.))) %>% 
+  mutate_if(is.numeric,round,2)
+
+row.names(cor_table_2) <- gsub("a|b|c|d", "", row.names(cor_table_2))
+
+latex_table <- cor_table_2 %>% 
+  kable(format = "latex",
+        align = c(rep("c", 21)),
+        booktabs = TRUE,
+        linesep = "",
+        escape = FALSE,
+        caption = "Correlations for isolation variables",
+        label = "table:corrsNB")  %>% 
+    kable_styling(latex_options = c("hold_position",
+                                    "scale_down"),
+
+                  position = "center") %>% 
+     add_header_above(c(" " = 1, 
+                        "74" = 8,
+                        "23" = 8,
+                        "Phy" = 8),
+                      line = FALSE) %>% 
+  row_spec(0, angle = 90) %>% 
+  column_spec(2:21, width = ".3cm")
+  
+latex_table <- gsub("a74", "", latex_table)
+latex_table <- gsub("b23", "", latex_table)
+latex_table <- gsub("cPhy", "", latex_table)
+latex_table <- gsub("0\\.", ".", latex_table)
+latex_table <- gsub("zz", "", latex_table)
+latex_table <- gsub("NA", "", latex_table)
+
+writeLines(latex_table, here("output/CorrsIso.tex"))
+
+```
+
+## Run Analysis
+
+This places the birds into two categories - those alone in a taxon and those with companions - and uses logistic regressions to predict which category birds will be placed into 
+I wrote all this code while we were still calling them "monotypic" rather than "singleton" categories. I'm not changing it.
+
+```{r}
+
+variables <- c("zIso74", "zIsoPhy", "zIsoPer")
+AllVals_LRmt <- data.frame(Model = character(),
+                  Variable = character(),
+                  Statistic = character(),
+                  All = numeric())
+LanguageVals_LRmt <- list()
+models_LRmt <- list()
+VIFs_lrmt <- list()
+
+# make all possible combinations of variables
+combinations <- unlist(
+  lapply(1:length(variables),
+         function(i) combn(1:length(variables),i,simplify = FALSE)),
+  recursive = FALSE)
+
+# Paste them into formulas
+formulas_mlm <- sapply(combinations, function(i)
+  as.formula(paste("Monotypic ~", 
+                   paste(variables[i], collapse = "+"), 
+                   "+ (1 | Language)")))
+formulas_mlm <- c(as.formula("Monotypic ~ zIso23 + (1 | Language)"), formulas_mlm) # add the 23 model
+formulas_mlm <- c(as.formula("Monotypic ~ (1 | Language)"), formulas_mlm)  # Add the null model
+
+# Get data for MLM
+model_data <- bird_data2 %>% 
+  mutate(Language = factor(Language)) %>% 
+  mutate(Monotypic = ifelse(n==1, 1, 0))
+
+models_mlm <- list()
+  for (formula in formulas_mlm) {
+    
+      if (as.character(formula)[3] == "(1 | Language)") {
+    model_name <- "null"
+  } else {
+    model_name <- as.character(formula)[3] %>% 
+      str_remove_all(., "\\s*\\+\\s*\\(1 \\| Language\\)") %>% 
+      str_remove_all(., "^.*~\\s*") %>% 
+      str_replace_all(., "zIso", "") %>% 
+      gsub(" ", "", .)
+  }
+
+     model <-  glmmTMB(formula,
+                   data = model_data,
+                   family = "binomial")
+     
+    models_mlm[[paste0(model_name)]] <- model
+  }
+  
+  models_LRmt[["All"]] <- models_mlm
+
+# Get BICs and coefficients for MLM
+for (i in seq_along(models_mlm)) {
+  
+  thisModel <- names(models_mlm)[i]
+
+  BIC <- BIC(models_mlm[[i]])
+  Data <- data.frame(Model = c(thisModel),
+                     Variable = "",
+                     Statistic = c("BIC"),
+                     All = c(BIC)) %>% 
+    mutate(Model = gsub("zIso", "", Model),
+           Model = gsub(" + (1 | Language)", "", Model))
+  Coeffs <- as.data.frame(coeffs(models_mlm[[i]])) %>% 
+    rownames_to_column(var = "Variable") %>% 
+    filter(!str_detect(Variable, "Int")) %>% 
+    mutate(Variable = str_extract(Variable, "(?<=\\().*?(?=\\))"),
+           Variable = gsub("zIso", "", Variable),
+           Statistic = "β",
+           Model = thisModel) %>% 
+    rename_with(~ ifelse(str_detect(.x, "coeffs"), "All", .x)) %>% 
+    select(Model, Variable, Statistic, All)
+  thing <- rbind(Data, Coeffs)
+  AllVals_LRmt <- rbind(AllVals_LRmt, thing)
+  
+}
+
+# Make Formulas for logistic regressions for all languages
+formulas <- sapply(combinations, function(i)
+  as.formula(paste("Monotypic ~", 
+                   paste(variables[i], collapse = "+"))))
+formulas <- c(as.formula("Monotypic ~ zIso23"), formulas) # add the 23 model
+formulas <- c(as.formula("Monotypic ~ 1"), formulas)  # Add the null model
+
+# Fit models for all languages
+for (language in languages) {
+  
+  print(language)
+  
+  language_data <- bird_data2 %>% 
+    filter(Language == language) %>% 
+    mutate(Monotypic = ifelse(n==1, 1, 0))
+
+  models <- list()
+  
+  for (formula in formulas) {
+    
+    if(as.character(formula)[3] == 1) {
+      model_name <- "null"
+    } else {
+      model_name <- as.character(formula)[3] %>% 
+        gsub("zIso", "", .) %>% 
+        gsub(" ", "", .)
+      
+    }
+    
+     model <-  glmmTMB(formula,
+                   data = language_data,
+                   family = "binomial")
+     
+    models[[paste0(model_name)]] <- model
+    
+  }
+  
+  models_LRmt[[language]] <- models
+  
+  languageVals <- tibble(Model = character(),
+                         Variable = character(),
+                         Statistic = character(),
+                         !!paste0(language) := numeric())
+
+# Get BICs and coefficients
+for (i in seq_along(models)) {
+  
+  thisModel <- names(models)[i]
+
+  BIC <- BIC(models[[i]])
+  Data <- tibble(Model = c(thisModel),
+                 Variable = "",
+                 Statistic = c("BIC"),
+                 !!paste0(language) := BIC) %>% 
+    mutate(Model = gsub("zIso", "", Model))
+  Coeffs <- as.data.frame(coeffs(models[[i]])) %>% 
+    rownames_to_column(var = "Variable") %>% 
+    filter(!str_detect(Variable, "Int")) %>% 
+    mutate(Variable = str_extract(Variable, "(?<=\\().*?(?=\\))"),
+           Variable = gsub("zIso", "", Variable),
+           Statistic = "β",
+           Model = thisModel) %>% 
+    rename_with(~ ifelse(str_detect(.x, "coeffs"), paste0(str_to_title(language)), .x))
+  thing <- rbind(Data, Coeffs)
+  languageVals <- rbind(languageVals, thing)
+  
+}
+  
+  LanguageVals_LRmt[[str_to_title(language)]] <- languageVals 
+  
+  # get VIFs
+  
+  fullmodel <- models[["74+Phy+Per"]]
+  
+  vif <- check_collinearity(fullmodel)  %>%
+    select(Term, VIF) %>%
+    mutate(VIF = round(VIF, 2)) %>%
+    rename(!!language := VIF,
+           Variable = Term)
+  
+  VIFs_lrmt[[language]] <- vif
+  
+  # VIFs get exported a little later in this one, they have their own chunk after the analysis is run again on the Anindilyakwa data with the outlier taken out
+  
+}
+
+table4 <-  reduce(LanguageVals_LRmt, 
+                  left_join, 
+                  by = c("Model", "Variable", "Statistic")) %>% 
+  left_join(AllVals_LRmt,
+            by = c("Model", "Variable", "Statistic"))
+
+
+ small_bic <- table4 %>% 
+   filter(Statistic == "BIC") %>% 
+   select(-c(Variable, Model, Statistic)) %>% 
+   summarise(across(everything(), min, na.rm = TRUE))
+ 
+ # Now minus the smallest value from everything
+
+min_bic <- table4 %>% 
+  mutate(across(names(small_bic), 
+                ~ if_else(Statistic == "BIC", 
+                          . - small_bic[[cur_column()]], 
+                          .)),
+         Model = gsub(" ", "", Model)) %>% 
+  mutate_if(is.numeric, round, 2) %>% 
+  filter(!is.na(Variable)) %>% 
+  group_by(Model) %>% 
+  mutate(n = n()) %>% 
+  ungroup()%>% 
+  filter(Statistic=="BIC")%>% 
+  summarise(across(all_of(languages_plus), 
+                   list(min_bic = ~ min(., na.rm = TRUE),
+                        min_bic_single = ~ min(.[n == 2], na.rm = TRUE)),
+                   .names = "{col}_{fn}"))
+
+min_bic_list <- lapply(languages_plus, function(language) {
+  list(
+    min_bic = min_bic[[paste0(language, "_min_bic")]],
+    min_bic_single = min_bic[[paste0(language, "_min_bic_single")]]
+  )
+})
+names(min_bic_list) <- languages_plus
+
+table4 <- table4 %>% 
+   mutate(across(names(small_bic), 
+                ~ if_else(Statistic == "BIC", 
+                          . - small_bic[[cur_column()]], 
+                          .)),
+         Model = gsub(" ", "", Model)) %>% 
+  mutate_if(is.numeric, round, 2) %>% 
+  filter(!is.na(Variable))
+
+latex_table <- table4 %>% 
+  group_by(Model) %>% 
+  mutate(n = n()) %>% 
+  ungroup() %>% 
+  # First this one is for things that need both shading and bolding/colouring
+  mutate(across(
+    names(min_bic_list),
+    ~ {
+      min_value <- min_bic_list[[cur_column()]][["min_bic"]]
+      max_value <- min_value + 2
+    ifelse(as.numeric(.) >=min_value &
+             as.numeric(.) <= max_value &
+             Statistic == "BIC" &
+             n == 2 &
+             min_value <=2
+           ,
+           cell_spec(as.character(.), 
+                     "latex", 
+                     bold = TRUE,
+                     color = colour_pairs[[cur_column()]][2],
+                     background = colour_pairs[[cur_column()]][1],
+                     extra_css = "border-spacing: 10px;"),
+             as.character(.))
+    }
+  )) %>% 
+    # Now this one is just for things that need bolding/colouring
+      mutate(across(
+    names(min_bic_list),
+    ~ {
+      min_value <- min_bic_list[[cur_column()]][["min_bic_single"]]
+      max_value <- min_value + 2
+      ifelse(str_length(.)>5, .,
+    ifelse(as.numeric(.) >= min_value &
+             as.numeric(.) <= max_value &
+             Statistic == "BIC" &
+             n == 2,
+           cell_spec(as.character(.), 
+                     "latex", 
+                     bold = TRUE,
+                     color = colour_pairs[[cur_column()]][2]),
+             as.character(.)))
+    }
+    # And finally the ones that just need shading
+    )) %>% 
+        mutate(across(
+    names(min_bic_list),
+    ~ {
+      min_value <- min_bic_list[[cur_column()]][["min_bic"]]
+      max_value <- min_value + 2
+      ifelse(str_length(.)>5, .,
+    ifelse(as.numeric(.) >= min_value &
+             as.numeric(.) <= max_value &
+             Statistic == "BIC" &
+             n != 2,
+           cell_spec(as.character(.), 
+                     "latex", 
+                     bold = TRUE,
+                     background = colour_pairs[[cur_column()]][1]),
+             as.character(.)))
+    }
+    )) %>% 
+  select(-n) %>% 
+  group_by(Model) %>% 
+  mutate(Model = ifelse(row_number()==1,Model, "")) %>% 
+     mutate(Statistic = ifelse(Statistic=="BIC", "$\\Delta BIC$", "$\\beta$")) %>% 
+     rename(" " = Model,
+            "  " = Variable,
+            "   " = Statistic) %>% 
+     kable(format = "latex",
+           align = c("l", "l", "l", "c", "c", "c", "c", "c", "c", "c", "c", "c"),
+           booktabs = TRUE,
+           linesep = "",
+           escape = FALSE,
+           caption = "Logistic regression for Monotypic/non-Monotypic",
+           label = "table:resultsLRmt") %>% 
+    kable_styling(latex_options = c("hold_position", "scale down")) %>% 
+     add_header_above(c("Model" = 1, 
+                        "Pred." = 1,
+                        "Stat." = 1,
+                        "Language" = 8)) %>% 
+     pack_rows("Null Model", 1,1,
+               latex_align = "c",
+               hline_before = FALSE,
+               hline_after = TRUE,
+               indent = FALSE,
+               bold = FALSE,
+               latex_gap_space = "0.0em") %>% 
+     pack_rows("Single Predictor Models", 2, 9,
+               latex_align = "c",
+               hline_before = TRUE,
+               hline_after = TRUE,
+               indent = FALSE,
+               bold = FALSE,
+                latex_gap_space = "0.0em") %>% 
+     pack_rows("Two Predictor Models", 10, 18,
+               latex_align = "c",
+               hline_before = TRUE,
+               hline_after = TRUE,
+               indent = FALSE,
+               bold = FALSE,
+               latex_gap_space = "0.0em") %>% 
+     pack_rows("Full Model", 19,22,
+               latex_align = "c",
+               hline_before = TRUE,
+               hline_after = TRUE,
+               indent = FALSE,
+               bold = FALSE,
+               latex_gap_space = "0.0em")
+   
+    writeLines(latex_table, here("output/ResultsTableLRmt.tex"))
+ 
+    
+    best_models_nb <- table4 %>% 
+      filter(Statistic == "BIC") %>% 
+      pivot_longer(cols = !c(Model, Variable, Statistic),
+                   names_to = "Language",
+                   values_to = "BIC") %>% 
+      filter(BIC <= 2) %>% 
+      select(Model, Language)
+    
+    table4_bics <- table4 %>% 
+      filter(Statistic=="BIC")
+
+```
+
+### This is weird
+
+```{r}
+
+check_collinearity(models_LRmt[["Tlingit"]][["74+Phy+Per"]])
+
+```
+The upper confidence interval for the Per VIF is 432.42
+
+### No Emu
+Taking out the emu outlier and running the analysis again on the Anindilyakwa data.
+
+```{r}
+
+data_noemu <- bird_data2 %>% 
+  filter(Language == "Anindilyakwa" & zIsoPer < 10) %>% 
+    mutate(Monotypic = ifelse(n==1, 1, 0))
+
+variables <- c("zIso74", "zIsoPhy", "zIsoPer")
+AllVals_noemu <- data.frame(Model = character(),
+                  Variable = character(),
+                  Statistic = character(),
+                  All = numeric())
+models_LRmt_noemu <- list()
+
+
+# make all possible combinations of variables
+combinations <- unlist(
+  lapply(1:length(variables),
+         function(i) combn(1:length(variables),i,simplify = FALSE)),
+  recursive = FALSE)
+
+
+# Make Formulas for logistic regressions for all languages
+formulas <- sapply(combinations, function(i)
+  as.formula(paste("Monotypic ~", 
+                   paste(variables[i], collapse = "+"))))
+formulas <- c(as.formula("Monotypic ~ zIso23"), formulas) # add the 23 model
+formulas <- c(as.formula("Monotypic ~ 1"), formulas)  # Add the null model
+
+  models <- list()
+  
+  for (formula in formulas) {
+    
+    if(as.character(formula)[3] == 1) {
+      model_name <- "null"
+    } else {
+      model_name <- as.character(formula)[3] %>% 
+        gsub("zIso", "", .) %>% 
+        gsub(" ", "", .)
+      
+    }
+    
+     model <-  glmmTMB(formula,
+                   data = data_noemu,
+                   family = "binomial")
+     
+    models[[paste0(model_name)]] <- model
+  }
+  
+  models_LRmt_noemu <- models
+  
+  noemuVals <- tibble(Model = character(),
+                         Variable = character(),
+                         Statistic = character(),
+                         Anindilyakwa = numeric())
+
+# Get BICs and coefficients
+for (i in seq_along(models)) {
+  
+  thisModel <- names(models)[i]
+
+  BIC <- BIC(models[[i]])
+  Data <- tibble(Model = c(thisModel),
+                 Variable = "",
+                 Statistic = c("BIC"),
+                 Anindilyakwa = BIC) %>% 
+    mutate(Model = gsub("zIso", "", Model))
+  Coeffs <- as.data.frame(coeffs(models[[i]])) %>% 
+    rownames_to_column(var = "Variable") %>% 
+    filter(!str_detect(Variable, "Int")) %>% 
+    mutate(Variable = str_extract(Variable, "(?<=\\().*?(?=\\))"),
+           Variable = gsub("zIso", "", Variable),
+           Statistic = "β",
+           Model = thisModel) %>% 
+    rename_with(~ ifelse(str_detect(.x, "coeffs"), paste0("Anindilyakwa"), .x))
+  thing <- rbind(Data, Coeffs)
+  AllVals_noemu <- rbind(AllVals_noemu, thing)
+  
+}
+  
+ small_bic <- AllVals_noemu %>% 
+   filter(Statistic == "BIC") %>% 
+   select(-c(Variable, Model, Statistic)) %>% 
+   summarise(across(everything(), min, na.rm = TRUE))
+ 
+ # Now minus the smallest value from everything
+
+min_bic_noemu <- AllVals_noemu %>% 
+  mutate(across(names(small_bic), 
+                ~ if_else(Statistic == "BIC", 
+                          . - small_bic[[cur_column()]], 
+                          .)),
+         Model = gsub(" ", "", Model)) %>% 
+  mutate_if(is.numeric, round, 2) %>% 
+  filter(!is.na(Variable)) %>% 
+  group_by(Model) %>% 
+  mutate(n = n()) %>% 
+  ungroup()%>% 
+  filter(Statistic=="BIC")%>% 
+  summarise(across(any_of(languages_plus), 
+                   list(min_bic = ~ min(., na.rm = TRUE),
+                        min_bic_single = ~ min(.[n == 2], na.rm = TRUE)),
+                   .names = "{col}_{fn}"))
+
+table_noemu <- AllVals_noemu %>% 
+   mutate(across(names(small_bic), 
+                ~ if_else(Statistic == "BIC", 
+                          . - small_bic[[cur_column()]], 
+                          .)),
+         Model = gsub(" ", "", Model)) %>% 
+  mutate_if(is.numeric, round, 2) %>% 
+  filter(!is.na(Variable))
+
+latex_table <- table_noemu %>% 
+  group_by(Model) %>% 
+  mutate(n = n())%>% 
+  ungroup() %>% 
+  # First this one is for things that need both shading and bolding/colouring
+  mutate(Anindilyakwa = 
+    ifelse(as.numeric(Anindilyakwa) >= min_bic$Anindilyakwa_min_bic &
+             as.numeric(Anindilyakwa) <= min_bic$Anindilyakwa_min_bic +2 &
+             Statistic == "BIC" &
+             n==2 &
+             min_bic$Anindilyakwa_min_bic <=2
+           ,
+           cell_spec(as.character(Anindilyakwa), 
+                     "latex", 
+                     bold = TRUE,
+                     color = colour_pairs[["Anindilyakwa"]][2],
+                     background = colour_pairs[["Anindilyakwa"]][1],
+                     extra_css = "border-spacing: 10px;"),
+             as.character(Anindilyakwa))
+  ) %>% 
+    #Now this one is just for things that need bolding/colouring
+      mutate(Anindilyakwa =
+    ifelse(as.numeric(Anindilyakwa) >= min_bic$Anindilyakwa_min_bic_single &
+             as.numeric(Anindilyakwa) <=  min_bic$Anindilyakwa_min_bic_single + 2 &
+             Statistic == "BIC" &
+             n == 2,
+           cell_spec(as.character(Anindilyakwa), 
+                     "latex", 
+                     bold = TRUE,
+                     color = colour_pairs[["Anindilyakwa"]][2]),
+             as.character(Anindilyakwa))) %>% 
+        mutate(Anindilyakwa =
+      ifelse(str_length(Anindilyakwa)>5, Anindilyakwa,
+    ifelse(as.numeric(Anindilyakwa) >= min_bic$Anindilyakwa_min_bic &
+             as.numeric(Anindilyakwa) <= min_bic$Anindilyakwa_min_bic + 2 &
+             Statistic == "BIC" &
+             n != 2,
+           cell_spec(as.character(Anindilyakwa), 
+                     "latex", 
+                     bold = TRUE,
+                     background = colour_pairs[["Anindilyakwa"]][1]),
+             as.character(Anindilyakwa)))
+    )%>% 
+  select(-n) %>% 
+  group_by(Model) %>% 
+  mutate(Model = ifelse(row_number() == 1,Model, "")) %>% 
+     mutate(Statistic = ifelse(Statistic=="BIC", "$\\Delta BIC$", "$\\beta$")) %>% 
+     rename(" " = Model,
+            "  " = Variable,
+            "   " = Statistic) %>% 
+     kable(format = "latex",
+           align = c("l", "l", "l", "c"),
+           booktabs = TRUE,
+           linesep = "",
+           escape = FALSE,
+           caption = "Logistic regression for Monotypic/non-Monotypic for Anindilyakwa with emu removed",
+           label = "table:resultsNoEmu") %>% 
+    kable_styling(latex_options = c("hold_position", "scale down")) %>% 
+     add_header_above(c("Model" = 1, 
+                        "Pred." = 1,
+                        "Stat." = 1,
+                        "Anindilyakwa" = 1)) %>% 
+     pack_rows("Null Model", 1,1,
+               latex_align = "c",
+               hline_before = FALSE,
+               hline_after = TRUE,
+               indent = FALSE,
+               bold = FALSE,
+               latex_gap_space = "0.0em") %>% 
+     pack_rows("Single Predictor Models", 2, 9,
+               latex_align = "c",
+               hline_before = TRUE,
+               hline_after = TRUE,
+               indent = FALSE,
+               bold = FALSE,
+                latex_gap_space = "0.0em") %>% 
+     pack_rows("Two Predictor Models", 10, 18,
+               latex_align = "c",
+               hline_before = TRUE,
+               hline_after = TRUE,
+               indent = FALSE,
+               bold = FALSE,
+               latex_gap_space = "0.0em") %>% 
+     pack_rows("Full Model", 19,22,
+               latex_align = "c",
+               hline_before = TRUE,
+               hline_after = TRUE,
+               indent = FALSE,
+               bold = FALSE,
+               latex_gap_space = "0.0em")
+   
+    writeLines(latex_table, here("output/ResultsTableLRmt_noemu.tex"))
+    
+# VIFs for noemu model
+    
+    full_model <- models_LRmt_noemu[["74+Phy+Per"]]
+    
+    vifs_noemu <- check_collinearity(full_model) %>% 
+      select(Term, VIF) %>% 
+      mutate(VIF = round(VIF, 2)) %>% 
+      rename(Anindilyakwa_noemu = VIF,
+             Variable = Term)
+ 
+```
+
+### Export all VIFs
+
+```{r}
+
+# Make a nice table for VIFs and export it as csv and LaTeX
+
+vif_table_lrmt <- reduce(VIFs_lrmt,
+                  left_join,
+                  by = "Variable") %>% 
+  left_join(vifs_noemu,
+            by = "Variable") %>% 
+  mutate(Variable = gsub("zDist", "", Variable)) %>% 
+  column_to_rownames("Variable") %>% 
+  select(order(names(.)))
+
+latex_vifs_lrmt <- kable(vif_table_lrmt,
+                      format = "latex",
+                      align = c(rep("c", 7)),
+                      booktabs = TRUE,
+                      linesep = "",
+                      escape = FALSE,
+                      caption = "Variance inflation factors for logistic regressions predicting name sharing") %>% 
+    kable_styling(latex_options = c("hold_position"))
+
+  writeLines(latex_vifs_lrmt, here("output/VIFs_LRmt.tex"))
+  
+  write.csv(vif_table_lrmt, file = here("output/VIFs_LRmt.csv"))
+
+```
+
+### Predictions for paper
+
+Some predictions for particular birds
+
+```{r}
+
+# Kookaburra - Dacelo leachii
+
+D_leachii <- 	data.frame(
+  zIso74 = bird_data2$zIso74[bird_data2$CanonicalName == "Dacelo leachii"],
+  zIsoPer = bird_data2$zIsoPer[bird_data2$CanonicalName == "Dacelo leachii"]
+  )
+
+D_leachii_74 <- predict(models_LRmt[["Anindilyakwa"]][["74"]],
+                      D_leachii,
+                      type = "response")
+
+D_leachii_74Per <- predict(models_LRmt[["Anindilyakwa"]][["74+Per"]],
+                      D_leachii,
+                      type = "response")
+
+print(c(D_leachii_74, D_leachii_74Per))
+
+# Tern
+
+S_albifrons <- 	data.frame(
+  zIso74 = bird_data2$zIso74[bird_data2$CanonicalName == "Sternula albifrons"],
+  zIsoPer = bird_data2$zIsoPer[bird_data2$CanonicalName == "Sternula albifrons"]
+  )
+
+S_albifrons_74 <- predict(models_LRmt[["Anindilyakwa"]][["74"]],
+                      S_albifrons,
+                      type = "response")
+
+S_albifrons_74Per <- predict(models_LRmt[["Anindilyakwa"]][["74+Per"]],
+                      S_albifrons,
+                      type = "response")
+
+print(c(S_albifrons_74, S_albifrons_74Per))
+
+# Osprey
+
+P_haliaetus <- data.frame(
+  zIso74 = bird_data2$zIso74[bird_data2$CanonicalName == "Pandion haliaetus"],
+  zIsoPer = bird_data2$zIsoPer[bird_data2$CanonicalName == "Pandion haliaetus"]
+  )
+
+P_haliaetus_74 <- predict(models_LRmt[["Anindilyakwa"]][["74"]],
+                      P_haliaetus,
+                      type = "response")
+
+P_haliaetus_74Per <- predict(models_LRmt[["Anindilyakwa"]][["74+Per"]],
+                      P_haliaetus,
+                      type = "response")
+
+print(c(P_haliaetus_74, P_haliaetus_74Per))
+
+# Brahminy kite
+
+H_indus <- data.frame(
+  zIso74 = bird_data2$zIso74[bird_data2$CanonicalName == "Haliastur indus"],
+  zIsoPer = bird_data2$zIsoPer[bird_data2$CanonicalName == "Haliastur indus"]
+  )
+
+H_indus_74 <- predict(models_LRmt[["Anindilyakwa"]][["74"]],
+                      H_indus,
+                      type = "response")
+
+H_indus_74Per <- predict(models_LRmt[["Anindilyakwa"]][["74+Per"]],
+                      H_indus,
+                      type = "response")
+
+print(c(H_indus_74, H_indus_74Per))
+
+bird_preds <- data.frame(
+  Pred = c("74", "74 + Per"),
+  Kookaburra = c(D_leachii_74, D_leachii_74Per),
+  Tern = c(S_albifrons_74, S_albifrons_74Per),
+  Osprey = c(P_haliaetus_74, P_haliaetus_74Per),
+  Kite = c(H_indus_74, H_indus_74Per)
+  )
+
+```
+
+# Analysis 3b: Predicting companion count
+
+## Run analyses with full datasets
+
+```{r}
+
+variables <- c("zIso74", "zIsoPhy", "zIsoPer")
+AllVals <- data.frame(Model = character(),
+                  Variable = character(),
+                  Statistic = character(),
+                  All = numeric())
+LanguageVals <- list()
+models_nb <- list()
+VIFs_nb <- list()
+
+# make all possible combinations of variables
+combinations <- unlist(
+  lapply(1:length(variables),
+         function(i) combn(1:length(variables),i,simplify = FALSE)),
+  recursive = FALSE)
+
+# Paste them into formulas
+formulas_mlm <- sapply(combinations, function(i)
+  as.formula(paste("n ~", 
+                   paste(variables[i], collapse = "+"), 
+                   "+ (1 | Language)")))
+formulas_mlm <- c(as.formula("n ~ zIso23 + (1 | Language)"), formulas_mlm) # add the 23 model
+formulas_mlm <- c(as.formula("n ~ (1 | Language)"), formulas_mlm)  # Add the null model
+
+
+# Get data for MLM
+model_data <- bird_data2 %>% 
+  mutate(Language = as.factor(Language)) %>% 
+  mutate(n = n-1)
+
+
+models_mlm <- list()
+  for (formula in formulas_mlm) {
+    
+      if (as.character(formula)[3] == "(1 | Language)") {
+    model_name <- "null"
+  } else {
+    model_name <- as.character(formula)[3] %>% 
+      str_remove_all(., "\\s*\\+\\s*\\(1 \\| Language\\)") %>% 
+      str_remove_all(., "^.*~\\s*") %>% 
+      str_replace_all(., "zIso", "") %>% 
+      gsub(" ", "", .)
+  }
+
+     model <-  glmmTMB(formula,
+                   data = model_data,
+                   family = "nbinom2")
+     
+    models_mlm[[paste0(model_name)]] <- model
+  }
+  
+  models_nb[["All"]] <- models_mlm
+
+# Get BICs and coefficients for MLM
+for (i in seq_along(models_mlm)) {
+  
+  thisModel <- names(models_mlm)[i]
+
+  BIC <- BIC(models_mlm[[i]])
+  Data <- data.frame(Model = c(thisModel),
+                     Variable = "",
+                     Statistic = c("BIC"),
+                     All = c(BIC)) %>% 
+    mutate(Model = gsub("zIso", "", Model),
+           Model = gsub(" + (1 | Language)", "", Model))
+  Coeffs <- as.data.frame(coeffs(models_mlm[[i]])) %>% 
+    rownames_to_column(var = "Variable") %>% 
+    filter(!str_detect(Variable, "Int")) %>% 
+    mutate(Variable = str_extract(Variable, "(?<=\\().*?(?=\\))"),
+           Variable = gsub("zIso", "", Variable),
+           Statistic = "β",
+           Model = thisModel) %>% 
+    rename_with(~ ifelse(str_detect(.x, "coeffs"), "All", .x)) %>% 
+    select(Model, Variable, Statistic, All)
+  thing <- rbind(Data, Coeffs)
+  AllVals <- rbind(AllVals, thing)
+  
+}
+
+# Make Formulas for logistic regressions for all languages
+formulas <- sapply(combinations, function(i)
+  as.formula(paste("n ~", 
+                   paste(variables[i], collapse = "+"))))
+formulas <- c(as.formula("n ~ zIso23"), formulas) # add the 23 model
+formulas <- c(as.formula("n ~ 1"), formulas)  # Add the null model
+
+
+# Fit models for all languages
+for (language in languages) {
+  
+  print(language)
+  
+  language_data <- bird_data2 %>% 
+    filter(Language == language) %>% 
+    mutate(n = n-1)
+
+  models <- list()
+  
+  for (formula in formulas) {
+    
+    if(as.character(formula)[3] == 1) {
+      model_name <- "null"
+    } else {
+      model_name <- as.character(formula)[3] %>% 
+        gsub("zIso", "", .) %>% 
+        gsub(" ", "", .)
+      
+    }
+    
+     model <-  glmmTMB(formula,
+                   data = language_data,
+                   family = "nbinom2")
+     
+    models[[paste0(model_name)]] <- model
+  }
+  
+  models_nb[[language]] <- models
+  
+  languageVals <- tibble(Model = character(),
+                         Variable = character(),
+                         Statistic = character(),
+                         !!paste0(language) := numeric())
+
+# Get BICs and coefficients
+for (i in seq_along(models)) {
+  
+  thisModel <- names(models)[i]
+
+  BIC <- BIC(models[[i]])
+  Data <- tibble(Model = c(thisModel),
+                 Variable = "",
+                 Statistic = c("BIC"),
+                 !!paste0(language) := BIC) %>% 
+    mutate(Model = gsub("zIso", "", Model))
+  Coeffs <- as.data.frame(coeffs(models[[i]])) %>% 
+    rownames_to_column(var = "Variable") %>% 
+    filter(!str_detect(Variable, "Int")) %>% 
+    mutate(Variable = str_extract(Variable, "(?<=\\().*?(?=\\))"),
+           Variable = gsub("zIso", "", Variable),
+           Statistic = "β",
+           Model = thisModel) %>% 
+    rename_with(~ ifelse(str_detect(.x, "coeffs"), paste0(str_to_title(language)), .x))
+  thing <- rbind(Data, Coeffs)
+  languageVals <- rbind(languageVals, thing)
+  
+}
+  
+  LanguageVals[[str_to_title(language)]] <- languageVals 
+  
+  # Get VIFs 
+  
+  fullmodel <- models[["74+Phy+Per"]]
+  
+  vif <- check_collinearity(fullmodel) %>% 
+    select(Term, VIF) %>% 
+    mutate(VIF = round(VIF, 2)) %>% 
+    rename(!!language := VIF)
+  
+  VIFs_nb[[language]] <- vif
+  
+}
+
+# Make a nice table for VIFs then export it as LaTeX and csv
+
+vifs_table_nb <- reduce(VIFs_nb,
+                        left_join,
+                        by = "Term") %>% 
+  mutate(Term = gsub("zIso", "", Term)) %>% 
+  column_to_rownames("Term")
+
+latex_vifs_nb <- kable(vif_table_nb,
+                      format = "latex",
+                      align = c(rep("c", 7)),
+                      booktabs = TRUE,
+                      linesep = "",
+                      escape = FALSE,
+                      caption = "Variance inflation factors for logistic regressions predicting name sharing") %>% 
+    kable_styling(latex_options = c("hold_position"))
+
+  writeLines(latex_vifs_nb, here("output/VIFs_NB.tex"))
+  
+  write.csv(vif_table_nb, file = here("output/VIFs_NB.csv"))
+
+
+
+table2 <-  reduce(LanguageVals, 
+                  left_join, 
+                  by = c("Model", "Variable", "Statistic")) %>% 
+  left_join(AllVals,
+            by = c("Model", "Variable", "Statistic"))
+
+ small_bic <- table2 %>% 
+   filter(Statistic == "BIC") %>% 
+   select(-c(Variable, Model, Statistic)) %>% 
+   summarise(across(everything(), min, na.rm = TRUE))
+ 
+ # Now minus the smallest value from everything
+ 
+min_bic <- table2 %>% 
+  mutate(across(names(small_bic), 
+                ~ if_else(Statistic == "BIC", 
+                          . - small_bic[[cur_column()]], 
+                          .)),
+         Model = gsub(" ", "", Model)) %>% 
+  mutate_if(is.numeric, round, 2) %>% 
+  filter(!is.na(Variable)) %>% 
+  group_by(Model) %>% 
+  mutate(n = n()) %>% 
+  ungroup()%>% 
+  filter(Statistic=="BIC")%>% 
+  summarise(across(all_of(languages_plus), 
+                   list(min_bic = ~ min(., na.rm = TRUE),
+                        min_bic_single = ~ min(.[n == 2], na.rm = TRUE)),
+                   .names = "{col}_{fn}"))
+
+min_bic_list <- lapply(languages_plus, function(language) {
+  list(
+    min_bic = min_bic[[paste0(language, "_min_bic")]],
+    min_bic_single = min_bic[[paste0(language, "_min_bic_single")]]
+  )
+})
+
+names(min_bic_list) <- languages_plus
+
+table2 <- table2 %>% 
+   mutate(across(names(small_bic), 
+                ~ if_else(Statistic == "BIC", 
+                          . - small_bic[[cur_column()]], 
+                          .)),
+         Model = gsub(" ", "", Model)) %>% 
+  mutate_if(is.numeric, round, 2) %>% 
+  filter(!is.na(Variable))
+
+latex_table <- table2 %>% 
+  group_by(Model) %>% 
+  mutate(n = n()) %>% 
+  ungroup() %>% 
+  # First this one is for things that need both shading and bolding/colouring
+  mutate(across(
+    names(min_bic_list),
+    ~ {
+      min_value <- min_bic_list[[cur_column()]][["min_bic"]]
+      max_value <- min_value + 2
+    ifelse(as.numeric(.) >=min_value &
+             as.numeric(.) <= max_value &
+             Statistic == "BIC" &
+             n == 2 &
+             min_value <=2
+           ,
+           cell_spec(as.character(.), 
+                     "latex", 
+                     bold = TRUE,
+                     color = colour_pairs[[cur_column()]][2],
+                     background = colour_pairs[[cur_column()]][1],
+                     extra_css = "border-spacing: 10px;"),
+             as.character(.))
+    }
+  )) %>% 
+    #Now this one is just for things that need bolding/colouring
+      mutate(across(
+    names(min_bic_list),
+    ~ {
+      min_value <- min_bic_list[[cur_column()]][["min_bic_single"]]
+      max_value <- min_value + 2
+      ifelse(str_length(.)>5, .,
+    ifelse(as.numeric(.) >= min_value &
+             as.numeric(.) <= max_value &
+             Statistic == "BIC" &
+             n == 2,
+           cell_spec(as.character(.), 
+                     "latex", 
+                     bold = TRUE,
+                     color = colour_pairs[[cur_column()]][2]),
+             as.character(.)))
+    }
+    )) %>% 
+        mutate(across(
+    names(min_bic_list),
+    ~ {
+      min_value <- min_bic_list[[cur_column()]][["min_bic"]]
+      max_value <- min_value + 2
+      ifelse(str_length(.)>5, .,
+    ifelse(as.numeric(.) >= min_value &
+             as.numeric(.) <= max_value &
+             Statistic == "BIC" &
+             n != 2,
+           cell_spec(as.character(.), 
+                     "latex", 
+                     bold = TRUE,
+                     background = colour_pairs[[cur_column()]][1]),
+             as.character(.)))
+    }
+    )) %>% 
+  select(-n) %>% 
+  group_by(Model) %>% 
+  mutate(Model = ifelse(row_number()==1,Model, "")) %>% 
+     mutate(Statistic = ifelse(Statistic=="BIC", "$\\Delta BIC$", "$\\beta$")) %>% 
+     rename(" " = Model,
+            "  " = Variable,
+            "   " = Statistic) %>% 
+     kable(format = "latex",
+           align = c("l", "l", "l", "c", "c", "c", "c", "c", "c", "c", "c", "c"),
+           booktabs = TRUE,
+           linesep = "",
+           escape = FALSE,
+           caption = "Results table for negative binomial regressions",
+           label = "table:resultsNB") %>% 
+    kable_styling(latex_options = c("hold_position", "scale down")) %>% 
+     add_header_above(c("Model" = 1, 
+                        "Pred." = 1,
+                        "Stat." = 1,
+                        "Language" = 8)) %>% 
+     pack_rows("Null Model", 1,1,
+               latex_align = "c",
+               hline_before = FALSE,
+               hline_after = TRUE,
+               indent = FALSE,
+               bold = FALSE,
+               latex_gap_space = "0.0em") %>% 
+     pack_rows("Single Predictor Models", 2, 9,
+               latex_align = "c",
+               hline_before = TRUE,
+               hline_after = TRUE,
+               indent = FALSE,
+               bold = FALSE,
+                latex_gap_space = "0.0em") %>% 
+     pack_rows("Two Predictor Models", 10, 18,
+               latex_align = "c",
+               hline_before = TRUE,
+               hline_after = TRUE,
+               indent = FALSE,
+               bold = FALSE,
+               latex_gap_space = "0.0em") %>% 
+     pack_rows("Full Model", 19,22,
+               latex_align = "c",
+               hline_before = TRUE,
+               hline_after = TRUE,
+               indent = FALSE,
+               bold = FALSE,
+               latex_gap_space = "0.0em")
+   
+    writeLines(latex_table, here("output/ResultsTableNB.tex"))
+ 
+    
+    best_models_nb <- table2 %>% 
+      filter(Statistic == "BIC") %>% 
+      pivot_longer(cols = !c(Model, Variable, Statistic),
+                   names_to = "Language",
+                   values_to = "BIC") %>% 
+      filter(BIC <= 2) %>% 
+      select(Model, Language)
+
+```
+
+## Run analyses with subset of data 
+
+Truncated negative binomial with n = 1 removed
+
+```{r}
+
+variables <- c("zIso74", "zIsoPhy", "zIsoPer")
+AllVals_tNB <- data.frame(Model = character(),
+                  Variable = character(),
+                  Statistic = character(),
+                  All = numeric())
+LanguageVals_tNB <- list()
+models_tNB <- list()
+
+# make all possible combinations of variables
+combinations <- unlist(
+  lapply(1:length(variables),
+         function(i) combn(1:length(variables),i,simplify = FALSE)),
+  recursive = FALSE)
+
+# Paste them into formulas
+formulas_mlm <- sapply(combinations, function(i)
+  as.formula(paste("n ~", 
+                   paste(variables[i], collapse = "+"), 
+                   "+ (1 | Language)")))
+formulas_mlm <- c(as.formula("n ~ zIso23 + (1 | Language)"), formulas_mlm) # add the 23 model
+formulas_mlm <- c(as.formula("n ~ (1 | Language)"), formulas_mlm)  # Add the null model
+
+# Get data for MLM
+model_data <- bird_data2 %>% 
+  mutate(Language = as.factor(Language)) %>% 
+  filter(n != 1) %>% 
+  # change them to the "companion count" scale
+  mutate(n = n-1)
+
+models_mlm <- list()
+
+  for (formula in formulas_mlm) {
+    
+      if (as.character(formula)[3] == "(1 | Language)") {
+    model_name <- "null"
+  } else {
+    model_name <- as.character(formula)[3] %>% 
+      str_remove_all(., "\\s*\\+\\s*\\(1 \\| Language\\)") %>% 
+      str_remove_all(., "^.*~\\s*") %>% 
+      str_replace_all(., "zIso", "") %>% 
+      gsub(" ", "", .)
+  }
+
+     model <-  glmmTMB(formula,
+                   data = model_data,
+                   family = "truncated_nbinom2",
+                   #  helps with convergence
+                   control = glmmTMBControl(optimizer = optim, optArgs = list(method="BFGS")))
+     
+    models_mlm[[paste0(model_name)]] <- model
+  }
+  
+  models_tNB[["All"]] <- models_mlm
+
+# Get BICs and coefficients for MLM
+for (i in seq_along(models_mlm)) {
+  
+  thisModel <- names(models_mlm)[i]
+
+  BIC <- BIC(models_mlm[[i]])
+  
+  Data <- data.frame(Model = c(thisModel),
+                     Variable = "",
+                     Statistic = c("BIC"),
+                     All = c(BIC)) %>% 
+    mutate(Model = gsub("zIso", "", Model),
+           Model = gsub(" + (1 | Language)", "", Model))
+  
+  Coeffs <- as.data.frame(coeffs(models_mlm[[i]])) %>% 
+    rownames_to_column(var = "Variable") %>% 
+    filter(!str_detect(Variable, "Int")) %>% 
+    mutate(Variable = str_extract(Variable, "(?<=\\().*?(?=\\))"),
+           Variable = gsub("zIso", "", Variable),
+           Statistic = "β",
+           Model = thisModel) %>% 
+    rename_with(~ ifelse(str_detect(.x, "coeffs"), "All", .x)) %>% 
+    select(Model, Variable, Statistic, All)
+  
+  thing <- rbind(Data, Coeffs)
+  
+  AllVals_tNB <- rbind(AllVals_tNB, thing)
+  
+}
+
+# Make formulas for logistic regressions for all languages
+formulas <- sapply(combinations, function(i)
+  as.formula(paste("n ~", 
+                   paste(variables[i], collapse = "+"))))
+formulas <- c(as.formula("n ~ zIso23"), formulas) # add the 23 model
+formulas <- c(as.formula("n ~ 1"), formulas)  # Add the null model
+
+# Fit models for all languages
+for (language in languages) {
+  
+  print(language)
+  
+  language_data <- bird_data2 %>% 
+    filter(Language == language) %>% 
+    filter(n != 1) %>% 
+    mutate(n = n-1)
+
+  models <- list()
+  
+  for (formula in formulas) {
+    print(formula)
+    
+    if(as.character(formula)[3] == 1) {
+      model_name <- "null"
+    } else {
+      model_name <- as.character(formula)[3] %>% 
+        gsub("zIso", "", .) %>% 
+        gsub(" ", "", .)
+      
+    }
+    
+     model <-  glmmTMB(formula,
+                   data = language_data,
+                   family = "truncated_nbinom2",
+                   # this helps with convergence
+                   control = glmmTMBControl(optimizer = optim, optArgs = list(method="BFGS")))
+     
+    models[[paste0(model_name)]] <- model
+  }
+  
+  models_tNB[[language]] <- models
+  
+  languageVals <- tibble(Model = character(),
+                         Variable = character(),
+                         Statistic = character(),
+                         !!paste0(language) := numeric())
+
+# Get BICs and coefficients
+for (i in seq_along(models)) {
+  
+  thisModel <- names(models)[i]
+
+  BIC <- BIC(models[[i]])
+  Data <- tibble(Model = c(thisModel),
+                 Variable = "",
+                 Statistic = c("BIC"),
+                 !!paste0(language) := BIC) %>% 
+    mutate(Model = gsub("zIso", "", Model))
+  Coeffs <- as.data.frame(coeffs(models[[i]])) %>% 
+    rownames_to_column(var = "Variable") %>% 
+    filter(!str_detect(Variable, "Int")) %>% 
+    mutate(Variable = str_extract(Variable, "(?<=\\().*?(?=\\))"),
+           Variable = gsub("zIso", "", Variable),
+           Statistic = "β",
+           Model = thisModel) %>% 
+    rename_with(~ ifelse(str_detect(.x, "coeffs"), paste0(str_to_title(language)), .x))
+  thing <- rbind(Data, Coeffs)
+  languageVals <- rbind(languageVals, thing)
+  
+}
+  
+  LanguageVals_tNB[[str_to_title(language)]] <- languageVals
+  
+}
+
+table5 <-  reduce(LanguageVals_tNB, 
+                  left_join, 
+                  by = c("Model", "Variable", "Statistic")) %>% 
+  left_join(AllVals_tNB,
+            by = c("Model", "Variable", "Statistic"))
+
+ small_bic <- table5 %>% 
+   filter(Statistic == "BIC") %>% 
+   select(-c(Variable, Model, Statistic)) %>% 
+   summarise(across(everything(), min, na.rm = TRUE))
+ 
+ # Now minus the smallest value from everything
+ 
+min_bic <- table5 %>% 
+  mutate(across(names(small_bic), 
+                ~ if_else(Statistic == "BIC", 
+                          . - small_bic[[cur_column()]], 
+                          .)),
+         Model = gsub(" ", "", Model)) %>% 
+  mutate_if(is.numeric, round, 2) %>% 
+  filter(!is.na(Variable)) %>% 
+  group_by(Model) %>% 
+  mutate(n = n()) %>% 
+  ungroup()%>% 
+  filter(Statistic=="BIC")%>% 
+  summarise(across(all_of(languages_plus), 
+                   list(min_bic = ~ min(., na.rm = TRUE),
+                        min_bic_single = ~ min(.[n == 2], na.rm = TRUE)),
+                   .names = "{col}_{fn}"))
+
+min_bic_list <- lapply(languages_plus, function(language) {
+  list(
+    min_bic = min_bic[[paste0(language, "_min_bic")]],
+    min_bic_single = min_bic[[paste0(language, "_min_bic_single")]]
+  )
+})
+
+names(min_bic_list) <- languages_plus
+
+table5 <- table5 %>% 
+   mutate(across(names(small_bic), 
+                ~ if_else(Statistic == "BIC", 
+                          . - small_bic[[cur_column()]], 
+                          .)),
+         Model = gsub(" ", "", Model)) %>% 
+  mutate_if(is.numeric, round, 2) %>% 
+  filter(!is.na(Variable))
+
+latex_table <- table5 %>% 
+  group_by(Model) %>% 
+  mutate(n = n()) %>% 
+  ungroup() %>% 
+  # First this one is for things that need both shading and bolding/colouring
+  mutate(across(
+    names(min_bic_list),
+    ~ {
+      min_value <- min_bic_list[[cur_column()]][["min_bic"]]
+      max_value <- min_value + 2
+    ifelse(as.numeric(.) >=min_value &
+             as.numeric(.) <= max_value &
+             Statistic == "BIC" &
+             n == 2 &
+             min_value <=2
+           ,
+           cell_spec(as.character(.), 
+                     "latex", 
+                     bold = TRUE,
+                     color = colour_pairs[[cur_column()]][2],
+                     background = colour_pairs[[cur_column()]][1],
+                     extra_css = "border-spacing: 10px;"),
+             as.character(.))
+    }
+  )) %>% 
+    #Now this one is just for things that need bolding/colouring
+      mutate(across(
+    names(min_bic_list),
+    ~ {
+      min_value <- min_bic_list[[cur_column()]][["min_bic_single"]]
+      max_value <- min_value + 2
+      ifelse(str_length(.)>5, .,
+    ifelse(as.numeric(.) >= min_value &
+             as.numeric(.) <= max_value &
+             Statistic == "BIC" &
+             n == 2,
+           cell_spec(as.character(.), 
+                     "latex", 
+                     bold = TRUE,
+                     color = colour_pairs[[cur_column()]][2]),
+             as.character(.)))
+    }
+    )) %>% 
+        mutate(across(
+    names(min_bic_list),
+    ~ {
+      min_value <- min_bic_list[[cur_column()]][["min_bic"]]
+      max_value <- min_value + 2
+      ifelse(str_length(.)>5, .,
+    ifelse(as.numeric(.) >= min_value &
+             as.numeric(.) <= max_value &
+             Statistic == "BIC" &
+             n != 2,
+           cell_spec(as.character(.), 
+                     "latex", 
+                     bold = TRUE,
+                     background = colour_pairs[[cur_column()]][1]),
+             as.character(.)))
+    }
+    )) %>% 
+  select(-n) %>% 
+  group_by(Model) %>% 
+  mutate(Model = ifelse(row_number()==1,Model, "")) %>% 
+     mutate(Statistic = ifelse(Statistic=="BIC", "$\\Delta BIC$", "$\\beta$")) %>% 
+     rename(" " = Model,
+            "  " = Variable,
+            "   " = Statistic) %>% 
+     kable(format = "latex",
+           align = c("l", "l", "l", "c", "c", "c", "c", "c", "c", "c", "c", "c"),
+           booktabs = TRUE,
+           linesep = "",
+           escape = FALSE,
+           caption = "Checking whether these relationships still hold without n=1",
+           label = "table:NB_check") %>% 
+    kable_styling(latex_options = c("hold_position", "scale down")) %>% 
+     add_header_above(c("Model" = 1, 
+                        "Pred." = 1,
+                        "Stat." = 1,
+                        "Language" = 8)) %>% 
+     pack_rows("Null Model", 1,1,
+               latex_align = "c",
+               hline_before = FALSE,
+               hline_after = TRUE,
+               indent = FALSE,
+               bold = FALSE,
+               latex_gap_space = "0.0em") %>% 
+     pack_rows("Single Predictor Models", 2, 9,
+               latex_align = "c",
+               hline_before = TRUE,
+               hline_after = TRUE,
+               indent = FALSE,
+               bold = FALSE,
+                latex_gap_space = "0.0em") %>% 
+     pack_rows("Two Predictor Models", 10, 18,
+               latex_align = "c",
+               hline_before = TRUE,
+               hline_after = TRUE,
+               indent = FALSE,
+               bold = FALSE,
+               latex_gap_space = "0.0em") %>% 
+     pack_rows("Full Model", 19,22,
+               latex_align = "c",
+               hline_before = TRUE,
+               hline_after = TRUE,
+               indent = FALSE,
+               bold = FALSE,
+               latex_gap_space = "0.0em")
+   
+    # writeLines(latex_table, here("output/ResultsTableNB_check.tex"))
+ 
+    
+    best_models_tNB <- table5 %>%
+      filter(Statistic == "BIC") %>%
+      pivot_longer(cols = !c(Model, Variable, Statistic),
+                   names_to = "Language",
+                   values_to = "BIC") %>%
+      filter(BIC <= 2) %>%
+      select(Model, Language)
+
+table5_bics <- table5 %>% 
+  filter(Statistic=="BIC")
+
+
+```
+
+### Predictions
+
+```{r}
+
+variables <- c("zIso74", "zIsoPer", "zIsoPhy")
+preds <- str_remove(variables, "^zIso")
+# all_models <- list()
+constant_values <- list(zIso74 = 0, zIsoPer = 0, zIsoPhy = 0)
+all_predictions_tNB <- list()
+
+for (language in languages_plus) { 
+  
+  if (language == "All") {
+    language_data <- bird_data2
+  } else {
+    language_data <- bird_data2 %>% 
+      filter(Language == language)
+  }
+
+# Filter the models
+language_models <- models_tNB[[language]]
+single_models <- language_models[names(language_models) %in% preds]
+
+  language_predictions <- list()
+
+predictions_df <- data.frame(Language = character(),
+                             Model = character(),
+                             Predictor = character(),
+                             Value = numeric(),  # column for prediction values after pivoting
+                             Level = character(), # column for the predictor levels
+                             stringsAsFactors = FALSE,
+                             check.names = FALSE)
+
+for (i in seq_along(single_models)) {
+  model <- single_models[[i]]
+  model_name <- names(single_models)[i]
+  pred_vars <- all.vars(formula(model))[-1] 
+  
+  for (var in pred_vars) {
+    
+    if (var == "Language") {
+      next  # Skip this iteration if the variable is "Language"
+    } else {
+      # Determine the range of the predictor in the current language data
+      var_min <- floor(min(language_data[[var]], na.rm = TRUE)) 
+      var_max <- ceiling(max(language_data[[var]], na.rm = TRUE))  
+      values <- seq(var_min, var_max)  # Create an integer sequence between min and max
+      
+      # Create a newdata dataframe with the correct number of rows
+      newdata <- data.frame(matrix(rep(NA, length(pred_vars) * length(values)), 
+                                   nrow = length(values), 
+                                   ncol = length(pred_vars)))
+      colnames(newdata) <- pred_vars
+      
+      # Assign the constant values to all predictors
+      for (pred_var in pred_vars) {
+        newdata[[pred_var]] <- constant_values[[pred_var]]
+      }
+      
+      # Vary the current predictor variable based on the new integer sequence
+      newdata[[var]] <- values
+      
+      # Make predictions
+      predictions <- predict(model,
+                             type = "response",
+                             newdata = newdata,
+                             re.form = NA)
+      
+      # Dynamically create column names based on values used for prediction
+      prediction_cols <- as.character(values)  # Convert integer values to character for column names
+
+      # Create a temp_df
+      temp_df <- data.frame(Language = language,
+                            Model = model_name,
+                            Predictor = var,
+                            stringsAsFactors = FALSE,
+                            check.names = FALSE)
+      
+      # Transpose the predictions and create the appropriate column structure
+      temp_df[prediction_cols] <- t(data.frame(predictions))
+
+            # Calculate confidence intervals
+      link_preds <- predict(model,                              
+                            type = "link",
+                            newdata = newdata,
+                            se.fit = TRUE,
+                            re.form = NA)
+      ci_lwr <- link_preds$fit - qnorm(0.975) * link_preds$se.fit
+      ci_upr <- link_preds$fit + qnorm(0.975) * link_preds$se.fit
+      pred <- link_preds$fit
+      
+      # Transform to the count scale by exponentiating it
+
+      ci_lwr_response <- exp(ci_lwr)
+      ci_upr_response <- exp(ci_upr)
+      pred_response <- exp(pred) 
+
+# Apply zero-truncation adjustment
+      ci_lwr_truncated <- ci_lwr_response / (1 - exp(-ci_lwr_response))
+      ci_upr_truncated <- ci_upr_response / (1 - exp(-ci_upr_response))
+      pred_truncated <- pred_response / (1 - exp(-pred_response))
+
+# Format the results
+confint_lower <- c(language, "CI_lower", var,
+                   (ci_lwr_truncated))
+confint_upper <- c(language, "CI_upper", var,
+                   (ci_upr_truncated))
+pred_middle <- c(language, "pred_trunc", var,
+                   (pred_truncated))
+
+temp_df <- rbind(temp_df, confint_lower, confint_upper, pred_middle)
+
+      # Pivot temp_df to long format
+      temp_long <- temp_df %>% 
+        pivot_longer(cols = all_of(prediction_cols), 
+                     names_to = "value", 
+                     values_to = "n")
+
+      
+      # Bind the current temp_long to the predictions_df
+      predictions_df <- rbind(predictions_df, temp_long)
+    }
+  }
+}
+
+ all_predictions_tNB[[language]] <- predictions_df
+
+ }
+
+table_tNB_preds <- reduce(all_predictions_tNB, rbind)
+
+
+write_csv(table_tNB_preds, here("data/Predictions_tnb.csv"))
+
+```
+
+# Comparisons between variance in different measures
+
+```{r}
+
+# Function to make fractional rankings
+frac_rank <- function(x) {
+  if (all(is.na(x))) {
+    return(rep(NA, length(x)))
+  }
+  
+  rank_x <- rank(x, na.last = "keep")
+  frac_rank <- ave(rank_x, rank_x, FUN = function(y) mean(y, na.rm = TRUE))
+  return(frac_rank)
+}
+
+
+Variances <- list()
+
+for(language in languages) {
+  
+  language_data <- bird_data2 %>% 
+    filter(Language == str_to_title(language) & n>1) %>% 
+    select(IndexFG, VarPer, VarPhy) %>% 
+    unique() %>% 
+    mutate(RankVarPer = frac_rank(VarPer),
+           RankVarPhy = frac_rank(VarPhy),
+           Diff = RankVarPer - RankVarPhy)
+  
+  Variances[[language]] <- language_data
+  
+}
+
+```
+
+# Permutation test
+
+This keeps the structure of the category system in each language (i.e. the number and size of the categories) and shuffles the birds at random to the groups, then 
+
+## Setup
+
+```{r eval = FALSE}
+
+bird_perm <- function(data_frame, list, groups, names, n){
+  # feed this function a data frame ("data_frame") with the names of species ("names") and the groups they are in ("groups"), and also a list of pairwise distances with the names of the birds ("list")
+  
+    # This is to make it so you can use the word "groups" to mean the column with that name
+  groups_sym <- ensym(groups)
+  names_sym <- ensym(names)
+  
+  # Pull out the names and groups from the data frame
+  data_frame <- data_frame %>% 
+    rename(groups = {{groups}},
+           names = {{names}}) %>% 
+    select(names, groups)
+  
+  # Get the total number of groups
+  n_groups <- n_distinct(data_frame$groups)
+  
+    real_scores <- list %>% 
+      left_join(data_frame,
+                by = c("Species1" = "names"))%>% 
+      left_join(data_frame,
+                by = c("Species2" = "names"))%>% 
+      filter(groups.x == groups.y)%>% 
+      group_by(groups.x) %>% 
+      summarise(Variance = sum(Dist^2, na.rm = TRUE)/n())
+    
+    # add variance scores for each group and divide by degrees of freedom to calculate test statistic
+    test_stat <- sum(real_scores$Variance) / (nrow(data_frame) - n_groups)
+  
+test_stats <- data.frame(
+  Test = "real",
+  Stat = test_stat)
+
+# Function to calculate the fake test scores
+  calculate_fake_scores <- function(data_frame, list) {
+    data_frame$groups <- sample(data_frame$groups)
+    fake_scores <- list %>% 
+      left_join(data_frame, by = c("Species1" = "names")) %>%
+      left_join(data_frame, by = c("Species2" = "names")) %>%
+      filter(groups.x == groups.y) %>%
+      group_by(groups.x) %>%
+      summarise(Variance = sum(Dist^2, na.rm = TRUE) / n(), .groups = 'drop')
+    fake_stat <- sum(fake_scores$Variance) / (nrow(data_frame) - n_groups)
+    return(fake_stat)
+  }
+  
+  # replicate it a bunch of times
+    fake_stats <- replicate(n, calculate_fake_scores(data_frame, list))
+  
+  test_stats <- rbind(test_stats, data.frame(Test = "fake", Stat = fake_stats))
+  
+  # Calculate the proportion of times that the test stat beat the fake stat
+  prop_wins <- sum(fake_stats > test_stat) / n
+
+return(list(test_stats, prop_wins))
+  
+}
+
+```
+
+## Run permutation Test
+
+```{r eval = FALSE}
+phy_test_stats <- list()
+phy_wins <- list()
+n <- 10000
+
+for (language in languages) {
+  
+  language_data <- bird_data2 %>% 
+  filter(Language == str_to_title(language))
+  
+  list <- bird_similarity[[language]] %>% rename(Dist = DistPhy)
+  
+  stats <- bird_perm(language_data, list, IndexFG, CanonicalName, n)
+  
+  phy_test_stats[[language]] <- stats[[1]]
+  phy_wins[[language]] <- stats[[2]]
+  
+}
+
+per_test_stats <- list()
+per_wins <- list()
+
+for (language in languages) {
+  
+  language_data <- bird_data2 %>% 
+  filter(Language == str_to_title(language))
+  
+  list <- bird_similarity[[language]] %>% rename(Dist = DistPer)
+  
+  stats <- bird_perm(language_data, list, IndexFG, CanonicalName, n)
+  
+  per_test_stats[[language]] <- stats[[1]]
+  per_wins[[language]] <- stats[[2]]
+  
+}
+
+tax74_test_stats <- list()
+tax74_wins <- list()
+
+for (language in languages) {
+  
+  language_data <- bird_data2 %>% 
+  filter(Language == str_to_title(language))
+  
+  list <- bird_similarity[[language]] %>% rename(Dist = Dist74)
+  
+  stats <- bird_perm(language_data, list, IndexFG, CanonicalName, n)
+  
+  tax74_test_stats[[language]] <- stats[[1]]
+  tax74_wins[[language]] <- stats[[2]]
+  
+}
+
+tax23_test_stats <- list()
+tax23_wins <- list()
+
+for (language in languages) {
+  
+  language_data <- bird_data2 %>% 
+  filter(Language == str_to_title(language))
+  
+  list <- bird_similarity[[language]] %>% rename(Dist = Dist23)
+  
+  stats <- bird_perm(language_data, list, IndexFG, CanonicalName, n)
+  
+  tax23_test_stats[[language]] <- stats[[1]]
+  tax23_wins[[language]] <- stats[[2]]
+  
+}
+
+# col_test_stats <- list()
+# col_wins <- list()
+# 
+# for (language in languages) {
+#   
+#   language_data <- bird_data2 %>% 
+#   filter(Language == str_to_title(language))
+#   
+#   list <- bird_similarity[[language]] %>% rename(Dist = DistCol)
+#   
+#   stats <- bird_perm(language_data, list, IndexFG, CanonicalName, n)
+#   
+#   col_test_stats[[language]] <- stats[[1]]
+#   col_wins[[language]] <- stats[[2]]
+#   
+# }
+
+```

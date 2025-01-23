@@ -1,0 +1,190 @@
+ 4   ANAS                PLATYRHYNCHOS       ANAT
+     CAIRINA             MOSCHATA
+ 2   PODICEPS            DOMINICUS           PODICIPED
+ 22  CHARADRIUS          VOCIFERUS           CHARADRI
+ 2   RALLUS              LIMICOLA            RALL
+     PORZANA             CAROLINA
+ 22  EGRETTA             ALBA                ARDE
+                         THULA
+     ARDEA               HERODIAS
+     BUTORIDES           VIRESCENS
+     FLORIDA             CAERULEA
+ 3   SARCORAMPHUS        PAPA                CATHART
+ 2   CORAGYPS            ATRATUS
+ 2   CATHARTES           AURA
+ 3   HARPIA              HARPYJA             ACCIPITR
+ 22  BUTEO               JAMAICENSIS
+ 1                       MAGNIROSTRIS
+                         BRACHYURUS
+ 1   ACCIPITER           CHIONOGASTER
+ 2   FALCO               SPARVERIUS          FALCON
+ 22  ELANUS              LEUCURUS            ACCIPITR
+ 2   ELANOIDES           FORFICATUS
+ 3   MELEAGRIS           GALLOPAVO           MELEAGR
+ 2   PENELOPE            PURPURASCENS        CRAC
+ 2   CRAX                RUBRA
+ 22  PENELOPINA          NIGRA
+ 2   ORTALIS             VETULA
+ 3   PSILORHINUS         MORIO               CORV
+ 3   CALOCITTA           FORMOSA
+ 3   CYANOCORAX          YNCAS
+ 1   CYANOCITTA          STELLERI
+ 1   CYANOLYCA           PUMILO
+ 1                       CUCULLATA
+ 3   GALLUS              GALLUS              PHASIAN
+ 1
+ 1
+ 3   COLINUS             VIRGINIANUS
+ 1   DACTYLORTYX         THORACICUS
+ 2   CRYPTURELLUS        CINNAMOMEUS         TINAM
+ 3   GEOCOCCYX           VELOX               CUCUL
+ 3   PIAYA               CAYANA
+ 3   COLUMBA             LIVIA               COLUMB
+ 2                       FASCIATA
+ 2                       FLAVIROSTRIS
+ 22  ZENAIDA             ASIATICA
+ 1                       MACROURA
+ 1   LEPTOTILA           VERREAUXI
+ 22  SCARDAFELLA         INCA
+ 1   COLUMBINA           TALPACOTI
+ 3   OTUS                TRICHOPSIS          STRIG
+                         BARBARUS
+                         GUATEMALAE
+ 2   GLAUCIDIUM          BRASILIANUM
+ 1                       GNOMA
+     AEGOLIUS            RIDGWAYI
+ 22  TYTO                ALBA                TYTON
+ 22  CICCABA             VIRGATA             STRIG
+ 22  STRIX               FULVESCENS
+ 22  BUBO                VIRGINIANUS
+ 3   CAPRIMULGUS         VOCIFERUS           CAPRIMULG
+ 2   NYCTIDROMUS         ALBICOLLIS
+ 3   CHORDEILES          MINOR
+                         ACUTIPENNIS
+ 3   PETROCHELIDON       PYRRHONOTA          HIRUNDIN
+                         FULVA
+     HIRUNDO             RUSTICA
+     STELGIDOPTERYX      RUFICOLLIS
+     NOTIOCHELIDON       PILEATA
+     RIPARIA             RIPARIA
+     TACHYCINETA         BICOLOR
+                         ALBILINEA
+ 2   STREPTOPROCNE       ZONARIS             APOD
+ 1   CHAETURA            VAUXI
+     CYPSELOIDES         RUTILUS
+                         NIGER
+     AERONAUTES          SAXATALIS
+ 3   HYLOCHARIS          LEUCOTIS            TROCHIL
+ 1   COLIBRI             THALASSINUS
+ 1   DORICHA             ENICURA
+ 1   LAMPORNIS           AMETHYSTINUS
+ 1   AMAZILIA            CYANOCEPHALA
+ 3   PIONUS              SENILIS             PSITTAC
+     AMAZONA             ALBIFRONS
+ 2                       OCHROCEPHALA
+     ARATINGA            CANICULARIS
+                         HOLOCHLORA
+ 2                       CANICULARIS
+ 2   ARA                 MACAO
+ 3   AULACORYNCHUS       PRASINUS            RAMPHAST
+     PTEROGLOSSUS        TORQUATUS
+     RAMPHASTOS          SULFURATUS
+ 3   TROGON              MEXICANUS           TROGON
+                         VIOLACEUS
+ 2   ASPATHA             GULARIS             MOMOT
+ 2   MOMOTUS             MOMOTA
+ 3   COLAPTES            AURATUS             PIC
+ 22  CENTURUS            AURIFRONS
+ 2   MELANERPES          FORMICIVORUS
+ 22  DRYOCOPUS           LINEATUS
+ 22  DENDROCOPOS         VILLOSUS
+ 1                       SCALARIS
+ 1   PICULUS             RUBIGINOSUS
+ 3   CERTHIA             FAMILIARIS          CERTHI
+ 3   LEPIDOCOLAPTES      AFFINIS             DENDROCOLAPT
+ 3   MYIARCHUS           TUBERCULIFER        TYRANN
+     CONTOPUS            PERTINAX
+ 1   CONTOPUS            SORDIDULUS
+                         CINEREUS
+ 1   TYRANNUS            MELANCHOLICUS
+ 1   SAYORNIS            NIGRICANS
+ 1   PYROCEPHALUS        RUBINUS
+     MITREPHANES         PHAEOCERCUS
+ 2   EMPIDONAX           FULVIFRONS
+                         ALBIGULARIS
+ 2   MYIOZETES           SIMILIS
+ 3   CAMPYLORHYNCHUS     ZONATUS             TROGLODYT
+ 3   THRYOTHORUS         MODESTUS
+     HENICORHINA         LEUCOPHRYS
+ 2   TROGLODYTES         MUSCULUS
+                         RUFOCILIATUS
+ 3   MELANOTIS           HYPOLEUCUS          MIM
+ 2   MIMUS               GILVUS
+ 3   TURDUS              RUFITORQUES         TURD
+ 1                       GRAYI
+ 1                       INFUSCATUS
+ 1                       PLEBEJUS
+ 1                       MIGRATORIUS
+ 2   MYADESTES           OBSCURUS
+ 2   CATHARUS            FRANTZII
+ 2   SEIURUS             MOTACILLA           PARUL
+                         NOVEBORACENSIS
+ 3   SIALIA              SIALIS              TURD
+ 3   PTILOGONYS          CINEREUS            PTILOGONAT
+ 3   CYCLARHIS           GUJANENSIS          CYCLARH
+ 3   VIREO               FLAVOVIRIDIS        VIREON
+ 28                      HUTTONI
+                         SOLITARIUS
+ 2   WILSONIA            PUSILLA             PARUL
+                         CANADENSIS
+     VERMIVORA           RUFICAPILLA
+                         SUPERCILIOSA
+     DENDROICA           PETECHIA
+                         MAGNOLIA
+                         CORONATA
+                         TOWNSENDI
+                         VIRENS
+                         CHRYSOPARIA
+                         OCCIDENTALIS
+     OPORORNIS           TOLMIEI
+     GEOTHLYPIS          TRICHAS
+ 2   MYIOBORUS           PICTA
+                         MINIATUS
+ 2   ERGATICUS           VERSICOLOR
+ 2   BASILEUTERUS        RUFIFRONS
+                         BELLI
+ 2   DIGLOSSA            BARITULA            COEREB
+ 3   SPINUS              NOTATUS             FRINGILL
+                         ATRICEPS
+                         PINUS
+                         PSALTRIA
+ 2   SPOROPHILA          TORQUEOLA
+ 3   PSALTRIPARUS        MINIMUS             PAR
+ 3   JUNCO               PHAEONOTUS          FRINGILL
+ 28  ZONOTRICHIA         CAPENSIS
+ 1   MELOSPIZA           LINCOLNII
+ 1   AIMOPHILA           RUFESCENS
+ 1   PASSER              DOMESTICUS          PLOCE
+ 2   MELOZONE            BIARCUATUM          FRINGILL
+ 2   ATLAPETES           ALBINUCHA
+ 2   PIPILO              ERYTHROPHTHALMUS
+ 3   LOXIA               CURVIROSTRA
+ 3   PHEUCTICUS          LUDOVICIANUS
+ 3   CHLOROSPINGUS       OPHTHALMICUS        THRAUP
+ 3   PIRANGA             FLAVA
+ 3   STURNELLA           MAGNA               ICTER
+ 3   SALTATOR            COERULESCENS        FRINGILL
+ 3                       ATRICEPS
+ 3   ICTERUS             CHRYSATER           ICTER
+ 1                       GALBULA
+                         SCLATERI
+ 2                       MESOMELAS
+ 3   DUMETELLA           CAROLINENSIS        MIM
+ 3   CROTOPHAGA          SULCIROSTRIS        CUCUL
+ 2   AMBLYCERCUS         HOLOSERICEUS        ICTER
+ 2   DIVES               DIVES
+ 22  AGELAIUS            PHOENICEUS
+ 2   MOLOTHRUS           AENEUS
+ 22  CASSIDIX            MEXICANUS
+ 2   CORVUS              CORAX               CORV
+ 3   ZARHYNCHUS          WAGLERI             ICTER

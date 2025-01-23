@@ -1,0 +1,243 @@
+#NEXUS
+[R-package APE, Mon Jan 20 14:27:54 2025]
+
+BEGIN TAXA;
+	DIMENSIONS NTAX = 115;
+	TAXLABELS
+		Falco moluccensis
+		Hirundo rustica
+		Hirundo tahitica
+		Myiagra alecto
+		Myiagra galeata
+		Symposiachrus trivirgatus
+		Carterornis pileatus
+		Oriolus phaeochromus
+		Melitograis gilolensis
+		Myzomela obscura
+		Leptocoma aspasia
+		Cinnyris clementiae
+		Rhipidura leucophrys
+		Lalage aurea
+		Coracina atriceps
+		Coracina papuensis
+		Aplonis metallica
+		Aplonis mysolensis
+		Semioptera wallacii
+		Lycocorax pyrrhopterus
+		Corvus validus
+		Corvus orru
+		Pitta maxima
+		Erythropitta rufiventris
+		Artamus leucorynchus
+		Lonchura molucca
+		Dicrurus hottentottus
+		Dicaeum erythrothorax
+		Zosterops atriceps
+		Hypsipetes affinis
+		Pachycephala mentalis
+		Helopsaltes fasciolatus
+		Meleagris gallopavo
+		Gallus gallus
+		Eulipoa wallacei
+		Megapodius freycinet
+		Pelecanus conspicillatus
+		Egretta sacra
+		Ixobrychus flavicollis
+		Nycticorax caledonicus
+		Ardea alba
+		Ardea sumatrana
+		Lorius garrulus
+		Eos squamata
+		Tanygnathus megalorynchos
+		Geoffroyus geoffroyi
+		Alisterus amboinensis
+		Hypocharmosyna placentis
+		Loriculus amabilis
+		Eclectus roratus
+		Cacatua alba
+		Hydrobates matsudairae
+		Calonectris leucomelas
+		Centropus goliath
+		Centropus bengalensis
+		Eudynamys scolopaceus
+		Cacomantis variolosus
+		Sula leucogaster
+		Fregata minor
+		Fregata ariel
+		Hemiprocne mystacea
+		Aegotheles crinifrons
+		Aerodramus vanikorensis
+		Collocalia esculenta
+		Caprimulgus macrurus
+		Tanysiptera galatea
+		Todiramphus sanctus
+		Todiramphus diops
+		Todiramphus funebris
+		Alcedo atthis
+		Ceyx lepidus
+		Merops ornatus
+		Eurystomus orientalis
+		Eurystomus azureus
+		Numenius phaeopus
+		Tringa brevipes
+		Xenus cinereus
+		Calidris ruficollis
+		Actitis hypoleucos
+		Anarhynchus leschenaultii
+		Sterna hirundo
+		Columba vitiensis
+		Columba livia
+		Ducula concinna
+		Ducula basilica
+		Ducula bicolor
+		Ducula perspicillata
+		Caloenas nicobarica
+		Reinwardtoena reinwardti
+		Ptilinopus superbus
+		Ptilinopus hyogastrus
+		Ptilinopus granulifrons
+		Spilopelia chinensis
+		Chalcophaps indica
+		Macropygia amboinensis
+		Gymnocrex plumbeiventris
+		Gallirallus wallacii
+		Gallirallus philippensis
+		Rallina fasciata
+		Amaurornis olivacea
+		Accipiter erythrauchen
+		Accipiter henicogrammus
+		Accipiter soloensis
+		Accipiter hiogaster
+		Aviceda subcristata
+		Icthyophaga leucogaster
+		Haliastur indus
+		Pandion haliaetus
+		Radjah radjah
+		Tachybaptus ruficollis
+		Rhyticeros plicatus
+		Ninox connivens
+		Ninox squamipila
+		Ninox scutulata
+		Otus magicus
+	;
+END;
+BEGIN TREES;
+	TRANSLATE
+		1	Falco moluccensis,
+		2	Hirundo rustica,
+		3	Hirundo tahitica,
+		4	Myiagra alecto,
+		5	Myiagra galeata,
+		6	Symposiachrus trivirgatus,
+		7	Carterornis pileatus,
+		8	Oriolus phaeochromus,
+		9	Melitograis gilolensis,
+		10	Myzomela obscura,
+		11	Leptocoma aspasia,
+		12	Cinnyris clementiae,
+		13	Rhipidura leucophrys,
+		14	Lalage aurea,
+		15	Coracina atriceps,
+		16	Coracina papuensis,
+		17	Aplonis metallica,
+		18	Aplonis mysolensis,
+		19	Semioptera wallacii,
+		20	Lycocorax pyrrhopterus,
+		21	Corvus validus,
+		22	Corvus orru,
+		23	Pitta maxima,
+		24	Erythropitta rufiventris,
+		25	Artamus leucorynchus,
+		26	Lonchura molucca,
+		27	Dicrurus hottentottus,
+		28	Dicaeum erythrothorax,
+		29	Zosterops atriceps,
+		30	Hypsipetes affinis,
+		31	Pachycephala mentalis,
+		32	Helopsaltes fasciolatus,
+		33	Meleagris gallopavo,
+		34	Gallus gallus,
+		35	Eulipoa wallacei,
+		36	Megapodius freycinet,
+		37	Pelecanus conspicillatus,
+		38	Egretta sacra,
+		39	Ixobrychus flavicollis,
+		40	Nycticorax caledonicus,
+		41	Ardea alba,
+		42	Ardea sumatrana,
+		43	Lorius garrulus,
+		44	Eos squamata,
+		45	Tanygnathus megalorynchos,
+		46	Geoffroyus geoffroyi,
+		47	Alisterus amboinensis,
+		48	Hypocharmosyna placentis,
+		49	Loriculus amabilis,
+		50	Eclectus roratus,
+		51	Cacatua alba,
+		52	Hydrobates matsudairae,
+		53	Calonectris leucomelas,
+		54	Centropus goliath,
+		55	Centropus bengalensis,
+		56	Eudynamys scolopaceus,
+		57	Cacomantis variolosus,
+		58	Sula leucogaster,
+		59	Fregata minor,
+		60	Fregata ariel,
+		61	Hemiprocne mystacea,
+		62	Aegotheles crinifrons,
+		63	Aerodramus vanikorensis,
+		64	Collocalia esculenta,
+		65	Caprimulgus macrurus,
+		66	Tanysiptera galatea,
+		67	Todiramphus sanctus,
+		68	Todiramphus diops,
+		69	Todiramphus funebris,
+		70	Alcedo atthis,
+		71	Ceyx lepidus,
+		72	Merops ornatus,
+		73	Eurystomus orientalis,
+		74	Eurystomus azureus,
+		75	Numenius phaeopus,
+		76	Tringa brevipes,
+		77	Xenus cinereus,
+		78	Calidris ruficollis,
+		79	Actitis hypoleucos,
+		80	Anarhynchus leschenaultii,
+		81	Sterna hirundo,
+		82	Columba vitiensis,
+		83	Columba livia,
+		84	Ducula concinna,
+		85	Ducula basilica,
+		86	Ducula bicolor,
+		87	Ducula perspicillata,
+		88	Caloenas nicobarica,
+		89	Reinwardtoena reinwardti,
+		90	Ptilinopus superbus,
+		91	Ptilinopus hyogastrus,
+		92	Ptilinopus granulifrons,
+		93	Spilopelia chinensis,
+		94	Chalcophaps indica,
+		95	Macropygia amboinensis,
+		96	Gymnocrex plumbeiventris,
+		97	Gallirallus wallacii,
+		98	Gallirallus philippensis,
+		99	Rallina fasciata,
+		100	Amaurornis olivacea,
+		101	Accipiter erythrauchen,
+		102	Accipiter henicogrammus,
+		103	Accipiter soloensis,
+		104	Accipiter hiogaster,
+		105	Aviceda subcristata,
+		106	Icthyophaga leucogaster,
+		107	Haliastur indus,
+		108	Pandion haliaetus,
+		109	Radjah radjah,
+		110	Tachybaptus ruficollis,
+		111	Rhyticeros plicatus,
+		112	Ninox connivens,
+		113	Ninox squamipila,
+		114	Ninox scutulata,
+		115	Otus magicus
+	;
+	TREE * UNTITLED = [&U] (1:1,((2:1,3:1)Hirundo:1,((4:1,5:1)Myiagra:1,6:1,7:1)Monarchidae:1,8:1,(9:1,10:1)Meliphagidae:1,(11:1,12:1)Nectariniidae:1,13:1,(14:1,(15:1,16:1)Coracina:1)Campephagidae:1,(17:1,18:1)Aplonis:1,(19:1,20:1)Paradisaeidae:1,(21:1,22:1)Corvus:1,(23:1,24:1)Pittidae:1,25:1,26:1,27:1,28:1,29:1,30:1,31:1,32:1)Passeriformes:1,((33:1,34:1)Phasianidae:1,(35:1,36:1)Megapodiidae:1)Galliformes:1,(37:1,(38:1,39:1,40:1,(41:1,42:1)Ardea:1)Ardeidae:1)Pelecaniformes:1,((43:1,44:1,45:1,46:1,47:1,48:1,49:1,50:1)Psittaculidae:1,51:1)Psittaciformes:1,(52:1,53:1)Procellariiformes:1,((54:1,55:1)Centropus:1,56:1,57:1)Cuculidae:1,(58:1,(59:1,60:1)Fregata:1)Suliformes:1,(61:1,62:1,(63:1,64:1)Apodidae:1,65:1)Caprimulgiformes:1,((66:1,(67:1,68:1,69:1)Todiramphus:1,70:1,71:1)Alcedinidae:1,72:1,(73:1,74:1)Eurystomus:1)Coraciiformes:1,((75:1,76:1,77:1,78:1,79:1)Scolopacidae:1,80:1,81:1)Charadriiformes:1,((82:1,83:1)Columba:1,(84:1,85:1,86:1,87:1)Ducula:1,88:1,89:1,(90:1,91:1,92:1)Ptilinopus:1,93:1,94:1,95:1)Columbidae:1,(96:1,(97:1,98:1)Gallirallus:1,99:1,100:1)Rallidae:1,(((101:1,102:1,103:1,104:1)Accipiter:1,105:1,106:1,107:1)Accipitridae:1,108:1)Accipitriformes:1,109:1,110:1,111:1,((112:1,113:1,114:1)Ninox:1,115:1)Strigidae:1)Aves;
+END;

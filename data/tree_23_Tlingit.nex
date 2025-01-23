@@ -1,0 +1,273 @@
+#NEXUS
+[R-package APE, Mon Jan 20 14:27:54 2025]
+
+BEGIN TAXA;
+	DIMENSIONS NTAX = 130;
+	TAXLABELS
+		Onychoprion aleuticus
+		Sterna paradisaea
+		Rissa tridactyla
+		Chroicocephalus philadelphia
+		Larus glaucescens
+		Larus argentatus
+		Larus brachyrhynchus
+		Synthliboramphus antiquus
+		Ptychoramphus aleuticus
+		Uria aalge
+		Fratercula corniculata
+		Fratercula cirrhata
+		Brachyramphus brevirostris
+		Brachyramphus marmoratus
+		Cepphus columba
+		Cerorhinca monocerata
+		Haematopus bachmani
+		Arenaria melanocephala
+		Calidris alpina
+		Calidris minutilla
+		Calidris mauri
+		Tringa melanoleuca
+		Tringa flavipes
+		Limnodromus scolopaceus
+		Phalaropus lobatus
+		Numenius phaeopus
+		Gallinago delicata
+		Stercorarius parasiticus
+		Charadrius semipalmatus
+		Cinclus mexicanus
+		Hirundo rustica
+		Petrochelidon pyrrhonota
+		Progne subis
+		Tachycineta bicolor
+		Tachycineta thalassina
+		Riparia riparia
+		Stelgidopteryx serripennis
+		Poecile atricapillus
+		Poecile rufescens
+		Perisoreus canadensis
+		Corvus corax
+		Corvus brachyrhynchos
+		Cyanocitta stelleri
+		Pica hudsonia
+		Catharus guttatus
+		Catharus ustulatus
+		Catharus minimus
+		Ixoreus naevius
+		Turdus migratorius
+		Eremophila alpestris
+		Leiothlypis celata
+		Setophaga townsendi
+		Setophaga petechia
+		Cardellina pusilla
+		Pinicola enucleator
+		Spinus pinus
+		Melospiza melodia
+		Zonotrichia leucophrys
+		Junco hyemalis
+		Troglodytes pacificus
+		Falco sparverius
+		Falco peregrinus
+		Calypte anna
+		Selasphorus rufus
+		Chordeiles minor
+		Haliaeetus leucocephalus
+		Aquila chrysaetos
+		Buteo jamaicensis
+		Buteo lagopus
+		Accipiter striatus
+		Accipiter atricapillus
+		Circus hudsonius
+		Pandion haliaetus
+		Bucephala islandica
+		Bucephala albeola
+		Bucephala clangula
+		Aythya valisineria
+		Aythya marila
+		Aythya affinis
+		Mergus merganser
+		Mergus serrator
+		Anas crecca
+		Anas platyrhynchos
+		Histrionicus histrionicus
+		Clangula hyemalis
+		Melanitta perspicillata
+		Melanitta deglandi
+		Cygnus buccinator
+		Cygnus columbianus
+		Branta bernicla
+		Branta canadensis
+		Branta hutchinsii
+		Megaceryle alcyon
+		Phoebastria nigripes
+		Hydrobates furcatus
+		Hydrobates leucorhous
+		Fulmarus glacialis
+		Ardenna grisea
+		Aegolius funereus
+		Aegolius acadicus
+		Glaucidium gnoma
+		Asio flammeus
+		Bubo scandiacus
+		Bubo virginianus
+		Strix nebulosa
+		Strix varia
+		Surnia ulula
+		Megascops kennicottii
+		Gavia immer
+		Gavia stellata
+		Gavia adamsii
+		Gavia pacifica
+		Nannopterum auritum
+		Urile pelagicus
+		Dryobates pubescens
+		Dryobates villosus
+		Colaptes auratus
+		Picoides dorsalis
+		Sphyrapicus ruber
+		Ardea herodias
+		Columba livia
+		Zenaida macroura
+		Patagioenas fasciata
+		Lagopus muta
+		Lagopus lagopus
+		Bonasa umbellus
+		Canachites canadensis
+		Meleagris gallopavo
+		Dendragapus fuliginosus
+		Antigone canadensis
+	;
+END;
+BEGIN TREES;
+	TRANSLATE
+		1	Onychoprion aleuticus,
+		2	Sterna paradisaea,
+		3	Rissa tridactyla,
+		4	Chroicocephalus philadelphia,
+		5	Larus glaucescens,
+		6	Larus argentatus,
+		7	Larus brachyrhynchus,
+		8	Synthliboramphus antiquus,
+		9	Ptychoramphus aleuticus,
+		10	Uria aalge,
+		11	Fratercula corniculata,
+		12	Fratercula cirrhata,
+		13	Brachyramphus brevirostris,
+		14	Brachyramphus marmoratus,
+		15	Cepphus columba,
+		16	Cerorhinca monocerata,
+		17	Haematopus bachmani,
+		18	Arenaria melanocephala,
+		19	Calidris alpina,
+		20	Calidris minutilla,
+		21	Calidris mauri,
+		22	Tringa melanoleuca,
+		23	Tringa flavipes,
+		24	Limnodromus scolopaceus,
+		25	Phalaropus lobatus,
+		26	Numenius phaeopus,
+		27	Gallinago delicata,
+		28	Stercorarius parasiticus,
+		29	Charadrius semipalmatus,
+		30	Cinclus mexicanus,
+		31	Hirundo rustica,
+		32	Petrochelidon pyrrhonota,
+		33	Progne subis,
+		34	Tachycineta bicolor,
+		35	Tachycineta thalassina,
+		36	Riparia riparia,
+		37	Stelgidopteryx serripennis,
+		38	Poecile atricapillus,
+		39	Poecile rufescens,
+		40	Perisoreus canadensis,
+		41	Corvus corax,
+		42	Corvus brachyrhynchos,
+		43	Cyanocitta stelleri,
+		44	Pica hudsonia,
+		45	Catharus guttatus,
+		46	Catharus ustulatus,
+		47	Catharus minimus,
+		48	Ixoreus naevius,
+		49	Turdus migratorius,
+		50	Eremophila alpestris,
+		51	Leiothlypis celata,
+		52	Setophaga townsendi,
+		53	Setophaga petechia,
+		54	Cardellina pusilla,
+		55	Pinicola enucleator,
+		56	Spinus pinus,
+		57	Melospiza melodia,
+		58	Zonotrichia leucophrys,
+		59	Junco hyemalis,
+		60	Troglodytes pacificus,
+		61	Falco sparverius,
+		62	Falco peregrinus,
+		63	Calypte anna,
+		64	Selasphorus rufus,
+		65	Chordeiles minor,
+		66	Haliaeetus leucocephalus,
+		67	Aquila chrysaetos,
+		68	Buteo jamaicensis,
+		69	Buteo lagopus,
+		70	Accipiter striatus,
+		71	Accipiter atricapillus,
+		72	Circus hudsonius,
+		73	Pandion haliaetus,
+		74	Bucephala islandica,
+		75	Bucephala albeola,
+		76	Bucephala clangula,
+		77	Aythya valisineria,
+		78	Aythya marila,
+		79	Aythya affinis,
+		80	Mergus merganser,
+		81	Mergus serrator,
+		82	Anas crecca,
+		83	Anas platyrhynchos,
+		84	Histrionicus histrionicus,
+		85	Clangula hyemalis,
+		86	Melanitta perspicillata,
+		87	Melanitta deglandi,
+		88	Cygnus buccinator,
+		89	Cygnus columbianus,
+		90	Branta bernicla,
+		91	Branta canadensis,
+		92	Branta hutchinsii,
+		93	Megaceryle alcyon,
+		94	Phoebastria nigripes,
+		95	Hydrobates furcatus,
+		96	Hydrobates leucorhous,
+		97	Fulmarus glacialis,
+		98	Ardenna grisea,
+		99	Aegolius funereus,
+		100	Aegolius acadicus,
+		101	Glaucidium gnoma,
+		102	Asio flammeus,
+		103	Bubo scandiacus,
+		104	Bubo virginianus,
+		105	Strix nebulosa,
+		106	Strix varia,
+		107	Surnia ulula,
+		108	Megascops kennicottii,
+		109	Gavia immer,
+		110	Gavia stellata,
+		111	Gavia adamsii,
+		112	Gavia pacifica,
+		113	Nannopterum auritum,
+		114	Urile pelagicus,
+		115	Dryobates pubescens,
+		116	Dryobates villosus,
+		117	Colaptes auratus,
+		118	Picoides dorsalis,
+		119	Sphyrapicus ruber,
+		120	Ardea herodias,
+		121	Columba livia,
+		122	Zenaida macroura,
+		123	Patagioenas fasciata,
+		124	Lagopus muta,
+		125	Lagopus lagopus,
+		126	Bonasa umbellus,
+		127	Canachites canadensis,
+		128	Meleagris gallopavo,
+		129	Dendragapus fuliginosus,
+		130	Antigone canadensis
+	;
+	TREE * UNTITLED = [&U] (((1:1,2:1,3:1,4:1,(5:1,6:1,7:1)Larus:1)Laridae:1,(8:1,9:1,10:1,(11:1,12:1)Fratercula:1,(13:1,14:1)Brachyramphus:1,15:1,16:1)Alcidae:1,17:1,(18:1,(19:1,20:1,21:1)Calidris:1,(22:1,23:1)Tringa:1,24:1,25:1,26:1,27:1)Scolopacidae:1,28:1,29:1)Charadriiformes:1,(30:1,(31:1,32:1,33:1,(34:1,35:1)Tachycineta:1,36:1,37:1)Hirundinidae:1,(38:1,39:1)Poecile:1,(40:1,(41:1,42:1)Corvus:1,43:1,44:1)Corvidae:1,((45:1,46:1,47:1)Catharus:1,48:1,49:1)Turdidae:1,50:1,(51:1,(52:1,53:1)Setophaga:1,54:1)Parulidae:1,(55:1,56:1)Fringillidae:1,(57:1,58:1,59:1)Passerellidae:1,60:1)Passeriformes:1,(61:1,62:1)Falco:1,((63:1,64:1)Trochilidae:1,65:1)Caprimulgiformes:1,((66:1,67:1,(68:1,69:1)Buteo:1,(70:1,71:1)Accipiter:1,72:1)Accipitridae:1,73:1)Accipitriformes:1,((74:1,75:1,76:1)Bucephala:1,(77:1,78:1,79:1)Aythya:1,(80:1,81:1)Mergus:1,(82:1,83:1)Anas:1,84:1,85:1,(86:1,87:1)Melanitta:1,(88:1,89:1)Cygnus:1,(90:1,91:1,92:1)Branta:1)Anatidae:1,93:1,(94:1,(95:1,96:1)Hydrobates:1,(97:1,98:1)Procellariidae:1)Procellariiformes:1,((99:1,100:1)Aegolius:1,101:1,102:1,(103:1,104:1)Bubo:1,(105:1,106:1)Strix:1,107:1,108:1)Strigidae:1,(109:1,110:1,111:1,112:1)Gavia:1,(113:1,114:1)Phalacrocoracidae:1,((115:1,116:1)Dryobates:1,117:1,118:1,119:1)Picidae:1,120:1,(121:1,122:1,123:1)Columbidae:1,((124:1,125:1)Lagopus:1,126:1,127:1,128:1,129:1)Phasianidae:1,130:1)Aves;
+END;

@@ -1,0 +1,171 @@
+#NEXUS
+[R-package APE, Mon Jan 20 14:26:28 2025]
+
+BEGIN TAXA;
+	DIMENSIONS NTAX = 79;
+	TAXLABELS
+		Perisoreus infaustus
+		Corvus corax
+		Corvus corone
+		Pica pica
+		Turdus musicus
+		Turdus pilaris
+		Erithacus svecicus
+		Plectrophenax nivalis
+		Parus cinctus
+		Parus major
+		Cinclus cinclus
+		Motacilla alba
+		Motacilla flava
+		Riparia riparia
+		Delichon urbica
+		Grus grus
+		Philomachus pugnax
+		Numenius phaeopus
+		Tringa totanus
+		Tringa erythropus
+		Tringa nebularia
+		Tringa cinerea
+		Actitis hypoleucos
+		Capella gallinago
+		Phalaropus lobatus
+		Charadrius hiaticula
+		Pluvialis apricaria
+		Eudromias morinellus
+		Sterna paradisaea
+		Larus marinus
+		Larus argentatus
+		Larus canus
+		Uria aalge
+		Haematopus ostralegus
+		Mergus merganser
+		Mergus serrator
+		Anser erythropus
+		Anser fabalis
+		Anas penelope
+		Anas crecca
+		Anas acuta
+		Anas platyrhynchos
+		Bucephala clangula
+		Melanitta perspicillata
+		Melanitta fusca
+		Aythya fuligula
+		Aythya marila
+		Clangula hyemalis
+		Olor cygnus
+		Somateria mollissima
+		Somateria spectabilis
+		Polysticta stelleri
+		Gavia stellata
+		Gavia arctica
+		Lagopus mutus
+		Lagopus lagopus
+		Tetrao urogallus
+		Dendrocopos minor
+		Dryocopus martius
+		Picoides tridactylus
+		Haliaeetus albicilla
+		Aquila chrysaetos
+		Buteo lagopus
+		Accipiter nisus
+		Accipiter gentilis
+		Circus cyaneus
+		Pandion haliaetus
+		Falco columbarius
+		Falco rusticolus
+		Falco peregrinus
+		Falco tinnunculus
+		Nyctea scandiaca
+		Strix nebulosa
+		Asio flammeus
+		Surnia ulula
+		Aegolius funereus
+		Fulmarus glacialis
+		Cuculus canorus
+		Phalacrocorax carbo
+	;
+END;
+BEGIN TREES;
+	TRANSLATE
+		1	Perisoreus infaustus,
+		2	Corvus corax,
+		3	Corvus corone,
+		4	Pica pica,
+		5	Turdus musicus,
+		6	Turdus pilaris,
+		7	Erithacus svecicus,
+		8	Plectrophenax nivalis,
+		9	Parus cinctus,
+		10	Parus major,
+		11	Cinclus cinclus,
+		12	Motacilla alba,
+		13	Motacilla flava,
+		14	Riparia riparia,
+		15	Delichon urbica,
+		16	Grus grus,
+		17	Philomachus pugnax,
+		18	Numenius phaeopus,
+		19	Tringa totanus,
+		20	Tringa erythropus,
+		21	Tringa nebularia,
+		22	Tringa cinerea,
+		23	Actitis hypoleucos,
+		24	Capella gallinago,
+		25	Phalaropus lobatus,
+		26	Charadrius hiaticula,
+		27	Pluvialis apricaria,
+		28	Eudromias morinellus,
+		29	Sterna paradisaea,
+		30	Larus marinus,
+		31	Larus argentatus,
+		32	Larus canus,
+		33	Uria aalge,
+		34	Haematopus ostralegus,
+		35	Mergus merganser,
+		36	Mergus serrator,
+		37	Anser erythropus,
+		38	Anser fabalis,
+		39	Anas penelope,
+		40	Anas crecca,
+		41	Anas acuta,
+		42	Anas platyrhynchos,
+		43	Bucephala clangula,
+		44	Melanitta perspicillata,
+		45	Melanitta fusca,
+		46	Aythya fuligula,
+		47	Aythya marila,
+		48	Clangula hyemalis,
+		49	Olor cygnus,
+		50	Somateria mollissima,
+		51	Somateria spectabilis,
+		52	Polysticta stelleri,
+		53	Gavia stellata,
+		54	Gavia arctica,
+		55	Lagopus mutus,
+		56	Lagopus lagopus,
+		57	Tetrao urogallus,
+		58	Dendrocopos minor,
+		59	Dryocopus martius,
+		60	Picoides tridactylus,
+		61	Haliaeetus albicilla,
+		62	Aquila chrysaetos,
+		63	Buteo lagopus,
+		64	Accipiter nisus,
+		65	Accipiter gentilis,
+		66	Circus cyaneus,
+		67	Pandion haliaetus,
+		68	Falco columbarius,
+		69	Falco rusticolus,
+		70	Falco peregrinus,
+		71	Falco tinnunculus,
+		72	Nyctea scandiaca,
+		73	Strix nebulosa,
+		74	Asio flammeus,
+		75	Surnia ulula,
+		76	Aegolius funereus,
+		77	Fulmarus glacialis,
+		78	Cuculus canorus,
+		79	Phalacrocorax carbo
+	;
+	TREE * UNTITLED = [&U] (((1:0.5,(2:0.25,3:0.25)Corvus:0.25,4:0.5)Corvidae:0.25,((5:0.25,6:0.25)Turdus:0.25,7:0.5)Turdidae:0.25,8:0.75,(9:0.5,10:0.5)Parus:0.25,11:0.75,(12:0.5,13:0.5)Motacilla:0.25,(14:0.5,15:0.5)Hirundinidae:0.25)Passeriformes:0.25,16:1,((17:0.5,18:0.5,(19:0.25,20:0.25,21:0.25,22:0.25)Tringa:0.25,23:0.5,24:0.5)Scolopacidae:0.25,25:0.75,(26:0.5,27:0.5,28:0.5)Charadriidae:0.25,(29:0.5,(30:0.25,31:0.25,32:0.25)Larus:0.25)Laridae:0.25,33:0.75,34:0.75)Charadriiformes:0.25,((35:0.5,36:0.5)Mergus:0.25,(37:0.5,38:0.5)Anser:0.25,(39:0.5,40:0.5,41:0.5,42:0.5)Anas:0.25,43:0.75,(44:0.5,45:0.5)Melanitta:0.25,(46:0.5,47:0.5)Aythya:0.25,48:0.75,49:0.75,(50:0.5,51:0.5)Somateria:0.25,52:0.75)Anatidae:0.25,(53:0.75,54:0.75)Gavia:0.25,((55:0.5,56:0.5)Lagopus:0.25,57:0.75)Tetraonidae:0.25,(58:0.75,59:0.75,60:0.75)Picidae:0.25,((61:0.5,62:0.5,63:0.5,(64:0.25,65:0.25)Accipiter:0.25,66:0.5)Accipitridae:0.25,67:0.75,(68:0.5,69:0.5,70:0.5,71:0.5)Falco:0.25)Falconiformes:0.25,(72:0.75,73:0.75,74:0.75,75:0.75,76:0.75)Strigidae:0.25,77:1,78:1,79:1)Aves;
+END;

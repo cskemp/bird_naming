@@ -1,0 +1,171 @@
+#NEXUS
+[R-package APE, Mon Jan 20 14:27:54 2025]
+
+BEGIN TAXA;
+	DIMENSIONS NTAX = 79;
+	TAXLABELS
+		Perisoreus infaustus
+		Corvus corax
+		Corvus corone
+		Pica pica
+		Turdus iliacus
+		Turdus pilaris
+		Plectrophenax nivalis
+		Poecile cinctus
+		Parus major
+		Cinclus cinclus
+		Luscinia svecica
+		Motacilla alba
+		Motacilla flava
+		Riparia riparia
+		Delichon urbicum
+		Grus grus
+		Calidris pugnax
+		Numenius phaeopus
+		Phalaropus lobatus
+		Tringa totanus
+		Tringa erythropus
+		Tringa nebularia
+		Actitis hypoleucos
+		Xenus cinereus
+		Gallinago gallinago
+		Charadrius hiaticula
+		Pluvialis apricaria
+		Eudromias morinellus
+		Sterna paradisaea
+		Larus marinus
+		Larus argentatus
+		Larus canus
+		Uria aalge
+		Haematopus ostralegus
+		Mergus merganser
+		Mergus serrator
+		Anser erythropus
+		Anser fabalis
+		Mareca penelope
+		Anas crecca
+		Anas acuta
+		Anas platyrhynchos
+		Bucephala clangula
+		Melanitta perspicillata
+		Melanitta fusca
+		Aythya fuligula
+		Aythya marila
+		Clangula hyemalis
+		Cygnus cygnus
+		Somateria mollissima
+		Somateria spectabilis
+		Polysticta stelleri
+		Gavia stellata
+		Gavia arctica
+		Lagopus muta
+		Lagopus lagopus
+		Tetrao urogallus
+		Dryobates minor
+		Dryocopus martius
+		Picoides tridactylus
+		Haliaeetus albicilla
+		Aquila chrysaetos
+		Buteo lagopus
+		Accipiter nisus
+		Accipiter gentilis
+		Circus cyaneus
+		Pandion haliaetus
+		Falco columbarius
+		Falco rusticolus
+		Falco peregrinus
+		Falco tinnunculus
+		Bubo scandiacus
+		Strix nebulosa
+		Asio flammeus
+		Surnia ulula
+		Aegolius funereus
+		Fulmarus glacialis
+		Cuculus canorus
+		Phalacrocorax carbo
+	;
+END;
+BEGIN TREES;
+	TRANSLATE
+		1	Perisoreus infaustus,
+		2	Corvus corax,
+		3	Corvus corone,
+		4	Pica pica,
+		5	Turdus iliacus,
+		6	Turdus pilaris,
+		7	Plectrophenax nivalis,
+		8	Poecile cinctus,
+		9	Parus major,
+		10	Cinclus cinclus,
+		11	Luscinia svecica,
+		12	Motacilla alba,
+		13	Motacilla flava,
+		14	Riparia riparia,
+		15	Delichon urbicum,
+		16	Grus grus,
+		17	Calidris pugnax,
+		18	Numenius phaeopus,
+		19	Phalaropus lobatus,
+		20	Tringa totanus,
+		21	Tringa erythropus,
+		22	Tringa nebularia,
+		23	Actitis hypoleucos,
+		24	Xenus cinereus,
+		25	Gallinago gallinago,
+		26	Charadrius hiaticula,
+		27	Pluvialis apricaria,
+		28	Eudromias morinellus,
+		29	Sterna paradisaea,
+		30	Larus marinus,
+		31	Larus argentatus,
+		32	Larus canus,
+		33	Uria aalge,
+		34	Haematopus ostralegus,
+		35	Mergus merganser,
+		36	Mergus serrator,
+		37	Anser erythropus,
+		38	Anser fabalis,
+		39	Mareca penelope,
+		40	Anas crecca,
+		41	Anas acuta,
+		42	Anas platyrhynchos,
+		43	Bucephala clangula,
+		44	Melanitta perspicillata,
+		45	Melanitta fusca,
+		46	Aythya fuligula,
+		47	Aythya marila,
+		48	Clangula hyemalis,
+		49	Cygnus cygnus,
+		50	Somateria mollissima,
+		51	Somateria spectabilis,
+		52	Polysticta stelleri,
+		53	Gavia stellata,
+		54	Gavia arctica,
+		55	Lagopus muta,
+		56	Lagopus lagopus,
+		57	Tetrao urogallus,
+		58	Dryobates minor,
+		59	Dryocopus martius,
+		60	Picoides tridactylus,
+		61	Haliaeetus albicilla,
+		62	Aquila chrysaetos,
+		63	Buteo lagopus,
+		64	Accipiter nisus,
+		65	Accipiter gentilis,
+		66	Circus cyaneus,
+		67	Pandion haliaetus,
+		68	Falco columbarius,
+		69	Falco rusticolus,
+		70	Falco peregrinus,
+		71	Falco tinnunculus,
+		72	Bubo scandiacus,
+		73	Strix nebulosa,
+		74	Asio flammeus,
+		75	Surnia ulula,
+		76	Aegolius funereus,
+		77	Fulmarus glacialis,
+		78	Cuculus canorus,
+		79	Phalacrocorax carbo
+	;
+	TREE * UNTITLED = [&U] (((1:1,(2:1,3:1)Corvus:1,4:1)Corvidae:1,(5:1,6:1)Turdus:1,7:1,(8:1,9:1)Paridae:1,10:1,11:1,(12:1,13:1)Motacilla:1,(14:1,15:1)Hirundinidae:1)Passeriformes:1,16:1,((17:1,18:1,19:1,(20:1,21:1,22:1)Tringa:1,23:1,24:1,25:1)Scolopacidae:1,(26:1,27:1,28:1)Charadriidae:1,(29:1,(30:1,31:1,32:1)Larus:1)Laridae:1,33:1,34:1)Charadriiformes:1,((35:1,36:1)Mergus:1,(37:1,38:1)Anser:1,39:1,(40:1,41:1,42:1)Anas:1,43:1,(44:1,45:1)Melanitta:1,(46:1,47:1)Aythya:1,48:1,49:1,(50:1,51:1)Somateria:1,52:1)Anatidae:1,(53:1,54:1)Gavia:1,((55:1,56:1)Lagopus:1,57:1)Phasianidae:1,(58:1,59:1,60:1)Picidae:1,((61:1,62:1,63:1,(64:1,65:1)Accipiter:1,66:1)Accipitridae:1,67:1)Accipitriformes:1,(68:1,69:1,70:1,71:1)Falco:1,(72:1,73:1,74:1,75:1,76:1)Strigidae:1,77:1,78:1,79:1)Aves;
+END;

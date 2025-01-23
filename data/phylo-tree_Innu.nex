@@ -1,0 +1,207 @@
+#NEXUS
+[R-package APE, Mon Jan 20 14:19:16 2025]
+
+BEGIN TAXA;
+	DIMENSIONS NTAX = 97;
+	TAXLABELS
+		Branta_bernicla
+		Branta_canadensis
+		Chen_caerulescens
+		Anas_discors
+		Anas_crecca
+		Anas_acuta
+		Anas_rubripes
+		Clangula_hyemalis
+		Histrionicus_histrionicus
+		Somateria_spectabilis
+		Somateria_mollissima
+		Mergus_merganser
+		Mergus_serrator
+		Bucephala_clangula
+		Bucephala_islandica
+		Melanitta_fusca
+		Melanitta_perspicillata
+		Melanitta_nigra
+		Aythya_collaris
+		Aythya_affinis
+		Aythya_marila
+		Lagopus_muta
+		Lagopus_lagopus
+		Dendragapus_canadensis
+		Bonasa_umbellus
+		Gavia_stellata
+		Gavia_immer
+		Morus_bassanus
+		Phalacrocorax_carbo
+		Phalacrocorax_auritus
+		Botaurus_lentiginosus
+		Numenius_phaeopus
+		Tringa_solitaria
+		Tringa_melanoleuca
+		Actitis_macularius
+		Phalaropus_lobatus
+		Phalaropus_fulicarius
+		Gallinago_gallinago
+		Calidris_minutilla
+		Calidris_melanotos
+		Sterna_paradisaea
+		Sterna_hirundo
+		Larus_argentatus
+		Larus_hyperboreus
+		Larus_marinus
+		Larus_glaucoides
+		Rissa_tridactyla
+		Cepphus_grylle
+		Alca_torda
+		Alle_alle
+		Uria_aalge
+		Uria_lomvia
+		Fratercula_arctica
+		Stercorarius_pomarinus
+		Charadrius_vociferus
+		Charadrius_semipalmatus
+		Pluvialis_dominica
+		Empidonax_flaviventris
+		Empidonax_traillii
+		Perisoreus_canadensis
+		Corvus_brachyrhynchos
+		Corvus_corax
+		Eremophila_alpestris
+		Riparia_riparia
+		Tachycineta_bicolor
+		Parus_hudsonicus
+		Regulus_satrapa
+		Sitta_canadensis
+		Turdus_migratorius
+		Euphagus_carolinus
+		Quiscalus_quiscula
+		Passerella_iliaca
+		Zonotrichia_leucophrys
+		Zonotrichia_albicollis
+		Dendroica_magnolia
+		Dendroica_petechia
+		Plectrophenax_nivalis
+		Loxia_leucoptera
+		Loxia_curvirostra
+		Carduelis_flammea
+		Pinicola_enucleator
+		Falco_columbarius
+		Strix_varia
+		Bubo_scandiaca
+		Bubo_virginianus
+		Asio_flammeus
+		Surnia_ulula
+		Aegolius_funereus
+		Colaptes_auratus
+		Picoides_dorsalis
+		Picoides_arcticus
+		Megaceryle_alcyon
+		Chordeiles_minor
+		Pandion_haliaetus
+		Haliaeetus_leucocephalus
+		Buteo_lagopus
+		Circus_cyaneus
+	;
+END;
+BEGIN TREES;
+	TRANSLATE
+		1	Branta_bernicla,
+		2	Branta_canadensis,
+		3	Chen_caerulescens,
+		4	Anas_discors,
+		5	Anas_crecca,
+		6	Anas_acuta,
+		7	Anas_rubripes,
+		8	Clangula_hyemalis,
+		9	Histrionicus_histrionicus,
+		10	Somateria_spectabilis,
+		11	Somateria_mollissima,
+		12	Mergus_merganser,
+		13	Mergus_serrator,
+		14	Bucephala_clangula,
+		15	Bucephala_islandica,
+		16	Melanitta_fusca,
+		17	Melanitta_perspicillata,
+		18	Melanitta_nigra,
+		19	Aythya_collaris,
+		20	Aythya_affinis,
+		21	Aythya_marila,
+		22	Lagopus_muta,
+		23	Lagopus_lagopus,
+		24	Dendragapus_canadensis,
+		25	Bonasa_umbellus,
+		26	Gavia_stellata,
+		27	Gavia_immer,
+		28	Morus_bassanus,
+		29	Phalacrocorax_carbo,
+		30	Phalacrocorax_auritus,
+		31	Botaurus_lentiginosus,
+		32	Numenius_phaeopus,
+		33	Tringa_solitaria,
+		34	Tringa_melanoleuca,
+		35	Actitis_macularius,
+		36	Phalaropus_lobatus,
+		37	Phalaropus_fulicarius,
+		38	Gallinago_gallinago,
+		39	Calidris_minutilla,
+		40	Calidris_melanotos,
+		41	Sterna_paradisaea,
+		42	Sterna_hirundo,
+		43	Larus_argentatus,
+		44	Larus_hyperboreus,
+		45	Larus_marinus,
+		46	Larus_glaucoides,
+		47	Rissa_tridactyla,
+		48	Cepphus_grylle,
+		49	Alca_torda,
+		50	Alle_alle,
+		51	Uria_aalge,
+		52	Uria_lomvia,
+		53	Fratercula_arctica,
+		54	Stercorarius_pomarinus,
+		55	Charadrius_vociferus,
+		56	Charadrius_semipalmatus,
+		57	Pluvialis_dominica,
+		58	Empidonax_flaviventris,
+		59	Empidonax_traillii,
+		60	Perisoreus_canadensis,
+		61	Corvus_brachyrhynchos,
+		62	Corvus_corax,
+		63	Eremophila_alpestris,
+		64	Riparia_riparia,
+		65	Tachycineta_bicolor,
+		66	Parus_hudsonicus,
+		67	Regulus_satrapa,
+		68	Sitta_canadensis,
+		69	Turdus_migratorius,
+		70	Euphagus_carolinus,
+		71	Quiscalus_quiscula,
+		72	Passerella_iliaca,
+		73	Zonotrichia_leucophrys,
+		74	Zonotrichia_albicollis,
+		75	Dendroica_magnolia,
+		76	Dendroica_petechia,
+		77	Plectrophenax_nivalis,
+		78	Loxia_leucoptera,
+		79	Loxia_curvirostra,
+		80	Carduelis_flammea,
+		81	Pinicola_enucleator,
+		82	Falco_columbarius,
+		83	Strix_varia,
+		84	Bubo_scandiaca,
+		85	Bubo_virginianus,
+		86	Asio_flammeus,
+		87	Surnia_ulula,
+		88	Aegolius_funereus,
+		89	Colaptes_auratus,
+		90	Picoides_dorsalis,
+		91	Picoides_arcticus,
+		92	Megaceryle_alcyon,
+		93	Chordeiles_minor,
+		94	Pandion_haliaetus,
+		95	Haliaeetus_leucocephalus,
+		96	Buteo_lagopus,
+		97	Circus_cyaneus
+	;
+	TREE * UNTITLED = [&R] ((((((((((((((73:0.009259259259,74:0.009259259259)1:0.009259259259,72:0.01851851852)1:0.01851851852,(70:0.01851851852,71:0.01851851852)1:0.01851851852)0.772:0.01851851852,(75:0.02777777778,76:0.02777777778)1:0.02777777778)1:0.01851851852,77:0.07407407407)1:0.01851851852,(((78:0.02314814815,79:0.02314814815)1:0.02314814815,80:0.0462962963)1:0.02314814815,81:0.06944444444)1:0.02314814815)1:0.01851851852,((68:0.02777777778,69:0.02777777778)1:0.02777777778,67:0.05555555556)1:0.05555555556)1:0.05555555556,(((64:0.02777777778,65:0.02777777778)1:0.02777777778,63:0.05555555556)1:0.05555555556,66:0.1111111111)1:0.05555555556)1:0.05555555556,((61:0.05555555556,62:0.05555555556)1:0.05555555556,60:0.1111111111)1:0.1111111111)1:0.1111111111,(58:0.1666666667,59:0.1666666667)1:0.1666666667)1:0.1666666667,82:0.5)1:0.1666666667,(((((((84:0.04761904762,85:0.04761904762)1:0.04761904762,83:0.09523809524)1:0.09523809524,86:0.1904761905)1:0.09523809524,(87:0.1428571429,88:0.1428571429)1:0.1428571429)1:0.09523809524,(((90:0.06349206349,91:0.06349206349)1:0.06349206349,89:0.126984127)1:0.126984127,92:0.253968254)1:0.126984127)1:0.09523809524,93:0.4761904762)1:0.09523809524,(((95:0.09523809524,96:0.09523809524)1:0.09523809524,97:0.1904761905)1:0.09523809524,94:0.2857142857)1:0.2857142857)1:0.09523809524)1:0.1666666667,(((((((((43:0.03333333333,44:0.03333333333)1:0.03333333333,45:0.06666666667)0.804:0.03333333333,46:0.1)1:0.03333333333,47:0.1333333333)1:0.03333333333,(41:0.08333333333,42:0.08333333333)1:0.08333333333)1:0.08333333333,(((((49:0.02083333333,50:0.02083333333)0.876:0.02083333333,(51:0.02083333333,52:0.02083333333)1:0.02083333333)1:0.02083333333,48:0.0625)1:0.0625,53:0.125)1:0.0625,54:0.1875)1:0.0625)1:0.08333333333,((((((33:0.02777777778,34:0.02777777778)1:0.02777777778,35:0.05555555556)0.544:0.02777777778,(36:0.04166666667,37:0.04166666667)1:0.04166666667)1:0.02777777778,38:0.1111111111)0.812:0.02777777778,(39:0.06944444444,40:0.06944444444)1:0.06944444444)1:0.02777777778,32:0.1666666667)1:0.1666666667)1:0.1666666667,((55:0.1666666667,56:0.1666666667)1:0.1666666667,57:0.3333333333)1:0.1666666667)1:0.1666666667,((((29:0.08333333333,30:0.08333333333)1:0.08333333333,28:0.1666666667)1:0.1666666667,(26:0.1666666667,27:0.1666666667)1:0.1666666667)0.628:0.1666666667,31:0.5)1:0.1666666667)1:0.1666666667)1:0.1666666667,((((((((12:0.05,13:0.05)1:0.05,(14:0.05,15:0.05)1:0.05)1:0.05,((16:0.05,17:0.05)1:0.05,18:0.1)1:0.05)1:0.05,(((10:0.025,11:0.025)1:0.025,9:0.05)0.7:0.05,8:0.1)0.66:0.1)1:0.1,((20:0.075,21:0.075)1:0.075,19:0.15)1:0.15)0.988:0.1,(((5:0.06666666667,6:0.06666666667)0.692:0.06666666667,7:0.1333333333)1:0.06666666667,4:0.2)1:0.2)1:0.2,((1:0.2,2:0.2)1:0.2,3:0.4)1:0.2)1:0.2,(((22:0.2,23:0.2)1:0.2,24:0.4)1:0.2,25:0.6)1:0.2)1:0.2)1;
+END;

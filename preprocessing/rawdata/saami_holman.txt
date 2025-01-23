@@ -1,0 +1,82 @@
+ 42  DELICHON            URBICA              HIRUNDIN
+ 2   RIPARIA             RIPARIA              
+ 2   PERISOERUS          INFAUSTUS           CORV
+ 2   TURDUS              ILIAEUS             TURD
+                         PILARIS              
+ 2   PLECTROPHENAX       NIVALIS             EMBERIZ
+ 2   PARUS               CINCTUS             PAR
+ 2   CINCLUS             CINCLUS             CINCL
+ 2   CYANOSYLVIA         SVECICA             TURD
+ 2   MOTACILLA           ALBA                MOTACILL
+ 2                       FLAVA                
+ 2   PARUS               MAJOR               PAR
+ 3   GRUS                GRUS                GRU
+ 2   PHILOMACHUS         PUGNAX              SCOLOPAC
+ 2   NUMENIUS            PHAEOPUS             
+ 2   PHALAROPUS          LOBATUS              
+ 2   CHARADRIUS          HIATICULA           CHARADRI 
+ 2   PLUVIALIS           APRICARIA            
+ 2   EUDROMIAS           MORINELLUS           
+ 2   TRINGA              TOTANUS             SCOLOPAC
+ 1                       ERYTHROPUS           
+ 1                       NEBULARIA            
+                         HYPOLEUCES           
+ 2   XENUS               CINEREUS             
+ 2   GALLINAGO           GALLINAGO            
+ 3   STERNA              PARADISEA           LAR
+ 2   MERGUS              MERGANSER           CATHART
+ 1                       SERRATOR             
+ 2   ANSER               FABALIS             ANAT
+ 1                       ERYTHROPUS           
+ 2   ANAS                PENELOPE             
+ 2                       CRECCA               
+ 2                       PLATYRHYNCHOS        
+ 2                       ACUTA                
+ 2   BUCEPHALA           CLANGULA             
+ 2   MELANITTA           FUSCA                
+                         PERSPICILLATA        
+ 2   AYTHYA              FULIGULA             
+ 1                       MARILA               
+ 2   CLANGULA            HYEMALIS             
+ 2   CYGNUS              CYGNUS              
+ 2   PHALACROCORAX       CARBA               PHALACROCORAC
+ 2   X                   X                   X       AVES
+ 3   GAVIA               STELLATA            GAVI
+ 2                       ARCTICA              
+ 2   LAGOPUS             LAGOPUS             PHASIAN
+ 2                       MUTUS                
+ 2   TETRAO              UROGALLUS            
+ 2   CUCULUS             CANORUS             CUCUL
+ 2   PICOIDES            TRIDACTYLUS         PIC
+     DENDROCOPUS         MINOR                
+                         MARTIUS              
+ 2   PICA                PICA                CORV
+ 2   CORVUS              CORAX                
+ 2                       CORONE               
+ 3   HALIAETUS           ALBICILLA           ACCIPITR
+     AQUILA              CHRYSAETOS           
+ 2   BUTEO               LAGOPUS              
+ 2   ACCIPTER            GENTILIS             
+ 1                       NISUS                
+ 1   PANDION             HALIAETUS           PANDION
+ 1   FALCO               PEREGRINUS          FALCON
+                         COLUMBARIAS          
+ 1                       RUSTICOLUS           
+                         TINNUNCULUS          
+     CIRCUS              CYANEUS             ACCIPITR
+ 2   NYCTEA              SCANDIACA           STRIG
+ 1   STRIX               NEBULOSA             
+ 1   ASIO                FLAMMEUS             
+ 1   SURNIA              ULULA                
+     AEGOLIUS            FUNEREUS             
+ 3   LARUS               MARINUS             LAR
+ 2                       CANUS                
+ 2                       ARGENTATUS           
+ 2                                            
+ 2   HAEMATOPUS          OSTRALEGUS          HAEMATOPOD
+ 2   URIA                AALGE               ALC
+ 2   FULMARUS            GLACIALIS           PROCELLARI
+ 2   X                   X                   COLUMB
+ 2   SOMATERIA           MOLLISSIMA          ANAT
+                         SPECTABILIS                     
+     POLYSTICTA          STELLERI             

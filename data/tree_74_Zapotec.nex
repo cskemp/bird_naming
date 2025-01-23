@@ -1,0 +1,315 @@
+#NEXUS
+[R-package APE, Mon Jan 20 14:26:55 2025]
+
+BEGIN TAXA;
+	DIMENSIONS NTAX = 151;
+	TAXLABELS
+		Melanerpes formicivorus
+		Centurus hypopolius
+		Dendrocopos villosus
+		Dendrocopos scalaris
+		Dryocopus lineatus
+		Phloeoceastes guatemalensis
+		Colaptes auratus
+		Sphyrapicus varius
+		Cinclus mexicanus
+		Hirundo rustica
+		Petrochelidon pyrrhonota
+		Tachycineta thalassina
+		Stelgidopteryx ruficollis
+		Thryomanes bewickii
+		Campylorhynchus jocosus
+		Catherpes mexicanus
+		Salpinctes obsoletus
+		Henicorhina leucophrys
+		Troglodytes aedon
+		Mniotilta varia
+		Dendroica nigrescens
+		Dendroica occidentalis
+		Dendroica townsendi
+		Dendroica coronata
+		Parula superciliosa
+		Oporornis tolmiei
+		Vermivora ruficapilla
+		Vermivora celata
+		Setophaga pictus
+		Ergaticus ruber
+		Cardellina rubrifrons
+		Basileuterus rufifrons
+		Myioborus miniatus
+		Wilsonia pusilla
+		Pheucticus melanocephalus
+		Carduelis notata
+		Carduelis psaltria
+		Aimophila mystacalis
+		Aimophila ruficeps
+		Spizella passerina
+		Pipilo ocai
+		Pipilo albicollis
+		Pipilo erythrophthalmus
+		Carpodacus mexicanus
+		Zonotrichia lincolnii
+		Pooecetes gramineus
+		Junco phaeonotus
+		Atlapetes brunneinucha
+		Icterus wagleri
+		Cassidix mexicanus
+		Molothrus aeneus
+		Melanotis caerulescens
+		Toxostoma curvirostre
+		Mimus polyglottos
+		Polioptila caerulea
+		Parus wollweberi
+		Parus sclateri
+		Psaltriparus minimus
+		Myadestes obscurus
+		Catharus aurantiirostris
+		Catharus frantzii
+		Catharus occidentalis
+		Turdus migratorius
+		Tyrannus vociferans
+		Tyrannus crassirostris
+		Tyrannus verticalis
+		Empidonax difficilis
+		Empidonax oberholseri
+		Empidonax affinis
+		Contopus pertinas
+		Myiarchus nuttingi
+		Myiarchus tuberculifer
+		Sayornis saya
+		Sayornis nigricans
+		Mitrephanes phaeocercus
+		Bombycilla cedrorum
+		Corvus corax
+		Cyanocitta stelleri
+		Aphelocoma ultramarina
+		Ptilogonys cinereus
+		Eremophila alpestris
+		Vireo huttoni
+		Vireo gilvus
+		Vireo solitarius
+		Piranga rubra
+		Lepidocolaptes leucogaster
+		Passer domesticus
+		Falco sparverius
+		Falco peregrinus
+		Caracara cheriway
+		Coragyps atratus
+		Sarcoramphus papa
+		Cathartes aura
+		Accipiter cooperii
+		Accipiter striatus
+		Buteo jamaicensis
+		Buteo brachyurus
+		Buteo albonotatus
+		Circus cyaneus
+		Anas americana
+		Anas discors
+		Anas crecca
+		Anas platyrhynchos
+		Dendrocygna autumnalis
+		Anser anser
+		Anser cygnoid
+		Aythya affinis
+		Cairina moschata
+		Oxyura jamaicensis
+		Lampornis amethystinus
+		Lampornis clemenciae
+		Calothorax pulcher
+		Amazilia beryllina
+		Amazilia viridifrons
+		Atthis heloisa
+		Cynanthus sordidus
+		Lamprolaima rhami
+		Archilochus colubris
+		Selasphorus rufus
+		Hylocharis leucotis
+		Colibri thalassinus
+		Eugenes fulgens
+		Cypseloides niger
+		Cypseloides rutilus
+		Aeronautes saxatalis
+		Columbina passerina
+		Scardafella inca
+		Columba livia
+		Columba fasciata
+		Leptotila verreauxi
+		Zenaida macroura
+		Zenaida asiatica
+		Trogon elegans
+		Trogon mexicanus
+		Micrathene whitneyi
+		Ciccaba virgata
+		Glaucidium gnoma
+		Asio stygius
+		Otus trichopsis
+		Bubo virginianus
+		Geococcyx velox
+		Amazona finschi
+		Ara militaris
+		Aratinga canicularis
+		Dendrortyx macroura
+		Cyrtonyx montezumae
+		Gallus gallus
+		Meleagris gallopavo
+		Ortalis poliocephala
+		Bubulcus ibis
+		Caprimulgus vociferus
+	;
+END;
+BEGIN TREES;
+	TRANSLATE
+		1	Melanerpes formicivorus,
+		2	Centurus hypopolius,
+		3	Dendrocopos villosus,
+		4	Dendrocopos scalaris,
+		5	Dryocopus lineatus,
+		6	Phloeoceastes guatemalensis,
+		7	Colaptes auratus,
+		8	Sphyrapicus varius,
+		9	Cinclus mexicanus,
+		10	Hirundo rustica,
+		11	Petrochelidon pyrrhonota,
+		12	Tachycineta thalassina,
+		13	Stelgidopteryx ruficollis,
+		14	Thryomanes bewickii,
+		15	Campylorhynchus jocosus,
+		16	Catherpes mexicanus,
+		17	Salpinctes obsoletus,
+		18	Henicorhina leucophrys,
+		19	Troglodytes aedon,
+		20	Mniotilta varia,
+		21	Dendroica nigrescens,
+		22	Dendroica occidentalis,
+		23	Dendroica townsendi,
+		24	Dendroica coronata,
+		25	Parula superciliosa,
+		26	Oporornis tolmiei,
+		27	Vermivora ruficapilla,
+		28	Vermivora celata,
+		29	Setophaga pictus,
+		30	Ergaticus ruber,
+		31	Cardellina rubrifrons,
+		32	Basileuterus rufifrons,
+		33	Myioborus miniatus,
+		34	Wilsonia pusilla,
+		35	Pheucticus melanocephalus,
+		36	Carduelis notata,
+		37	Carduelis psaltria,
+		38	Aimophila mystacalis,
+		39	Aimophila ruficeps,
+		40	Spizella passerina,
+		41	Pipilo ocai,
+		42	Pipilo albicollis,
+		43	Pipilo erythrophthalmus,
+		44	Carpodacus mexicanus,
+		45	Zonotrichia lincolnii,
+		46	Pooecetes gramineus,
+		47	Junco phaeonotus,
+		48	Atlapetes brunneinucha,
+		49	Icterus wagleri,
+		50	Cassidix mexicanus,
+		51	Molothrus aeneus,
+		52	Melanotis caerulescens,
+		53	Toxostoma curvirostre,
+		54	Mimus polyglottos,
+		55	Polioptila caerulea,
+		56	Parus wollweberi,
+		57	Parus sclateri,
+		58	Psaltriparus minimus,
+		59	Myadestes obscurus,
+		60	Catharus aurantiirostris,
+		61	Catharus frantzii,
+		62	Catharus occidentalis,
+		63	Turdus migratorius,
+		64	Tyrannus vociferans,
+		65	Tyrannus crassirostris,
+		66	Tyrannus verticalis,
+		67	Empidonax difficilis,
+		68	Empidonax oberholseri,
+		69	Empidonax affinis,
+		70	Contopus pertinas,
+		71	Myiarchus nuttingi,
+		72	Myiarchus tuberculifer,
+		73	Sayornis saya,
+		74	Sayornis nigricans,
+		75	Mitrephanes phaeocercus,
+		76	Bombycilla cedrorum,
+		77	Corvus corax,
+		78	Cyanocitta stelleri,
+		79	Aphelocoma ultramarina,
+		80	Ptilogonys cinereus,
+		81	Eremophila alpestris,
+		82	Vireo huttoni,
+		83	Vireo gilvus,
+		84	Vireo solitarius,
+		85	Piranga rubra,
+		86	Lepidocolaptes leucogaster,
+		87	Passer domesticus,
+		88	Falco sparverius,
+		89	Falco peregrinus,
+		90	Caracara cheriway,
+		91	Coragyps atratus,
+		92	Sarcoramphus papa,
+		93	Cathartes aura,
+		94	Accipiter cooperii,
+		95	Accipiter striatus,
+		96	Buteo jamaicensis,
+		97	Buteo brachyurus,
+		98	Buteo albonotatus,
+		99	Circus cyaneus,
+		100	Anas americana,
+		101	Anas discors,
+		102	Anas crecca,
+		103	Anas platyrhynchos,
+		104	Dendrocygna autumnalis,
+		105	Anser anser,
+		106	Anser cygnoid,
+		107	Aythya affinis,
+		108	Cairina moschata,
+		109	Oxyura jamaicensis,
+		110	Lampornis amethystinus,
+		111	Lampornis clemenciae,
+		112	Calothorax pulcher,
+		113	Amazilia beryllina,
+		114	Amazilia viridifrons,
+		115	Atthis heloisa,
+		116	Cynanthus sordidus,
+		117	Lamprolaima rhami,
+		118	Archilochus colubris,
+		119	Selasphorus rufus,
+		120	Hylocharis leucotis,
+		121	Colibri thalassinus,
+		122	Eugenes fulgens,
+		123	Cypseloides niger,
+		124	Cypseloides rutilus,
+		125	Aeronautes saxatalis,
+		126	Columbina passerina,
+		127	Scardafella inca,
+		128	Columba livia,
+		129	Columba fasciata,
+		130	Leptotila verreauxi,
+		131	Zenaida macroura,
+		132	Zenaida asiatica,
+		133	Trogon elegans,
+		134	Trogon mexicanus,
+		135	Micrathene whitneyi,
+		136	Ciccaba virgata,
+		137	Glaucidium gnoma,
+		138	Asio stygius,
+		139	Otus trichopsis,
+		140	Bubo virginianus,
+		141	Geococcyx velox,
+		142	Amazona finschi,
+		143	Ara militaris,
+		144	Aratinga canicularis,
+		145	Dendrortyx macroura,
+		146	Cyrtonyx montezumae,
+		147	Gallus gallus,
+		148	Meleagris gallopavo,
+		149	Ortalis poliocephala,
+		150	Bubulcus ibis,
+		151	Caprimulgus vociferus
+	;
+	TREE * UNTITLED = [&U] ((1:0.75,2:0.75,(3:0.5,4:0.5)Dendrocopos:0.25,5:0.75,6:0.75,7:0.75,8:0.75)Picidae:0.25,(9:0.75,(10:0.5,11:0.5,12:0.5,13:0.5)Hirundinidae:0.25,(14:0.5,15:0.5,16:0.5,17:0.5,18:0.5,19:0.5)Troglodytidae:0.25,(20:0.5,(21:0.25,22:0.25,23:0.25,24:0.25)Dendroica:0.25,25:0.5,26:0.5,(27:0.25,28:0.25)Vermivora:0.25,29:0.5,30:0.5,31:0.5,32:0.5,33:0.5,34:0.5)Parulidae:0.25,(35:0.5,(36:0.25,37:0.25)Carduelis:0.25,(38:0.25,39:0.25)Aimophila:0.25,40:0.5,(41:0.25,42:0.25,43:0.25)Pipilo:0.25,44:0.5,45:0.5,46:0.5,47:0.5,48:0.5)Fringillidae:0.25,(49:0.5,50:0.5,51:0.5)Icteridae:0.25,(52:0.5,53:0.5,54:0.5)Mimidae:0.25,55:0.75,((56:0.25,57:0.25)Parus:0.25,58:0.5)Paridae:0.25,(59:0.5,(60:0.25,61:0.25,62:0.25)Catharus:0.25,63:0.5)Turdidae:0.25,((64:0.25,65:0.25,66:0.25)Tyrannus:0.25,(67:0.25,68:0.25,69:0.25)Empidonax:0.25,70:0.5,(71:0.25,72:0.25)Myiarchus:0.25,(73:0.25,74:0.25)Sayornis:0.25,75:0.5)Tyrannidae:0.25,76:0.75,(77:0.5,78:0.5,79:0.5)Corvidae:0.25,80:0.75,81:0.75,(82:0.5,83:0.5,84:0.5)Vireo:0.25,85:0.75,86:0.75,87:0.75)Passeriformes:0.25,(((88:0.25,89:0.25)Falco:0.25,90:0.5)Falconidae:0.25,(91:0.5,92:0.5,93:0.5)Cathartidae:0.25,((94:0.25,95:0.25)Accipiter:0.25,(96:0.25,97:0.25,98:0.25)Buteo:0.25,99:0.5)Accipitridae:0.25)Falconiformes:0.25,((100:0.5,101:0.5,102:0.5,103:0.5)Anas:0.25,104:0.75,(105:0.5,106:0.5)Anser:0.25,107:0.75,108:0.75,109:0.75)Anatidae:0.25,(((110:0.25,111:0.25)Lampornis:0.25,112:0.5,(113:0.25,114:0.25)Amazilia:0.25,115:0.5,116:0.5,117:0.5,118:0.5,119:0.5,120:0.5,121:0.5,122:0.5)Trochilidae:0.25,((123:0.25,124:0.25)Cypseloides:0.25,125:0.5)Apodidae:0.25)Apodiformes:0.25,(126:0.75,127:0.75,(128:0.5,129:0.5)Columba:0.25,130:0.75,(131:0.5,132:0.5)Zenaida:0.25)Columbidae:0.25,(133:0.75,134:0.75)Trogon:0.25,(135:0.75,136:0.75,137:0.75,138:0.75,139:0.75,140:0.75)Strigidae:0.25,141:1,(142:0.75,143:0.75,144:0.75)Psittacidae:0.25,((145:0.5,146:0.5,147:0.5)Phasianidae:0.25,148:0.75,149:0.75)Galliformes:0.25,150:1,151:1)Aves;
+END;

@@ -1,0 +1,249 @@
+#NEXUS
+[R-package APE, Mon Jan 20 14:26:20 2025]
+
+BEGIN TAXA;
+	DIMENSIONS NTAX = 118;
+	TAXLABELS
+		Terathopius ecaudatus
+		Aquila rapax
+		Circaetus pectoralis
+		Circus ranivorus
+		Circus macrourus
+		Necrosyrtes monachus
+		Milvus migrans
+		Buteo rufofuscus
+		Falco biarmicus
+		Falco cuvierii
+		Sagittarius serpentarius
+		Ciconia abdimii
+		Ibis ibis
+		Ardea cinerea
+		Ardea melanocephala
+		Ardea purpurea
+		Casmerodius albus
+		Egretta garzetta
+		Egretta intermedia
+		Bubulcus ibis
+		Hagedashia hagedash
+		Threskiornis aethiopica
+		Scopus umbretta
+		Balearica regulorum
+		Fulica cristata
+		Porphyrio madagascarensis
+		Plectropterus gambensis
+		Cairina moschata
+		Alopochen aegyptiaca
+		Anas erythrorhyncha
+		Sarkidiornis melanotos
+		Charadrius tricollaris
+		Charadrius pecuarius
+		Charadrius hiaticula
+		Charadrius dubius
+		Hoplopterus armatus
+		Stephanibyx coronatus
+		Calidris alpina
+		Calidris minuta
+		Actitis hypoleucos
+		Tringa glareola
+		Rhinoptilus chalcopterus
+		Scotornis fossii
+		Spreo superbus
+		Laniarius funebris
+		Lanius collaris
+		Corvus albus
+		Corvus albicollis
+		Hirundo rustica
+		Hirundo angolensis
+		Hirundo smithii
+		Hirundo senegalensis
+		Hirundo abyssinica
+		Hirundo daurica
+		Pseudhirundo griseopyga
+		Riparia cincta
+		Riparia paludicola
+		Psalidoprocne albiceps
+		Psalidoprocne pristoptera
+		Ptyonoprogne fuligula
+		Delichon urbica
+		Vidua fischeri
+		Vidua macroura
+		Vidua hypocherina
+		Vidua paradisaea
+		Ploceus jacksoni
+		Euplectes axillaris
+		Euplectes gierowii
+		Euplectes capensis
+		Euplectes orix
+		Quelea quelea
+		Lagonosticta senegala
+		Uraeginthus angolensis
+		Uraeginthus ianthinogaster
+		Pytilia afra
+		Passer griseus
+		Sporopipes frontalis
+		Eremopterix leucopareia
+		Mirafra rufocinnamomea
+		Cisticola aridula
+		Cisticola chiniana
+		Prinia subflava
+		Motacilla aguimp
+		Motacilla flava
+		Anthus novaeseelandiae
+		Nectarinia senegalensis
+		Nectarinia kilimensis
+		Nectarinia pulchella
+		Nectarinia mariquensis
+		Nectarinia venusta
+		Nectarinia amethystina
+		Nectarinia bifasciata
+		Anthreptes collaris
+		Anthreptes orientalis
+		Prionops plumata
+		Pycnonotus barbatus
+		Emberiza tahapisi
+		Serinus atrogularis
+		Centropus superciliosus
+		Lybius leucocephalus
+		Oena capensis
+		Streptopelia semitorquata
+		Streptopelia senegalensis
+		Streptopelia decipiens
+		Columba guinea
+		Treron calva
+		Apus caffer
+		Apus melba
+		Apus apus
+		Apus affinis
+		Apus horus
+		Cypsiurus parvus
+		Colius striatus
+		Gallus gallus
+		Pternistis cranchii
+		Numida mitrata
+		Bubo africanus
+		Struthio camelus
+	;
+END;
+BEGIN TREES;
+	TRANSLATE
+		1	Terathopius ecaudatus,
+		2	Aquila rapax,
+		3	Circaetus pectoralis,
+		4	Circus ranivorus,
+		5	Circus macrourus,
+		6	Necrosyrtes monachus,
+		7	Milvus migrans,
+		8	Buteo rufofuscus,
+		9	Falco biarmicus,
+		10	Falco cuvierii,
+		11	Sagittarius serpentarius,
+		12	Ciconia abdimii,
+		13	Ibis ibis,
+		14	Ardea cinerea,
+		15	Ardea melanocephala,
+		16	Ardea purpurea,
+		17	Casmerodius albus,
+		18	Egretta garzetta,
+		19	Egretta intermedia,
+		20	Bubulcus ibis,
+		21	Hagedashia hagedash,
+		22	Threskiornis aethiopica,
+		23	Scopus umbretta,
+		24	Balearica regulorum,
+		25	Fulica cristata,
+		26	Porphyrio madagascarensis,
+		27	Plectropterus gambensis,
+		28	Cairina moschata,
+		29	Alopochen aegyptiaca,
+		30	Anas erythrorhyncha,
+		31	Sarkidiornis melanotos,
+		32	Charadrius tricollaris,
+		33	Charadrius pecuarius,
+		34	Charadrius hiaticula,
+		35	Charadrius dubius,
+		36	Hoplopterus armatus,
+		37	Stephanibyx coronatus,
+		38	Calidris alpina,
+		39	Calidris minuta,
+		40	Actitis hypoleucos,
+		41	Tringa glareola,
+		42	Rhinoptilus chalcopterus,
+		43	Scotornis fossii,
+		44	Spreo superbus,
+		45	Laniarius funebris,
+		46	Lanius collaris,
+		47	Corvus albus,
+		48	Corvus albicollis,
+		49	Hirundo rustica,
+		50	Hirundo angolensis,
+		51	Hirundo smithii,
+		52	Hirundo senegalensis,
+		53	Hirundo abyssinica,
+		54	Hirundo daurica,
+		55	Pseudhirundo griseopyga,
+		56	Riparia cincta,
+		57	Riparia paludicola,
+		58	Psalidoprocne albiceps,
+		59	Psalidoprocne pristoptera,
+		60	Ptyonoprogne fuligula,
+		61	Delichon urbica,
+		62	Vidua fischeri,
+		63	Vidua macroura,
+		64	Vidua hypocherina,
+		65	Vidua paradisaea,
+		66	Ploceus jacksoni,
+		67	Euplectes axillaris,
+		68	Euplectes gierowii,
+		69	Euplectes capensis,
+		70	Euplectes orix,
+		71	Quelea quelea,
+		72	Lagonosticta senegala,
+		73	Uraeginthus angolensis,
+		74	Uraeginthus ianthinogaster,
+		75	Pytilia afra,
+		76	Passer griseus,
+		77	Sporopipes frontalis,
+		78	Eremopterix leucopareia,
+		79	Mirafra rufocinnamomea,
+		80	Cisticola aridula,
+		81	Cisticola chiniana,
+		82	Prinia subflava,
+		83	Motacilla aguimp,
+		84	Motacilla flava,
+		85	Anthus novaeseelandiae,
+		86	Nectarinia senegalensis,
+		87	Nectarinia kilimensis,
+		88	Nectarinia pulchella,
+		89	Nectarinia mariquensis,
+		90	Nectarinia venusta,
+		91	Nectarinia amethystina,
+		92	Nectarinia bifasciata,
+		93	Anthreptes collaris,
+		94	Anthreptes orientalis,
+		95	Prionops plumata,
+		96	Pycnonotus barbatus,
+		97	Emberiza tahapisi,
+		98	Serinus atrogularis,
+		99	Centropus superciliosus,
+		100	Lybius leucocephalus,
+		101	Oena capensis,
+		102	Streptopelia semitorquata,
+		103	Streptopelia senegalensis,
+		104	Streptopelia decipiens,
+		105	Columba guinea,
+		106	Treron calva,
+		107	Apus caffer,
+		108	Apus melba,
+		109	Apus apus,
+		110	Apus affinis,
+		111	Apus horus,
+		112	Cypsiurus parvus,
+		113	Colius striatus,
+		114	Gallus gallus,
+		115	Pternistis cranchii,
+		116	Numida mitrata,
+		117	Bubo africanus,
+		118	Struthio camelus
+	;
+	TREE * UNTITLED = [&U] (((1:0.5,2:0.5,3:0.5,(4:0.25,5:0.25)Circus:0.25,6:0.5,7:0.5,8:0.5)Accipitridae:0.25,(9:0.5,10:0.5)Falco:0.25,11:0.75)Falconiformes:0.25,((12:0.5,13:0.5)Ciconiidae:0.25,((14:0.25,15:0.25,16:0.25)Ardea:0.25,17:0.5,(18:0.25,19:0.25)Egretta:0.25,20:0.5)Ardeidae:0.25,(21:0.5,22:0.5)Threskiornithidae:0.25,23:0.75)Ciconiiformes:0.25,(24:0.75,(25:0.5,26:0.5)Rallidae:0.25)Gruiformes:0.25,(27:0.75,28:0.75,29:0.75,30:0.75,31:0.75)Anatidae:0.25,(((32:0.25,33:0.25,34:0.25,35:0.25)Charadrius:0.25,36:0.5,37:0.5)Charadriidae:0.25,((38:0.25,39:0.25)Calidris:0.25,40:0.5,41:0.5)Scolopacidae:0.25,42:0.75)Charadriiformes:0.25,43:1,(44:0.75,(45:0.5,46:0.5)Laniidae:0.25,(47:0.5,48:0.5)Corvus:0.25,((49:0.25,50:0.25,51:0.25,52:0.25,53:0.25,54:0.25)Hirundo:0.25,55:0.5,(56:0.25,57:0.25)Riparia:0.25,(58:0.25,59:0.25)Psalidoprocne:0.25,60:0.5,61:0.5)Hirundinidae:0.25,((62:0.25,63:0.25,64:0.25,65:0.25)Vidua:0.25,66:0.5,(67:0.25,68:0.25,69:0.25,70:0.25)Euplectes:0.25,71:0.5,72:0.5,(73:0.25,74:0.25)Uraeginthus:0.25,75:0.5,76:0.5,77:0.5)Ploceidae:0.25,(78:0.5,79:0.5)Alaudidae:0.25,((80:0.25,81:0.25)Cisticola:0.25,82:0.5)Sylviidae:0.25,((83:0.25,84:0.25)Motacilla:0.25,85:0.5)Motacillidae:0.25,((86:0.25,87:0.25,88:0.25,89:0.25,90:0.25,91:0.25,92:0.25)Nectarinia:0.25,(93:0.25,94:0.25)Anthreptes:0.25)Nectariniidae:0.25,95:0.75,96:0.75,(97:0.5,98:0.5)Fringillidae:0.25)Passeriformes:0.25,99:1,100:1,(101:0.75,(102:0.5,103:0.5,104:0.5)Streptopelia:0.25,105:0.75,106:0.75)Columbidae:0.25,((107:0.5,108:0.5,109:0.5,110:0.5,111:0.5)Apus:0.25,112:0.75)Apodidae:0.25,113:1,((114:0.5,115:0.5)Phasianidae:0.25,116:0.75)Galliformes:0.25,117:1,118:1)Aves;
+END;

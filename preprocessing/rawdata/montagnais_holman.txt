@@ -1,0 +1,102 @@
+ 35  GAVIA               IMMER               GAVI
+ 1                       STELLATA
+ 1   X                   X                   X       AVES
+ 3   MORUS               BASSANUS            SUL
+ 3   PHALACROCORAX       AURITUS             PHALACROCORAC
+ 1                       CARBO
+ 3   BOTAURUS            LENTIGINOSUS        ARDE
+ 3   BRANTA              CANADENSIS          ANAT
+ 1                       BERNICLA
+ 1   CHEN                CAERULESCENS
+ 3   ANUS                RUBRIPES
+ 1                       ACUTA
+ 1                       CAROLINENSIS
+                         DISCORS
+ 3   BUCEPHALA           CLANGULA            
+                         ISLANDICA
+ 1   AYTHYA              COLLARIS
+                         MARILA
+                         AFFINIS
+ 3   CLANGULA            HYEMALIS
+ 3   HISTRIONICUS        HISTRIONICUS        
+ 3   SOMATERIA           MOLLISSIMA
+ 1
+ 1                       SPECTABILIS
+ 3   MELANITTA           DEGLANDI
+ 1                       PERSPICILLATA       
+ 1   OIDEMIA             NIGRA
+ 3   MERGUS              SERRATOR
+ 1                       MERGANSER
+ 3   LARUS               ARGENTATUS          LAR
+                         HYPERBOREUS
+ 1                       GLAUCOIDES
+ 1                       MARINUS
+ 1   RISSA               TRIDACTYLA
+ 1   STERCORARIUS        POMARINUS           STERCORARI
+ 3   STERNA              HIRUNDO             LAR
+                         PARADISAEA
+ 3   ALCA                TORDA               ALC
+     URIA                LOMVIA
+ 1                       AALGE
+ 1   PLAUTUS             ALLE
+ 3   CEPPHUS             GRYLLE
+ 3   FRATERCULA          ARCTICA
+ 35  BUTEO               LAGOPUS             ACCIPITR
+ 1   X                   X                   X       AVES
+ 1   HALIAEETUS          LEUCOCEPHALUS       ACCIPITR
+ 1   CIRCUS              CYANEUS
+ 1   PANDION             HALIAETUS           PANDION
+ 1   FALCO               COLOMBARIUS         FALCON
+ 2   BUBO                VIRGINIANUS         STRIG
+ 1   NYCTEA              SCANDIACA
+ 1   AEGOLIUS            FUNEREUS
+     SURNIA              ULULA
+ 1   STRIX               VARIA
+ 1   ASIO                FLAMMEUS
+ 1   CHORDEILES          MINOR               CAPRIMULG
+ 35  CANACHITES          CANADENSIS          PHASIAN
+ 1   BONASA              UMBELLUS
+ 2   LAGOPUS             LAGOPUS
+ 1                       MUTUS
+ 1   X                   X                   
+ 35  CHARADRIUS          SEMIPALMATUS        CHARADRI
+                         VOCIFERUS
+ 1   PLUVIALIS           DOMINICA
+     EROLIA              MELANOTOS           SCOLOPAC
+ 2   CAPELLA             GALLINAGO
+ 2   NUMENIUS            PHAEOPUS
+ 2   ACTITIS             MACULARIA
+ 2   TRINGA              SOLITARIA
+     TOTANUS             MELANOLEUCUS        
+ 2   EROLIA              MINUTILLA
+ 2   LOPIPES             LOBATUS
+     PHALAROPUS          FULICARIUS
+ 3   MEGACERYLE          ALCYON              ALCEDIN
+ 3   PICOIDES            ARCTICUS            PIC
+                         TRIDACTYLIS
+ 1   COLAPTES            AURATUS
+ 3   DENDROICA           PETECHIA            PARUL
+     EMPIDONAX           FLAVIVENTRIS        TYRANN
+     DENDROICA           MAGNOLIA            PARUL
+ 3   EMPIDONAX           TRAILLII            TYRANN
+ 3   EREMOPHILA          ALPESTRIS           ALAUD
+ 3   IRIDOPROCNE         BICOLOR             HIRUNDIN
+     RIPARIA             RIPARIA
+ 3   PERISOREUS          CANADENSIS          CORV
+ 3   CORVUS              CORAX
+ 1                       BRACHYRHYNCHOS
+ 3   PARUS               HUDSONICUS          PAR
+ 1   SITTA               CANADENSIS          SITT
+ 3   TURDUS              MIGRATORIUS         TURD
+ 3   EUPHAGUS            CAROLINUS           ICTER
+     QUISCALUS           QUISCULA
+ 3   PINICOLA            ENUDEATOR           FRINGILL 
+ 3   ACANTHIS            FLAMMEA
+ 3   LOXIA               LEUCOPTERA
+                         CURVIROSTRA
+ 3   X                   X                   X       AVES
+ 3   ZONOTRICHIA         LEUCOPHRYS          EMBERIZ
+                         ALBICOLLIS
+     REGULUS             SATRAPA             SYLVI 
+ 3   PASSERELLA          ILIACA              EMBERIZ
+ 3   PLECTROPHENAX       NIVALIS

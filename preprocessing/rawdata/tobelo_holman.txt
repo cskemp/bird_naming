@@ -1,0 +1,136 @@
+ 42  FALCO               MOLUCCENSIS         FALCON
+ 2   COLLOCALIA          VANIKORENSIS        APOD
+                         ESCULENTA
+     HIRUNDO             TAHITICA            HIRUNDIN
+                         RUSTICA
+ 2   MELEAGRIS           GALLOPAVO           PHASIAN
+ 2   ANAS                X                   ANAT
+ 1   ANSER
+ 1   PELECANUS           CONSPICILLATUS      PELECAN
+ 2   MYIAGRA             GALEATA             MUSCICAP
+     MONARCHA            TRIVIRGATUS
+     PIEZORHYNCHUS       ALECTO
+     ZOSTEROPS           ATRICEPS            ZOSTEROP
+ 2   DICRURUS            HOTTENTOTTUS        DICRUR
+ 2   EURYSTOMUS          ORIENTALIS          CORACI
+                         AZUREUS
+ 2   ORIOLUS             PHAEOCHROMUS        ORIOL
+ 2   LORIUS              GARRULUS            LORI
+ 2   OCEANODROMA         MATSUDAIRAE         HYDROBAT
+ 2   MELITOGRAIS         GILOLENSIS          MELIPHAG
+ 2   MYZOMELA            OBSCURA
+ 2   ZOSTEROPS           ATRICEPS            ZOSTEROP
+ 1   NECTARINIA          JUGULARIS           NECTARINI
+                         SERICEA
+ 2   DICAEUM             ERYTHROTHORAX       DICAE
+ 2   EOS                 SQUAMATA            LORI
+ 2   CENTROPUS           GOLIATH             CUCUL
+ 1
+ 2   RHIPIDURA           LEUCOPHRYS          MUSCICAP
+ 2   CENTROPUS           BENGALENSIS         CUCUL
+ 2   PUFFINUS            LEUCOMELAS          PROCELLARI
+     SULA                LEUCOGASTER         SUL
+ 2   PITTA               MAXIMA              PITT
+ 1                       ERYTHROGASTER
+ 2   HYPSIPETES          AFFINIS             PYCNONOT
+ 2   HEMIPROCNE          MYSTACEA            HEMIPROCN
+ 2   NINOX               SQUAMIPILA          STRIG
+ 2   LORICULUS           AMABILIS            PSITTAC
+ 2   LORIUS              RORATUS             LORI
+ 2   TANYSIPTERA         GALATEA             ALCEDIN
+ 1
+ 2   NUMENIUS            PHAEOPUS            SCOLOPAC
+     HETEROSCELUS        BREVIPES
+     XENUS               CINEREUS
+ 2   OTUS                MAGICUS             STRIG
+ 2   CACATUA             ALBA                CACATU
+ 2   TANYGNATHUS         MEGALORHYNCHOS      PSITTAC
+ 2   MONARCHA            TRIVIRGATUS         MUSCICAP
+     MYIAGRA             GALEATA
+     PIEZORHYNCHUS       ALECTO
+ 1   MONARCHA            PILEATUS
+ 2   COLUMBA             VITTIENSIS          COLUMB
+     DUCULA              BASILICA
+                         PERSPICILLATA
+                         CONCINNA
+ 2   MEGAPODIUS          WALLACEI            MEGAPODI
+ 2   LYCOCORAX           PYRRHOPTERUS        PARADISAE
+ 2   X                   X                   X       AVES
+ 2   GYMNOCREX           PLUMBEIVENTRIS      RALL
+ 1   HABROPTILA          WALLACII
+ 2   RALLINA             FASCIATA
+ 2   GEOFFROYUS          GEOFFROYI           PSITTAC
+ 1
+ 2   DICRURUS            HOTTENTOTTUS        DICRUR
+ 2   CALOENAS            NICOBARICA          COLUMB
+ 2   CAPRIMULGUS         MACRURUS            CAPRIMULG
+ 1   AEGOTHELES          CRINIFRONS          AEGOTHEL
+ 2   LALAGE              AUREA               CAMPEPHAG
+ 2   ARTAMUS             LEUCORHYNCHUS       ARTAM
+ 2   CHALCOPHAPS         INDICA              COLUMB
+ 2   APLONIS             METALLICA           STURN
+                         MYSOLENSIS
+ 1                       METALLICA
+                         MYSOLENSIS
+ 2   HALCYON             SANCTA              ALCEDIN
+                         DIOPS
+ 1                       FUNEBRIS
+ 1   CEYX                LEPIDUS
+     ALCEDO              ATTHIS
+ 2   ARTAMUS             LEUCORHYNCHUS       ARTAM
+ 2   ACCIPITER           GRISEOGULARIS       ACCIPITR
+                         ERYTHRAUCHEN
+                         HENICOGRAMMUS
+                         SOLOENSIS
+     AVICEDA             SUBCRISTATA
+ 2   X                   X                   X       AVES
+ 2   ACEROS              PLICATUS            BUCEROT
+ 2   X                   X                   X       AVES
+ 2   HALIAETUS           LEUCOGASTER         ACCIPITR
+ 1   PANDION             HALIAETUS           PANDION
+ 2   REINWARDTOENA       REINWARDTII         COLUMB
+ 2   MACROPYGIA          AMBOINENSIS         
+ 2   EGRETTA             SACRA               ARDE
+ 2   EUDYNAMIS           SCOLOPACEA          CUCUL
+ 2   FREGATA             MINOR               FREGAT
+                         ARIEL
+ 2   MEGAPODIUS          FREYCINET           MEGAPODI
+ 2   PTILINOPUS          SUPERBUS            COLUMB
+ 1                       HYOGASTER
+ 1                       SUPERBUS
+ 2   MONARCHA            ALECTO              MUSCICAP
+ 2   ALISTERUS           AMBOINENSUS         PSITTAC
+ 2   CHARMOSYNA          PLACENTIS           LORI
+ 2   DUCULA              BICOLOR             COLUMB
+ 2   TADORNA             RADJAH              ANAT
+ 2   TACHYBAPTUS         RUFICOLLIS          PODICIPED
+ 2   CACOMANTIS          VARIOLOSUS          CUCUL
+ 2   PACHYCEPHALA        PECTORALIS          PYCNONOT
+ 2   HALIASTUR           INDUS               ACCIPITR
+ 2   COLUMBA             LIVIA               COLUMB
+ 2   STREPTOPELIA        CHINENSIS
+ 2   CALIDRIS            RUFICOLLIS          SCOLOPAC
+     CHARADRIUS          LESCHENAULTII       CHARADRI
+     ACTITIS             HYPOLEUCOS          SCOLOPAC
+ 2   IXOBRYCHUS          FLAVICOLLIS         ARDE
+ 2   CORACINA            PAPUENSIS           CAMPEPHAG
+ 1                       ATRICEPS
+ 2   LOCUSTELLA          FASCIOLATA          MUSCICAP
+ 2   AMAURORNIS          OLIVACEUS           RALL
+ 1   RALLUS              PHILIPPENSIS
+ 2   GALLUS              GALLUS              PHASIAN
+ 2   LONCHURA            MOLUCCA             ESTRILD
+ 2   NYCTICORAX          CALEDONICUS         ARDE
+     EGRETTA             SACRA
+     ARDEA               ALBA
+                         SUMATRANA
+ 2   MEROPS              ORNATUS             ALCEDIN
+ 2   LORIUS              RORATUS             LORI
+ 2   STERNA              HIRUNDO             LAR
+ 2   SEMEIOPTERA         WALLACII            PARADISAE
+ 2   X                   X                   X       AVES
+ 2
+ 2   CORVUS              VALIDUS             CORV
+ 1                       ORRU
+ 2   NINOX               CONNIVENS           STRIG
+                         SCUTULATA
