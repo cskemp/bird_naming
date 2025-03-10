@@ -32,13 +32,13 @@ This dataframe comes from the data/bird_data.csv in this repository. It has the 
 -   Canonical Name - we have used Clements 2023 scientific names for our canonical names. This column should not contain duplicates (duplicate birds have a suffix)
 -   IndexFG - indices or names for each folk category.
 -   n - number of birds in the folk category
--   ScientificName2023 & ScientificName1974 - Names in the Clements 2023 and 1974 taxonomies. THese are the taxonomies that we used in the Hunn Correspondence measure, but you can switch them for other ones that you want to compare. You'll just have to change the code a little bit to do so.
+-   ScientificName2023 & ScientificName1974 - Names in the Clements 2023 and 1974 taxonomies. These are the taxonomies that we used in the Hunn Correspondence measure, but you can switch them for other ones that you want to compare. You'll just have to change the code a little bit to do so.
 -   BeakLengthCulmen, BeakLengthNares, BeakWidth, BeakDepth, TarsusLength, WingLength, KippsDistance, Secondary, HandWingIndex, TailLength, Mass - These are all the measurements from AVONET (Tobias et al., 2022) that are used in the preprocessing file to calculate the perceptual distance and isolation measures. They only time they are used in the Analyses file is to run a shapiro test on them (these measures can be downloaded from <https://opentraits.org/datasets/avonet.html>).
--   IsoPer/zIsoPer - unscaled and scaled perceptual isolation scores for each bird (we calculated these by calculating the Euclidean distance between each bird and its closest neighbour based on the scaled and log-transformed AVONET variables. See the preprocessing file for details.)
--   VarPer - variance for each folk category if birds based on IsoPer scores. This is only used in the Analyses file to compare the variances for each group across distance measures.
+-   IsoPer/zIsoPer - unscaled and scaled perceptual isolation scores for each bird (we calculated these by finding the Euclidean distance between each bird and its closest neighbour based on the scaled and log-transformed AVONET variables. See the preprocessing file for details.)
+-   VarPer - variance for each folk category of birds based on IsoPer scores. This is only used in the Analyses file to compare the variances for each group across distance measures.
 -   IsoPhy/zIsoPhy - unscaled and scaled phylogenetic isolation scores for each bird (we calculated these by taking cophenetic distance between each bird and its closest bird in a phylogenetic tree. See preprocessing file for details.)
 -   VarPhy - variance for each folk category of birds based on IsoPhy scores. This is only used in the Analyses file to compare the variances for each group across distance measures.
--   Iso23/zIso & Iso74/zIso74 - unscaled and scaled isolation variables for each of the two Western scientific taxonomies (calculated by counting up the steps of the taxonomic tree until the bird and its closest bird share a taxon. See preprocessing file for details)
+-   Iso23/zIso23 & Iso74/zIso74 - unscaled and scaled isolation variables for each of the two Western scientific taxonomies (calculated by counting up the steps of the taxonomic tree until the bird and its closest bird share a taxon. See preprocessing file for details)
 
 The following columns aren't used in the Analyses.Rmd code but are in the Plots.Rmd code (described below)
 

@@ -1,0 +1,21 @@
+\begin{table}[!h]
+\centering
+\caption{\label{tab:table:resultsLR}BICs for perceptual and colour measures for logistic regression models predicting name sharing.}
+\centering
+\begin{tabular}[t]{lllcccccccc}
+\toprule
+\multicolumn{1}{c}{Model} & \multicolumn{1}{c}{Pred.} & \multicolumn{1}{c}{Stat.} & \multicolumn{8}{c}{Language} \\
+\cmidrule(l{3pt}r{3pt}){1-1} \cmidrule(l{3pt}r{3pt}){2-2} \cmidrule(l{3pt}r{3pt}){3-3} \cmidrule(l{3pt}r{3pt}){4-11}
+  &    &     & Anindilyakwa & Innu & Saami & Tlingit & Tobelo & Tzeltal & Zapotec & All\\
+\midrule
+null &  & $\Delta BIC$ & 2042.21 & 442.60 & 229.55 & 547.57 & 441.15 & 1695.56 & 1391.61 & 6528.91\\
+Per &  & $\Delta BIC$ & 621.57 & 225.32 & 145.85 & 170.33 & 165.58 & 621.43 & 472.55 & 2281.77\\
+ & Per & $\beta$ & -3.50 & -2.45 & -2.00 & -4.56 & -4.58 & -6.38 & -3.88 & -3.77\\
+Col &  & $\Delta BIC$ & 1981.79 & 429.92 & 219.49 & 527.89 & 419.85 & 1602.17 & 1313.30 & 6199.58\\
+ & Col & $\beta$ & -0.46 & -0.60 & -0.77 & -0.93 & -0.77 & -0.87 & -0.73 & -0.65\\
+Per+Col &  & $\Delta BIC$ & 619.75 & 220.01 & 138.50 & 173.36 & 164.34 & 600.88 & 451.59 & 2186.72\\
+ & Per & $\beta$ & -3.44 & -2.42 & -1.95 & -4.49 & -4.43 & -6.26 & -3.84 & -3.70\\
+ & Col & $\beta$ & -0.20 & -0.49 & -0.76 & -0.43 & -0.47 & -0.53 & -0.45 & -0.38\\
+\bottomrule
+\end{tabular}
+\end{table}

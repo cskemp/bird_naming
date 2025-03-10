@@ -68,7 +68,3 @@ bird_data is exported into the data folder.
 ## Summary
 
 I make a summary dataframe that has mean, sd, min and max for all isolation and distance measures. I export this into the output folder.
-
-
-
-

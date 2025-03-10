@@ -1,0 +1,50 @@
+\begin{table}[!h]
+\centering
+\caption{\label{tab:table:NB_check}Checking whether these relationships still hold without n=1}
+\centering
+\begin{tabular}[t]{lllcccccccc}
+\toprule
+\multicolumn{1}{c}{Model} & \multicolumn{1}{c}{Pred.} & \multicolumn{1}{c}{Stat.} & \multicolumn{8}{c}{Language} \\
+\cmidrule(l{3pt}r{3pt}){1-1} \cmidrule(l{3pt}r{3pt}){2-2} \cmidrule(l{3pt}r{3pt}){3-3} \cmidrule(l{3pt}r{3pt}){4-11}
+  &    &     & Anindilyakwa & Innu & Saami & Tlingit & Tobelo & Tzeltal & Zapotec & All\\
+\midrule
+\addlinespace[0.0em]
+\multicolumn{11}{c}{Null Model}\\
+\hline
+null &  & $\Delta BIC$ & 2.55 & 2.49 & 2.96 & 3.98 & \cellcolor[HTML]{d7ffeb}{\textbf{0.07}} & 23.77 & \cellcolor[HTML]{f7e6ff}{\textbf{0}} & 20.82\\
+\addlinespace[0.0em]
+\hline
+\multicolumn{11}{c}{Single Predictor Models}\\
+\hline
+23 &  & $\Delta BIC$ & 6.17 & 3.83 & 6.08 & 6.04 & \cellcolor[HTML]{d7ffeb}{\textcolor[HTML]{00ee76}{\textbf{1.69}}} & 28.24 & 4.61 & 26.04\\
+ & 23 & $\beta$ & 0.13 & 0.19 & 0.17 & 0.22 & -0.22 & -0.07 & -0.03 & 0.06\\
+74 &  & $\Delta BIC$ & 6.93 & \cellcolor[HTML]{fae2e2}{\textcolor[HTML]{cd2626}{\textbf{0}}} & 6.08 & \cellcolor[HTML]{fff9d7}{\textcolor[HTML]{cdad00}{\textbf{0}}} & 2.79 & 28.48 & 4.41 & 24.59\\
+ & 74 & $\beta$ & 0.09 & 0.27 & 0.17 & 0.43 & -0.15 & 0.02 & -0.05 & 0.09\\
+Phy &  & $\Delta BIC$ & 7.51 & 5.88 & \cellcolor[HTML]{ffe7d7}{\textcolor[HTML]{cd6600}{\textbf{0}}} & 7.82 & 3.25 & \textcolor[HTML]{1e90ff}{\textbf{3.9}} & \cellcolor[HTML]{f7e6ff}{\textcolor[HTML]{bf3eff}{\textbf{1.39}}} & 24.11\\
+ & Phy & $\beta$ & -0.01 & 0.1 & 0.63 & 0.08 & -0.11 & -0.81 & -0.18 & -0.1\\
+Per &  & $\Delta BIC$ & \cellcolor[HTML]{ffe0f1}{\textcolor[HTML]{ff1493}{\textbf{0}}} & 6.27 & 6.24 & 8 & \cellcolor[HTML]{d7ffeb}{\textcolor[HTML]{00ee76}{\textbf{0}}} & \textcolor[HTML]{1e90ff}{\textbf{4.15}} & \cellcolor[HTML]{f7e6ff}{\textcolor[HTML]{bf3eff}{\textbf{0.63}}} & \textcolor[HTML]{675875}{\textbf{5.29}}\\
+ & Per & $\beta$ & -0.49 & 0.09 & 0.16 & -0.05 & -0.26 & -0.54 & -0.22 & -0.26\\
+\addlinespace[0.0em]
+\hline
+\multicolumn{11}{c}{Two Predictor Models}\\
+\hline
+74+Phy &  & $\Delta BIC$ & 11.84 & 2.8 & \cellcolor[HTML]{ffe7d7}{\textbf{0.01}} & 4.07 & 6.58 & 6.99 & 5.91 & 25.42\\
+ & 74 & $\beta$ & 0.09 & 0.41 & -0.62 & 0.42 & -0.12 & 0.15 & -0.04 & 0.12\\
+ & Phy & $\beta$ & -0.03 & -0.18 & 1.08 & 0.04 & -0.07 & -0.85 & -0.18 & -0.14\\
+74+Per &  & $\Delta BIC$ & 2.5 & 4.12 & 9.48 & 3.22 & 4.08 & 2.61 & 5.3 & \cellcolor[HTML]{e8e0ef}{\textbf{0}}\\
+ & 74 & $\beta$ & 0.17 & 0.3 & 0.15 & 0.45 & 0.02 & 0.3 & -0.01 & 0.18\\
+ & Per & $\beta$ & -0.56 & -0.06 & 0.12 & -0.1 & -0.28 & -0.65 & -0.21 & -0.32\\
+Phy+Per &  & $\Delta BIC$ & 4.94 & 10.12 & 3.31 & 11.86 & 4.09 & \cellcolor[HTML]{e2f1ff}{\textbf{1.35}} & 3.65 & 11.6\\
+ & Phy & $\beta$ & 0.02 & 0.08 & 0.68 & 0.08 & 0 & -0.51 & -0.13 & -0.02\\
+ & Per & $\beta$ & -0.49 & 0.04 & -0.14 & -0.04 & -0.26 & -0.33 & -0.17 & -0.25\\
+\addlinespace[0.0em]
+\hline
+\multicolumn{11}{c}{Full Model}\\
+\hline
+74+Phy+Per &  & $\Delta BIC$ & 7.41 & 7.09 & 3.09 & 7.32 & 8.17 & \cellcolor[HTML]{e2f1ff}{\textbf{0}} & 8.32 & 5.28\\
+ & 74 & $\beta$ & 0.18 & 0.42 & -0.63 & 0.44 & 0.02 & 0.28 & -0.01 & 0.2\\
+ & Phy & $\beta$ & -0.03 & -0.17 & 1.13 & 0.04 & 0 & -0.49 & -0.13 & -0.06\\
+ & Per & $\beta$ & -0.56 & -0.03 & -0.17 & -0.1 & -0.27 & -0.44 & -0.17 & -0.31\\
+\bottomrule
+\end{tabular}
+\end{table}

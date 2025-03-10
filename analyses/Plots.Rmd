@@ -9,8 +9,15 @@ output: html_notebook
 
 rm(list = ls())
 
-if (!requireNamespace("renv", quietly = TRUE)) install.packages("renv")
-renv::init()
+# This activates renv if it's not already activated. If it runs, it stops the rest of the code running and you'll you have to start it again.
+if (!requireNamespace("renv", quietly = TRUE)) {
+  stop("renv is not installed.")
+} else {
+  status <- renv::status()
+  if (length(status$missing) > 0) {
+    renv::activate()
+  }
+}
 
 library(tidyverse)
 library(here)
@@ -540,7 +547,8 @@ At the moment the predictions have the emu taken out. Unless I have changed it b
 # This is the long skinny version of the plot
 
 # Import prediction data for negative binomial models (full data)
-preds_nb <- read_csv(here("data/Predictions_nb.csv")) %>% 
+preds_nb <- read_csv(here("data/Predictions_nb.csv"),
+                     show_col_types = FALSE) %>% 
   # pivot_longer(cols = "-2":"3",
   #              names_to = "value",
   #              values_to = "n") %>%
@@ -554,11 +562,8 @@ preds_nb <- read_csv(here("data/Predictions_nb.csv")) %>%
          group = "All data")
 
 # Import prediction data for truncated negative binomial models (n=1 observations removed from the data)
-preds_tnb <- read_csv(here("data/Predictions_tnb.csv")) %>% 
-  filter(Model == "pred_trunc" | str_detect(Model, "CI")) %>% 
-  # pivot_longer(cols = "-2":"3",
-  #              names_to = "value",
-  #              values_to = "n") %>%
+preds_tnb <- read_csv(here("data/Predictions_tnb.csv"),
+                     show_col_types = FALSE) %>% 
   mutate(name = case_when(
     Predictor == "zIso74" ~ "1974 Traditional",
     Predictor == "zIsoPer" ~ "Perceptual",
@@ -566,7 +571,6 @@ preds_tnb <- read_csv(here("data/Predictions_tnb.csv")) %>%
     TRUE ~ Predictor)) %>% 
   mutate(value = as.numeric(value),
          n = as.numeric(n),
-         # n = n + 1, # this is to put it back on the same scale. (not necessary with the truncated model)
          group = "Monotypic removed")
 
 preds <- rbind(preds_nb, preds_tnb)
@@ -582,7 +586,7 @@ plot_data <- bird_data %>%
     CanonicalName, 
     n, 
     Language) %>%
-  # filter(zIsoPer<10) %>%  # take emu out
+  filter(zIsoPer<10) %>%  # take emu out
   pivot_longer(cols = c(
     zIso74,
     zIsoPhy,
@@ -718,11 +722,8 @@ preds_nb <- read_csv(here("data/Predictions_nb.csv")) %>%
          n = as.numeric(n),
          group = "All data")
 
-preds_tnb <- read_csv(here("data/Predictions_tnb.csv")) %>% 
-  filter(Model == "pred_trunc" | str_detect(Model, "CI")) %>% 
-  # pivot_longer(cols = "-2":"3",
-  #              names_to = "value",
-  #              values_to = "n") %>%
+preds_tnb <- read_csv(here("data/Predictions_tnb.csv"),
+                     show_col_types = FALSE) %>% 
   mutate(name = case_when(
     Predictor == "zIso74" ~ "1974 Traditional",
     Predictor == "zIsoPer" ~ "Perceptual",
@@ -730,7 +731,6 @@ preds_tnb <- read_csv(here("data/Predictions_tnb.csv")) %>%
     TRUE ~ Predictor)) %>% 
   mutate(value = as.numeric(value),
          n = as.numeric(n),
-         # n = n + 1, #this is to put it back on the same scale (not necessary with the truncated model)
          group = "Monotypic removed")
 
 preds <- rbind(preds_nb, preds_tnb)

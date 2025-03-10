@@ -33,6 +33,7 @@ library(apaTables)
 library(bbmle)
 library(janitor)      # for turning a row into column names
 library(MASS)
+library(audio)
 
 # set options
 options(na.action = "na.omit")
@@ -66,6 +67,9 @@ colour_pairs <- list(
   All = c( "#e8e0ef", "#675875")                 #plummy
   )
 
+bird <- load.wave(here("whip.wav"))
+play(bird)
+
 ```
 
 # Descriptive Stats
@@ -74,17 +78,14 @@ colour_pairs <- list(
 
 ```{r}
 
-bird_data <- read.csv(here("data/bird_data.csv"))%>% 
+bird_data <- read.csv(here("data/bird_data.csv")) %>% 
   filter(Language %in% languages)
-
 
 Shapiro <- bird_data %>%
   select(Language, BeakLengthCulmen:Mass) %>%
   filter(complete.cases(.[sapply(., is.numeric)])) %>%
   group_by(Language) %>%
   summarise(across(BeakLengthCulmen:Mass, ~ shapiro.test(.)$p.value, .names = "{.col}"))
-
-
 
 ```
 
@@ -343,7 +344,7 @@ manual_check_needed <- bird_data %>%
   filter(n_74 > 1 | n_canonical > 1 | is.na(ScientificName1974))
 
 # After checking the manual_check_needed, if all the birds are fine, change the number below to the number of rows in manual_check_needed then run this chunk again
-expect_equal(nrow(manual_check_needed), 25)
+expect_equal(nrow(manual_check_needed), 23)
 
 all_scores <- all_scores %>% 
   mutate(s = purrr::map(language, ~process_language(.x, bird_data))) %>% 
@@ -682,9 +683,17 @@ Logistic regressions with whether or not pairs of birds share names as the outco
 
 Before I was doing the logistics regressions with glm. But you can't do an MLM with glm, so I had to use glmmtmb. So now I am re-running all of the models to use the same package. This will make a table with the BICs and coefficients for each variable in each model (but with 23 omitted from the multi-variable models), and also for MLMs with random effect for Language.
 
-```{r}
+I suppress some warnings in this section when I'm making the table for LaTex, and throughout the rest of notebook whenever I make a LaTeX table. It's just because I turn some values of a column into text, then later turn the column back into numeric and it gets upset that it can't change the text values into numeric.
 
-variables <- c("zDist74", "zDistPhy", "zDistPer")
+```{r}
+variables <- c("zDist74",
+               "zDistPhy",
+               "zDistPer")
+variables_all <- c("zDist74",
+                   "zDist23",
+                   "zDistPhy",
+                   "zDistPer",
+                   "zDistCol")
 AllVals <- data.frame(Model = character(),
                   Variable = character(),
                   Statistic = character(),
@@ -696,7 +705,7 @@ VIFs_lr <- list()
 # make all possible combinations of variables
 combinations <- unlist(
   lapply(1:length(variables),
-         function(i) combn(1:length(variables),i,simplify = FALSE)),
+         function(i) combn(1:length(variables), i, simplify = FALSE)),
   recursive = FALSE)
 
 # Paste them into formulas
@@ -706,6 +715,11 @@ formulas_mlm <- sapply(combinations, function(i)
                    "+ (1 | Language)")))
 formulas_mlm <- c(as.formula("SameName ~ zDist23 + (1 | Language)"),
                   formulas_mlm) # add the 23 model
+formulas_mlm <- c(as.formula("SameName ~ zDistCol + (1 | Language)"),
+                  formulas_mlm) # add the colour model
+formulas_mlm <- c(as.formula(
+  "SameName ~ zDistPer + zDistCol + (1 | Language)"),
+  formulas_mlm) # add the colour plus perceptual model
 formulas_mlm <- c(as.formula("SameName ~ (1 | Language)"), 
                   formulas_mlm)  # Add the null model
 
@@ -713,17 +727,24 @@ formulas_mlm <- c(as.formula("SameName ~ (1 | Language)"),
 model_data <- bind_rows(bird_similarity, .id = "Language") %>% 
   mutate(Language = as.factor(Language))
 
+# Run models
 models_mlm <- list()
   for (formula in formulas_mlm) {
     
+    print(formula)
+    
       if (as.character(formula)[3] == "(1 | Language)") {
+        
     model_name <- "null"
+    
   } else {
+    
     model_name <- as.character(formula)[3] %>% 
       str_remove_all(., "\\s*\\+\\s*\\(1 \\| Language\\)") %>% 
       str_remove_all(., "^.*~\\s*") %>% 
       str_replace_all(., "zDist", "") %>% 
       gsub(" ", "", .)
+    
   }
 
      model <-  glmmTMB(formula,
@@ -736,6 +757,7 @@ models_mlm <- list()
   models_lr[["All"]] <- models_mlm
 
 # Get BICs and coefficients for MLM
+  
 for (i in seq_along(models_mlm)) {
   
   thisModel <- names(models_mlm)[i]
@@ -765,33 +787,39 @@ for (i in seq_along(models_mlm)) {
   
 }
 
-# Make Formulas for logistic regressions for all languages
+# Make formulas for logistic regressions for all languages
 formulas <- sapply(combinations, function(i)
   as.formula(paste("SameName ~", 
                    paste(variables[i], collapse = "+"))))
 formulas <- c(as.formula("SameName ~ zDist23"), formulas) # add the 23 model
+formulas <- c(as.formula("SameName ~ zDistCol"), formulas) # add the colour model
+formulas <- c(as.formula("SameName ~ zDistPer + zDistCol"), 
+              formulas) # add the colour model
 formulas <- c(as.formula("SameName ~ 1"), formulas)  # Add the null model
 
 # Fit models for all languages
 for (language in names(bird_similarity)) {
   
+  print(language)
+  
   language_data <- bird_similarity[[language]] %>%
     select(Species1,
            Species2,
            SameName,
-           zDist74,
-           zDist23,
-           zDistPer,
-           zDistPhy) %>% 
-    filter(complete.cases(.[sapply(., is.numeric)]))
+           all_of(variables_all)) %>% 
+    filter(complete.cases(select(., where(is.numeric))))
   
   models <- list()
   
   for (formula in formulas) {
+    print(formula)
     
     if(as.character(formula)[3] == 1) {
+      
       model_name <- "null"
+      
     } else {
+      
       model_name <- as.character(formula)[3] %>% 
         gsub("zDist", "", .) %>% 
         gsub(" ", "", .)
@@ -852,8 +880,6 @@ for (i in seq_along(models)) {
   
   VIFs_lr[[language]] <- vif
   
-  
-  
   LanguageVals[[str_to_title(language)]] <- languageVals 
   
 }
@@ -885,7 +911,8 @@ table1 <- reduce(LanguageVals,
                   left_join, 
                   by = c("Model", "Variable", "Statistic")) %>% 
   left_join(AllVals,
-            by = c("Model", "Variable", "Statistic"))
+            by = c("Model", "Variable", "Statistic")) %>% 
+  filter(!str_detect(Model, "Col"))
 
 # Find the smallest BIC value
  small_bic <- table1 %>% 
@@ -901,17 +928,15 @@ table1 <- reduce(LanguageVals,
                  ~ if_else(Statistic == "BIC", 
                            . - small_bic[[cur_column()]], 
                            .)),
-          Model = gsub(" ", "", Model))%>% 
+          Model = gsub(" ", "", Model)) %>% 
    mutate_if(is.numeric, round, 2) %>% 
    filter(!is.na(Variable)) 
- 
- # zzzzzz trying to figure out a way to 
  
  # make the table pretty for the paper
  latex_table <- table1 %>% 
    # First, this bit makes the best model overall be bolded with a shaded background (this version of this is slightly lazy because it doesn't deal with the problem of the best model overall being a single predictor model, but only because it didn't have to at this stage. Later I deal with this.)
    mutate(across(names(colour_pairs), 
-                 ~ ifelse(as.numeric(.) <= 2 & Statistic == "BIC", 
+                 ~ ifelse(suppressWarnings(as.numeric(.)) <= 2 & Statistic == "BIC", 
                           cell_spec(as.character(.), "latex", 
                                     bold = TRUE, 
                                     background =
@@ -921,21 +946,16 @@ table1 <- reduce(LanguageVals,
    group_by(Model) %>% 
    mutate(n = n()) %>% 
    ungroup() %>%
-   
-   
-
-   
-## zzzzzzz this is where the issue is happening
    mutate(across(
     names(colour_pairs), 
     ~ {
       # Identify the smallest BIC in single predictor models
-      min_value <- min(as.numeric(.)[Statistic == "BIC" & n == 2], 
+      min_value <- min(suppressWarnings(as.numeric(.))[Statistic == "BIC" & n == 2], 
                        na.rm = TRUE)
       max_value <- min_value + 2
       # Identify the smallest BIC and anything within 2 of the smallest
-      ifelse(as.numeric(.) >= min_value & 
-               as.numeric(.) <= max_value & 
+      ifelse(suppressWarnings(as.numeric(.)) >= min_value & 
+               suppressWarnings(as.numeric(.)) <= max_value & 
                Statistic == "BIC" & 
                n == 2,
              # make them pretty
@@ -945,8 +965,7 @@ table1 <- reduce(LanguageVals,
                        color = colour_pairs[[cur_column()]][2]),
              as.character(.))
     }
-  ))
- %>% 
+  )) %>% 
    group_by(Model) %>% 
    mutate(Model = ifelse(row_number() == 1,
                          Model,
@@ -1011,6 +1030,52 @@ table1 <- reduce(LanguageVals,
       mutate(BIC = as.numeric(BIC)) %>% 
       filter(BIC <= 2)    %>% 
       select(Model, Language)
+    
+    # latex table for comparing colour and perceptual BICs
+    table_order <- c("null", "Per", "Col", "Per+Col")
+    
+  table_col <- reduce(LanguageVals, 
+                  left_join, 
+                  by = c("Model", "Variable", "Statistic")) %>% 
+    left_join(AllVals,
+              by = c("Model", "Variable", "Statistic")) %>% 
+    filter(str_detect(Model, "Col") | Model == "Per" | Model == "null") %>% 
+    mutate(across(names(small_bic), 
+                 ~ if_else(Statistic == "BIC", 
+                           . - small_bic[[cur_column()]], 
+                           .)),
+           Model = factor(Model, levels = table_order)) %>%
+    arrange(Model)  %>% 
+    mutate_if(is.numeric, round, 2) %>% 
+    filter(!is.na(Variable)) %>% 
+    group_by(Model) %>% 
+    mutate(Model = as.character(Model),
+           Model = ifelse(row_number() == 1,
+                          Model,
+                          "")) %>% 
+    ungroup() %>% 
+     mutate(Statistic = ifelse(Statistic=="BIC", 
+                               "$\\Delta BIC$", 
+                               "$\\beta$")) %>% 
+    rename(" " = Model,
+           "  " = Variable,
+           "   " = Statistic) %>% 
+    kable(format = "latex",
+          align = c("l", "l", "l", "c", "c", "c", "c", "c", "c", "c", "c", "c"),
+          booktabs = TRUE,
+          linesep = "",
+          escape = FALSE,
+          caption = "BICs for perceptual and colour measures for logistic regression models predicting name sharing.",
+          label = "table:resultsLR") %>% 
+    kable_styling(latex_options = c("hold_position")) %>% 
+    add_header_above(c("Model" = 1, 
+                       "Pred." = 1,
+                       "Stat." = 1,                        
+                       "Language" = 8))
+  
+  writeLines(table_col, here("output/ResultsTableLR_col.tex"))
+    
+    play(bird)
 
 ```
 
@@ -1174,7 +1239,6 @@ print(c(raptors_preds_74,raptors_preds_74Per))
 
 ```
 
-
 # Mismatches between different measures
 
 This shows us the areas of greatest mismatch between each of the measures
@@ -1313,8 +1377,8 @@ This places the birds into two categories - those alone in a taxon and those wit
 I wrote all this code while we were still calling them "monotypic" rather than "singleton" categories. I'm not changing it.
 
 ```{r}
-
 variables <- c("zIso74", "zIsoPhy", "zIsoPer")
+variables_all <- c("zIso74", "zIsoPhy", "zIsoPer", "zIsoCol", "zIso23")
 AllVals_LRmt <- data.frame(Model = character(),
                   Variable = character(),
                   Statistic = character(),
@@ -1335,24 +1399,30 @@ formulas_mlm <- sapply(combinations, function(i)
                    paste(variables[i], collapse = "+"), 
                    "+ (1 | Language)")))
 formulas_mlm <- c(as.formula("Monotypic ~ zIso23 + (1 | Language)"), formulas_mlm) # add the 23 model
+formulas_mlm <- c(as.formula("Monotypic ~ zIsoCol + (1 | Language)"), formulas_mlm) # add the colour model
+formulas_mlm <- c(as.formula("Monotypic ~ zIsoPer + zIsoCol + (1 | Language)"), formulas_mlm) # add the per and colour model
 formulas_mlm <- c(as.formula("Monotypic ~ (1 | Language)"), formulas_mlm)  # Add the null model
 
 # Get data for MLM
 model_data <- bird_data2 %>% 
   mutate(Language = factor(Language)) %>% 
-  mutate(Monotypic = ifelse(n==1, 1, 0))
+  mutate(Monotypic = ifelse(n == 1, 1, 0))
 
 models_mlm <- list()
   for (formula in formulas_mlm) {
     
       if (as.character(formula)[3] == "(1 | Language)") {
+        
     model_name <- "null"
+    
   } else {
+    
     model_name <- as.character(formula)[3] %>% 
       str_remove_all(., "\\s*\\+\\s*\\(1 \\| Language\\)") %>% 
       str_remove_all(., "^.*~\\s*") %>% 
       str_replace_all(., "zIso", "") %>% 
       gsub(" ", "", .)
+    
   }
 
      model <-  glmmTMB(formula,
@@ -1360,6 +1430,7 @@ models_mlm <- list()
                    family = "binomial")
      
     models_mlm[[paste0(model_name)]] <- model
+    
   }
   
   models_LRmt[["All"]] <- models_mlm
@@ -1395,6 +1466,8 @@ formulas <- sapply(combinations, function(i)
   as.formula(paste("Monotypic ~", 
                    paste(variables[i], collapse = "+"))))
 formulas <- c(as.formula("Monotypic ~ zIso23"), formulas) # add the 23 model
+formulas <- c(as.formula("Monotypic ~ zIsoCol"), formulas) # add the colour model
+formulas <- c(as.formula("Monotypic ~ zIsoPer + zIsoCol"), formulas) # add the colour & per model
 formulas <- c(as.formula("Monotypic ~ 1"), formulas)  # Add the null model
 
 # Fit models for all languages
@@ -1404,7 +1477,7 @@ for (language in languages) {
   
   language_data <- bird_data2 %>% 
     filter(Language == language) %>% 
-    mutate(Monotypic = ifelse(n==1, 1, 0))
+    mutate(Monotypic = ifelse(n == 1, 1, 0))
 
   models <- list()
   
@@ -1476,18 +1549,22 @@ for (i in seq_along(models)) {
   
 }
 
+play(bird)
+
 table4 <-  reduce(LanguageVals_LRmt, 
                   left_join, 
                   by = c("Model", "Variable", "Statistic")) %>% 
   left_join(AllVals_LRmt,
-            by = c("Model", "Variable", "Statistic"))
+            by = c("Model", "Variable", "Statistic")) %>% 
+  filter(!str_detect(Model, "Col"))
 
 
  small_bic <- table4 %>% 
    filter(Statistic == "BIC") %>% 
    select(-c(Variable, Model, Statistic)) %>% 
-   summarise(across(everything(), min, na.rm = TRUE))
- 
+   summarise(across(everything(), \(x) min(x, na.rm = TRUE)))
+   # summarise(across(everything(), min, na.rm = TRUE))
+
  # Now minus the smallest value from everything
 
 min_bic <- table4 %>% 
@@ -1534,8 +1611,8 @@ latex_table <- table4 %>%
     ~ {
       min_value <- min_bic_list[[cur_column()]][["min_bic"]]
       max_value <- min_value + 2
-    ifelse(as.numeric(.) >=min_value &
-             as.numeric(.) <= max_value &
+    ifelse(suppressWarnings(as.numeric(.)) >=min_value &
+             suppressWarnings(as.numeric(.)) <= max_value &
              Statistic == "BIC" &
              n == 2 &
              min_value <=2
@@ -1556,8 +1633,8 @@ latex_table <- table4 %>%
       min_value <- min_bic_list[[cur_column()]][["min_bic_single"]]
       max_value <- min_value + 2
       ifelse(str_length(.)>5, .,
-    ifelse(as.numeric(.) >= min_value &
-             as.numeric(.) <= max_value &
+    ifelse(suppressWarnings(as.numeric(.)) >= min_value &
+             suppressWarnings(as.numeric(.)) <= max_value &
              Statistic == "BIC" &
              n == 2,
            cell_spec(as.character(.), 
@@ -1574,8 +1651,8 @@ latex_table <- table4 %>%
       min_value <- min_bic_list[[cur_column()]][["min_bic"]]
       max_value <- min_value + 2
       ifelse(str_length(.)>5, .,
-    ifelse(as.numeric(.) >= min_value &
-             as.numeric(.) <= max_value &
+    ifelse(suppressWarnings(as.numeric(.)) >= min_value &
+             suppressWarnings(as.numeric(.)) <= max_value &
              Statistic == "BIC" &
              n != 2,
            cell_spec(as.character(.), 
@@ -1644,19 +1721,52 @@ latex_table <- table4 %>%
       filter(BIC <= 2) %>% 
       select(Model, Language)
     
+    table_order <- c("null", "Per", "Col", "Per+Col")
+    table4_col <- reduce(LanguageVals_LRmt, 
+                         left_join, 
+                         by = c("Model", "Variable", "Statistic")) %>% 
+      left_join(AllVals_LRmt,
+                by = c("Model", "Variable", "Statistic")) %>% 
+      filter(str_detect(Model, "Col") | Model == "Per" | Model == "null") %>% 
+      mutate(across(names(small_bic), 
+                 ~ if_else(Statistic == "BIC", 
+                           . - small_bic[[cur_column()]], 
+                           .)),
+           Model = factor(Model, levels = table_order)) %>%
+    arrange(Model)  %>% 
+    mutate_if(is.numeric, round, 2) %>% 
+    filter(!is.na(Variable)) %>% 
+    group_by(Model) %>% 
+    mutate(Model = as.character(Model),
+           Model = ifelse(row_number() == 1,
+                             Model,
+                             "")) %>% 
+      ungroup() %>% 
+      mutate(Statistic = ifelse(Statistic == "BIC",
+                                "$\\Delta BIC$",
+                                "$\\beta$")) %>% 
+      rename(" " = Model,
+             "  " = Variable,
+             "   " = Statistic) %>% 
+      kable(format = "latex",
+            align = c("l", "l", "l", "c", "c", "c", "c", "c", "c", "c", "c", "c"),
+            booktabs = TRUE,
+            linesep = "",
+            escape = FALSE,
+            caption = "BICs for perceptual and colour measures for logistic regression models predicting singleton categories",
+            label = "table:resultsLR") %>% 
+      kable_styling(latex_options = c("hold_position")) %>% 
+      add_header_above(c("Model" = 1, 
+                         "Pred." = 1,
+                         "Stat." = 1,                        
+                         "Language" = 8))
+    
+    writeLines(table4_col, here("output/ResultsTableLRmt_col.tex"))
+      
     table4_bics <- table4 %>% 
       filter(Statistic=="BIC")
 
 ```
-
-### This is weird
-
-```{r}
-
-check_collinearity(models_LRmt[["Tlingit"]][["74+Phy+Per"]])
-
-```
-The upper confidence interval for the Per VIF is 432.42
 
 ### No Emu
 Taking out the emu outlier and running the analysis again on the Anindilyakwa data.
@@ -1743,7 +1853,7 @@ for (i in seq_along(models)) {
  small_bic <- AllVals_noemu %>% 
    filter(Statistic == "BIC") %>% 
    select(-c(Variable, Model, Statistic)) %>% 
-   summarise(across(everything(), min, na.rm = TRUE))
+   summarise(across(everything(), \(x) min(x, na.rm = TRUE)))
  
  # Now minus the smallest value from everything
 
@@ -2167,7 +2277,7 @@ vifs_table_nb <- reduce(VIFs_nb,
   mutate(Term = gsub("zIso", "", Term)) %>% 
   column_to_rownames("Term")
 
-latex_vifs_nb <- kable(vif_table_nb,
+latex_vifs_nb <- kable(vifs_table_nb,
                       format = "latex",
                       align = c(rep("c", 7)),
                       booktabs = TRUE,
@@ -2178,9 +2288,7 @@ latex_vifs_nb <- kable(vif_table_nb,
 
   writeLines(latex_vifs_nb, here("output/VIFs_NB.tex"))
   
-  write.csv(vif_table_nb, file = here("output/VIFs_NB.csv"))
-
-
+  write.csv(vifs_table_nb, file = here("output/VIFs_NB.csv"))
 
 table2 <-  reduce(LanguageVals, 
                   left_join, 
@@ -2191,7 +2299,7 @@ table2 <-  reduce(LanguageVals,
  small_bic <- table2 %>% 
    filter(Statistic == "BIC") %>% 
    select(-c(Variable, Model, Statistic)) %>% 
-   summarise(across(everything(), min, na.rm = TRUE))
+   summarise(across(everything(), \(x) min(x, na.rm = TRUE)))
  
  # Now minus the smallest value from everything
  
@@ -2240,8 +2348,8 @@ latex_table <- table2 %>%
     ~ {
       min_value <- min_bic_list[[cur_column()]][["min_bic"]]
       max_value <- min_value + 2
-    ifelse(as.numeric(.) >=min_value &
-             as.numeric(.) <= max_value &
+    ifelse(suppressWarnings(as.numeric(.)) >=min_value &
+             suppressWarnings(as.numeric(.)) <= max_value &
              Statistic == "BIC" &
              n == 2 &
              min_value <=2
@@ -2262,8 +2370,8 @@ latex_table <- table2 %>%
       min_value <- min_bic_list[[cur_column()]][["min_bic_single"]]
       max_value <- min_value + 2
       ifelse(str_length(.)>5, .,
-    ifelse(as.numeric(.) >= min_value &
-             as.numeric(.) <= max_value &
+    ifelse(suppressWarnings(as.numeric(.)) >= min_value &
+             suppressWarnings(as.numeric(.)) <= max_value &
              Statistic == "BIC" &
              n == 2,
            cell_spec(as.character(.), 
@@ -2279,8 +2387,8 @@ latex_table <- table2 %>%
       min_value <- min_bic_list[[cur_column()]][["min_bic"]]
       max_value <- min_value + 2
       ifelse(str_length(.)>5, .,
-    ifelse(as.numeric(.) >= min_value &
-             as.numeric(.) <= max_value &
+    ifelse(suppressWarnings(as.numeric(.)) >= min_value &
+             suppressWarnings(as.numeric(.)) <= max_value &
              Statistic == "BIC" &
              n != 2,
            cell_spec(as.character(.), 
@@ -2340,7 +2448,6 @@ latex_table <- table2 %>%
    
     writeLines(latex_table, here("output/ResultsTableNB.tex"))
  
-    
     best_models_nb <- table2 %>% 
       filter(Statistic == "BIC") %>% 
       pivot_longer(cols = !c(Model, Variable, Statistic),
@@ -2348,6 +2455,267 @@ latex_table <- table2 %>%
                    values_to = "BIC") %>% 
       filter(BIC <= 2) %>% 
       select(Model, Language)
+
+```
+
+### Predictions for plots
+
+```{r}
+
+variables <- c("zIso74", "zIsoPer", "zIsoPhy")
+preds <- str_remove(variables, "^zIso")
+constant_values <- list(zIso74 = 0, zIsoPer = 0, zIsoPhy = 0)
+all_predictions_nb <- list()
+
+for (language in languages_plus) {
+  
+  if (language == "All") {
+    language_data <- bird_data2
+    
+    } else {
+      
+      language_data <- bird_data2 %>%
+        filter(Language == language)
+      
+    }
+  
+  # Filter the models
+  language_models <- models_nb[[language]]
+  single_models <- language_models[names(language_models) %in% preds]
+  language_predictions <- list()
+  predictions_df <- data.frame(Language = character(),
+                               Model = character(),
+                               Predictor = character(),
+                               # column for prediction values after pivoting
+                               Value = numeric(),  
+                               # column for the predictor levels
+                               Level = character(), 
+                               stringsAsFactors = FALSE,
+                               check.names = FALSE)
+  
+for (i in seq_along(single_models)) {
+  
+  model <- single_models[[i]]
+  model_name <- names(single_models)[i]
+  pred_vars <- all.vars(formula(model))[-1]
+  
+  for (var in pred_vars) {
+    
+    if (var == "Language") {
+      next # Skip this iteration if the variable is "Language"
+      
+      } else {
+        
+        # Determine the range of the predictor in the current language data
+        var_min <- floor(min(language_data[[var]], na.rm = TRUE))
+        var_max <- ceiling(max(language_data[[var]], na.rm = TRUE))
+        # Create an integer sequence between min and max
+        values <- seq(var_min, var_max)  
+        # Create a newdata dataframe with the correct number of rows
+        newdata <- data.frame(matrix(rep(NA, 
+                                         length(pred_vars) * length(values)),
+                                     nrow = length(values),
+                                     ncol = length(pred_vars)))
+        colnames(newdata) <- pred_vars
+        
+        # Assign the constant values to all predictors
+        for (pred_var in pred_vars) {
+          
+          newdata[[pred_var]] <- constant_values[[pred_var]]
+          
+        }
+        
+        # Vary the current predictor variable based on the new integer sequence
+        newdata[[var]] <- values
+        # Make predictions
+        predictions <- format_sensibly(predict(model,
+                                               type = "response",
+                                               newdata = newdata,
+                                               re.form = NA))
+        
+        # create column names based on the values used for prediction
+        prediction_cols <- as.character(values)  
+        # Create a temp_df
+        temp_df <- data.frame(Language = language,
+                              Model = model_name,
+                              Predictor = var,
+                              stringsAsFactors = FALSE,
+                              check.names = FALSE)
+        # Transpose the predictions and create the appropriate column structure
+        temp_df[prediction_cols] <- t(data.frame(predictions))
+        link_preds <- predict(model,
+                              type = "link",
+                              newdata = newdata,
+                              se.fit = TRUE,
+                              re.form = NA)
+        
+        # Calculate 95% confidence intervals 
+        ci_lwr <- link_preds$fit - qnorm(0.975) * link_preds$se.fit
+        
+        ci_upr <- link_preds$fit + qnorm(0.975) * link_preds$se.fit
+        
+        # Transform to the count scale by exponentiating it
+        confint_lower <-c(language,
+                          "CI_lower",
+                          var,
+                          format_sensibly(unname(exp(ci_lwr))))
+        
+        confint_upper <-c(language,
+                          "CI_upper",
+                          var,
+                          format_sensibly(unname(exp(ci_upr))))
+        
+        temp_df <- rbind(temp_df, confint_lower, confint_upper)
+        
+        # Pivot temp_df to long format
+        temp_long <- temp_df %>%
+          pivot_longer(cols = all_of(prediction_cols),
+                       names_to = "value",
+                       values_to = "n")
+        
+        # Bind the current temp_long to the predictions_df
+        predictions_df <- rbind(predictions_df, temp_long)
+      }
+  }
+  }
+  
+  all_predictions_nb[[language]] <- predictions_df
+  
+  }
+
+table_nb_preds <- reduce(all_predictions_nb, rbind) 
+
+View(table_nb_preds)
+
+write_csv(table_nb_preds, here("data/Predictions_nb.csv"))
+
+```
+
+### Get predictions for best models
+
+```{r}
+
+variables <- c("zIso74", "zIsoPer", "zIsoPhy")
+constant_values <- list(zIso74 = 0, zIsoPer = 0, zIsoPhy = 0)
+values <- c(-2, -1, 0, 1, 2, 3)
+all_predictions <- list()
+
+for (language in languages_plus) {
+  
+  if (language == "All") {
+    language_data <- bird_data2
+  } else {
+    language_data <- bird_data2 %>% 
+      filter(Language == language)
+  }
+
+# Find the best model
+language_models <- models_nb[[language]]
+best_model_index <- best_models_nb$Model[
+  best_models_nb$Language == language & best_models_nb$Model != "null"]
+best_model <- language_models[best_model_index]
+
+  language_predictions <- list()
+
+# Make some predictions for all the models
+predictions_df <- data.frame(Language = character(),
+                             Model = character(),
+                             Predictor = character(),
+                             `-2sd` = numeric(),
+                             `-1sd` = numeric(),
+                             `Mean` = numeric(),
+                             `+1sd` = numeric(),
+                             `+2sd` = numeric(),
+                             `+3sd` = numeric(),
+                               stringsAsFactors = FALSE,
+                             check.names = FALSE)
+  
+  for (i in seq_along(best_model)) {
+    model <- best_model[[i]]
+    model_name <- best_model_index[i]
+    pred_vars <- all.vars(formula(model))[-1] 
+    
+    for (var in pred_vars) {
+      
+      if (var == "Language"){
+        return(NULL)
+      } else {
+      # Create a newdata dataframe with the correct number of rows
+      newdata <- data.frame(matrix(rep(NA, length(pred_vars) * length(values)), 
+                                   nrow = length(values), 
+                                   ncol = length(pred_vars)))
+      colnames(newdata) <- pred_vars
+      # Assign the constant values to all predictors
+      for (pred_var in pred_vars) {
+        newdata[[pred_var]] <- constant_values[[pred_var]]
+      }
+      
+      }
+      # Vary the current predictor variable
+      newdata[[var]] <- values
+      
+      # Make predictions
+      predictions <- format_sensibly(predict(model,
+                                     type = "response",
+                                   newdata = newdata,
+                                   re.form = NA))
+      
+      # Combine model name, predictor name, and predictions into columns
+      temp_df <- data.frame(Language = language,
+                            Model = model_name,
+                            Predictor = var,
+                            `-2sd` = predictions[1],
+                            `-1sd` = predictions[2],
+                            `Mean` = predictions[3],
+                            `+1sd` = predictions[4],
+                            `+2sd` = predictions[5],
+                            `+3sd` = predictions[6],
+                            stringsAsFactors = FALSE,
+                            check.names = FALSE)
+      
+      predictions_df <- rbind(predictions_df, temp_df)
+    }
+  }
+  
+ all_predictions[[language]] <- predictions_df
+}
+
+# I do not know why but the last one won't go into the list. This should make it do so.
+ all_predictions[[language]] <- predictions_df
+
+table_nb_preds <- reduce(all_predictions, rbind) %>% 
+   filter(!(Language=="Tlingit" & (Model == "74" | (Model=="Per")))
+          & !(Language == "Tzeltal" & Model != "74+Phy+Per") 
+          & !(Language == "Zapotec" & Model == "Per")) %>% 
+  group_by(Language, Model) %>% 
+  mutate(Model = ifelse(row_number() == 1, Model, "")) %>% 
+  ungroup() %>% 
+  group_by(Language) %>% 
+  mutate(Language = ifelse(row_number() == 1, Language, "")) %>%
+  mutate(Predictor = gsub("zDist","",Predictor)) %>% 
+  group_by(Language) %>% 
+  mutate(Language = ifelse(row_number() == 1,
+                           Language,
+                           "")) %>% 
+  ungroup() %>% 
+  mutate(Predictor = gsub("zIso", "", Predictor))
+
+
+   latex_preds <- table_nb_preds %>%
+     rename(" " = Language,
+            "   " = Model,
+            "  " = Predictor) %>%
+     kable(format = "latex",
+           align = c("l", "l", "l", "c", "c", "c", "c", "c", "c"),
+           booktabs = TRUE,
+           linesep = "",
+           escape = FALSE,
+           caption = "The effects of predictors on number of birds sharing a category",
+           label = "table:predsNB") %>%
+     kable_styling(latex_options = c("hold_position", "scale_down")) %>%
+     add_header_above(c("Language" = 1, "Model" = 1, "Pred." = 1, "Value of Predictor" = 6))
+
+    writeLines(latex_preds, here("output/PredictionsNB.tex"))
 
 ```
 
@@ -2525,7 +2893,7 @@ table5 <-  reduce(LanguageVals_tNB,
  small_bic <- table5 %>% 
    filter(Statistic == "BIC") %>% 
    select(-c(Variable, Model, Statistic)) %>% 
-   summarise(across(everything(), min, na.rm = TRUE))
+   summarise(across(everything(), \(x) min(x, na.rm = TRUE)))
  
  # Now minus the smallest value from everything
  
@@ -2672,7 +3040,7 @@ latex_table <- table5 %>%
                bold = FALSE,
                latex_gap_space = "0.0em")
    
-    # writeLines(latex_table, here("output/ResultsTableNB_check.tex"))
+    writeLines(latex_table, here("output/ResultsTableNB_no0.tex"))
  
     
     best_models_tNB <- table5 %>%
@@ -2686,12 +3054,48 @@ latex_table <- table5 %>%
 table5_bics <- table5 %>% 
   filter(Statistic=="BIC")
 
+play(bird)
 
 ```
 
 ### Predictions
 
 ```{r}
+
+# Function to get predictions for truncated model
+
+predict_trunc <- function(model, newdata) {
+  
+# extract dispersion parameter
+  disp <- sigma(model)
+  
+  # get predictions on link scale
+  l <- predict(model,            
+               type = "link",                       
+               se.fit = TRUE,
+               newdata = newdata,
+               re.form = NA)
+  
+# turn predictions into response scale, applying transformation to account for truncation
+  response_preds <- exp(l$fit) / (1 - (1 + exp(l$fit) / disp) ^ (-disp))
+  
+# get confidence intervals
+  ci_l <- l$fit - qnorm(0.975) * l$se.fit
+  ci_u <- l$fit + qnorm(0.975) * l$se.fit
+  
+# Transform them
+  ci_lwr <- exp(ci_l) / (1 - (1 + exp(ci_l) / disp) ^ (-disp))
+  ci_upr <- exp(ci_u) / (1 - (1 + exp(ci_u) / disp) ^ (-disp))
+
+# Put it all into a data frame
+  preds <- data.frame(x = newdata,  
+                      prediction = response_preds,
+                      ci_lower = ci_lwr,
+                      ci_upper = ci_upr)
+# Send it out into the world
+  return(preds)
+  
+}
 
 variables <- c("zIso74", "zIsoPer", "zIsoPhy")
 preds <- str_remove(variables, "^zIso")
@@ -2752,12 +3156,15 @@ for (i in seq_along(single_models)) {
       newdata[[var]] <- values
       
       # Make predictions
-      predictions <- predict(model,
-                             type = "response",
-                             newdata = newdata,
-                             re.form = NA)
       
-      # Dynamically create column names based on values used for prediction
+      # predictions <- predict(model,
+      #                        type = "response",
+      #                        newdata = newdata,
+      #                        re.form = NA)
+      
+      predictions <- predict_trunc(model, newdata)
+      
+      # Create column names based on values used for prediction
       prediction_cols <- as.character(values)  # Convert integer values to character for column names
 
       # Create a temp_df
@@ -2768,38 +3175,44 @@ for (i in seq_along(single_models)) {
                             check.names = FALSE)
       
       # Transpose the predictions and create the appropriate column structure
-      temp_df[prediction_cols] <- t(data.frame(predictions))
+      temp_df[prediction_cols] <- t(data.frame(predictions$prediction))
 
-            # Calculate confidence intervals
-      link_preds <- predict(model,                              
-                            type = "link",
-                            newdata = newdata,
-                            se.fit = TRUE,
-                            re.form = NA)
-      ci_lwr <- link_preds$fit - qnorm(0.975) * link_preds$se.fit
-      ci_upr <- link_preds$fit + qnorm(0.975) * link_preds$se.fit
-      pred <- link_preds$fit
+      #       # Calculate confidence intervals
+      # link_preds <- predict(model,                              
+      #                       type = "link",
+      #                       newdata = newdata,
+      #                       se.fit = TRUE,
+      #                       re.form = NA)
+      # ci_lwr <- link_preds$fit - qnorm(0.975) * link_preds$se.fit
+      # ci_upr <- link_preds$fit + qnorm(0.975) * link_preds$se.fit
+      # pred <- link_preds$fit
       
       # Transform to the count scale by exponentiating it
 
-      ci_lwr_response <- exp(ci_lwr)
-      ci_upr_response <- exp(ci_upr)
-      pred_response <- exp(pred) 
+      # ci_lwr_response <- exp(ci_lwr)
+      # ci_upr_response <- exp(ci_upr)
+      # pred_response <- exp(pred) 
 
-# Apply zero-truncation adjustment
-      ci_lwr_truncated <- ci_lwr_response / (1 - exp(-ci_lwr_response))
-      ci_upr_truncated <- ci_upr_response / (1 - exp(-ci_upr_response))
-      pred_truncated <- pred_response / (1 - exp(-pred_response))
+# # Apply zero-truncation adjustment
+#       ci_lwr_truncated <- ci_lwr_response / (1 - exp(-ci_lwr_response))
+#       ci_upr_truncated <- ci_upr_response / (1 - exp(-ci_upr_response))
+#       pred_truncated <- pred_response / (1 - exp(-pred_response))
 
 # Format the results
-confint_lower <- c(language, "CI_lower", var,
-                   (ci_lwr_truncated))
-confint_upper <- c(language, "CI_upper", var,
-                   (ci_upr_truncated))
-pred_middle <- c(language, "pred_trunc", var,
-                   (pred_truncated))
+# confint_lower <- c(language, "CI_lower", var,
+#                    (ci_lwr_truncated))
+# confint_upper <- c(language, "CI_upper", var,
+#                    (ci_upr_truncated))
+# pred_middle <- c(language, "pred_trunc", var,
+#                    (pred_truncated))
 
-temp_df <- rbind(temp_df, confint_lower, confint_upper, pred_middle)
+confint_lower <- c(language, "CI_lower", var,
+                   (predictions$ci_lower))
+confint_upper <- c(language, "CI_upper", var,
+                   (predictions$ci_upper))
+# pred_middle <- c(language, "pred_trunc", var,#                    (predictions$prediction))
+
+temp_df <- rbind(temp_df, confint_lower, confint_upper)
 
       # Pivot temp_df to long format
       temp_long <- temp_df %>% 
@@ -2819,7 +3232,6 @@ temp_df <- rbind(temp_df, confint_lower, confint_upper, pred_middle)
  }
 
 table_tNB_preds <- reduce(all_predictions_tNB, rbind)
-
 
 write_csv(table_tNB_preds, here("data/Predictions_tnb.csv"))
 

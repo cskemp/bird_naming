@@ -1,39 +1,18 @@
 #NEXUS
-[R-package APE, Mon Jan 20 14:28:54 2025]
+[R-package APE, Mon Feb 24 12:41:52 2025]
 
 BEGIN TAXA;
 	DIMENSIONS NTAX = 187;
 	TAXLABELS
-		Cairina moschata
-		Anas platyrhynchos
-		Tachybaptus dominicus
-		Charadrius vociferus
-		Rallus limicola
-		Porzana carolina
-		Ardea alba
-		Ardea herodias
-		Egretta thula
-		Egretta caerulea
-		Butorides virescens
-		Sarcoramphus papa
-		Coragyps atratus
-		Cathartes aura
-		Harpia harpyja
-		Buteo jamaicensis
-		Buteo brachyurus
-		Rupornis magnirostris
-		Elanus leucurus
-		Elanoides forficatus
-		Accipiter striatus
-		Falco sparverius
-		Meleagris gallopavo
-		Gallus gallus
-		Penelope purpurascens
-		Crax rubra
-		Penelopina nigra
-		Ortalis vetula
-		Colinus virginianus
-		Dactylortyx thoracicus
+		Cantorchilus modestus
+		Campylorhynchus zonatus
+		Troglodytes rufociliatus
+		Troglodytes aedon
+		Henicorhina leucophrys
+		Saltator grandis
+		Saltator atriceps
+		Diglossa baritula
+		Sporophila torqueola
 		Psilorhinus morio
 		Cyanocorax yncas
 		Cyanocitta stelleri
@@ -60,11 +39,6 @@ BEGIN TAXA;
 		Mitrephanes phaeocercus
 		Myiarchus tuberculifer
 		Pyrocephalus rubinus
-		Campylorhynchus zonatus
-		Troglodytes rufociliatus
-		Troglodytes aedon
-		Henicorhina leucophrys
-		Cantorchilus modestus
 		Melanotis hypoleucus
 		Dumetella carolinensis
 		Mimus gilvus
@@ -101,10 +75,6 @@ BEGIN TAXA;
 		Vireo huttoni
 		Vireo flavoviridis
 		Vireo solitarius
-		Diglossa baritula
-		Saltator atriceps
-		Saltator grandis
-		Sporophila torqueola
 		Spinus notatus
 		Spinus atriceps
 		Spinus pinus
@@ -135,6 +105,36 @@ BEGIN TAXA;
 		Certhia americana
 		Lepidocolaptes affinis
 		Passer domesticus
+		Cairina moschata
+		Anas platyrhynchos
+		Tachybaptus dominicus
+		Charadrius vociferus
+		Rallus limicola
+		Porzana carolina
+		Ardea alba
+		Ardea herodias
+		Egretta thula
+		Egretta caerulea
+		Butorides virescens
+		Sarcoramphus papa
+		Coragyps atratus
+		Cathartes aura
+		Harpia harpyja
+		Buteo jamaicensis
+		Buteo brachyurus
+		Rupornis magnirostris
+		Elanus leucurus
+		Elanoides forficatus
+		Accipiter striatus
+		Falco sparverius
+		Meleagris gallopavo
+		Gallus gallus
+		Penelope purpurascens
+		Crax rubra
+		Penelopina nigra
+		Ortalis vetula
+		Colinus virginianus
+		Dactylortyx thoracicus
 		Crypturellus cinnamomeus
 		Geococcyx velox
 		Piaya cayana
@@ -195,137 +195,137 @@ BEGIN TAXA;
 END;
 BEGIN TREES;
 	TRANSLATE
-		1	Cairina moschata,
-		2	Anas platyrhynchos,
-		3	Tachybaptus dominicus,
-		4	Charadrius vociferus,
-		5	Rallus limicola,
-		6	Porzana carolina,
-		7	Ardea alba,
-		8	Ardea herodias,
-		9	Egretta thula,
-		10	Egretta caerulea,
-		11	Butorides virescens,
-		12	Sarcoramphus papa,
-		13	Coragyps atratus,
-		14	Cathartes aura,
-		15	Harpia harpyja,
-		16	Buteo jamaicensis,
-		17	Buteo brachyurus,
-		18	Rupornis magnirostris,
-		19	Elanus leucurus,
-		20	Elanoides forficatus,
-		21	Accipiter striatus,
-		22	Falco sparverius,
-		23	Meleagris gallopavo,
-		24	Gallus gallus,
-		25	Penelope purpurascens,
-		26	Crax rubra,
-		27	Penelopina nigra,
-		28	Ortalis vetula,
-		29	Colinus virginianus,
-		30	Dactylortyx thoracicus,
-		31	Psilorhinus morio,
-		32	Cyanocorax yncas,
-		33	Cyanocitta stelleri,
-		34	Cyanolyca pumilo,
-		35	Cyanolyca cucullata,
-		36	Corvus corax,
-		37	Calocitta formosa,
-		38	Petrochelidon pyrrhonota,
-		39	Petrochelidon fulva,
-		40	Hirundo rustica,
-		41	Atticora pileata,
-		42	Tachycineta bicolor,
-		43	Tachycineta albilinea,
-		44	Stelgidopteryx serripennis,
-		45	Riparia riparia,
-		46	Contopus pertinax,
-		47	Contopus sordidulus,
-		48	Contopus bogotensis,
-		49	Empidonax fulvifrons,
-		50	Empidonax albigularis,
-		51	Myiozetetes similis,
-		52	Tyrannus melancholicus,
-		53	Sayornis nigricans,
-		54	Mitrephanes phaeocercus,
-		55	Myiarchus tuberculifer,
-		56	Pyrocephalus rubinus,
-		57	Campylorhynchus zonatus,
-		58	Troglodytes rufociliatus,
-		59	Troglodytes aedon,
-		60	Henicorhina leucophrys,
-		61	Cantorchilus modestus,
-		62	Melanotis hypoleucus,
-		63	Dumetella carolinensis,
-		64	Mimus gilvus,
-		65	Turdus rufitorques,
-		66	Turdus grayi,
-		67	Turdus infuscatus,
-		68	Turdus plebejus,
-		69	Turdus rufopalliatus,
-		70	Myadestes occidentalis,
-		71	Catharus frantzii,
-		72	Sialia sialis,
-		73	Parkesia motacilla,
-		74	Parkesia noveboracensis,
-		75	Cardellina pusilla,
-		76	Cardellina canadensis,
-		77	Cardellina versicolor,
-		78	Leiothlypis ruficapilla,
-		79	Oreothlypis superciliosa,
-		80	Setophaga magnolia,
-		81	Setophaga coronata,
-		82	Setophaga townsendi,
-		83	Setophaga virens,
-		84	Setophaga chrysoparia,
-		85	Setophaga occidentalis,
-		86	Setophaga petechia,
-		87	Geothlypis tolmiei,
-		88	Geothlypis trichas,
-		89	Myioborus pictus,
-		90	Myioborus miniatus,
-		91	Basileuterus belli,
-		92	Basileuterus rufifrons,
-		93	Ptiliogonys cinereus,
-		94	Cyclarhis gujanensis,
-		95	Vireo huttoni,
-		96	Vireo flavoviridis,
-		97	Vireo solitarius,
-		98	Diglossa baritula,
-		99	Saltator atriceps,
-		100	Saltator grandis,
-		101	Sporophila torqueola,
-		102	Spinus notatus,
-		103	Spinus atriceps,
-		104	Spinus pinus,
-		105	Spinus psaltria,
-		106	Loxia curvirostra,
-		107	Psaltriparus minimus,
-		108	Zonotrichia capensis,
-		109	Melospiza lincolnii,
-		110	Aimophila rufescens,
-		111	Atlapetes albinucha,
-		112	Pipilo maculatus,
-		113	Junco phaeonotus,
-		114	Melozone biarcuata,
-		115	Chlorospingus flavopectus,
-		116	Pheucticus ludovicianus,
-		117	Piranga flava,
-		118	Icterus chrysater,
-		119	Icterus mesomelas,
-		120	Icterus galbula,
-		121	Icterus pustulatus,
-		122	Amblycercus holosericeus,
-		123	Dives dives,
-		124	Quiscalus mexicanus,
-		125	Psarocolius wagleri,
-		126	Agelaius phoeniceus,
-		127	Molothrus aeneus,
-		128	Sturnella magna,
-		129	Certhia americana,
-		130	Lepidocolaptes affinis,
-		131	Passer domesticus,
+		1	Cantorchilus modestus,
+		2	Campylorhynchus zonatus,
+		3	Troglodytes rufociliatus,
+		4	Troglodytes aedon,
+		5	Henicorhina leucophrys,
+		6	Saltator grandis,
+		7	Saltator atriceps,
+		8	Diglossa baritula,
+		9	Sporophila torqueola,
+		10	Psilorhinus morio,
+		11	Cyanocorax yncas,
+		12	Cyanocitta stelleri,
+		13	Cyanolyca pumilo,
+		14	Cyanolyca cucullata,
+		15	Corvus corax,
+		16	Calocitta formosa,
+		17	Petrochelidon pyrrhonota,
+		18	Petrochelidon fulva,
+		19	Hirundo rustica,
+		20	Atticora pileata,
+		21	Tachycineta bicolor,
+		22	Tachycineta albilinea,
+		23	Stelgidopteryx serripennis,
+		24	Riparia riparia,
+		25	Contopus pertinax,
+		26	Contopus sordidulus,
+		27	Contopus bogotensis,
+		28	Empidonax fulvifrons,
+		29	Empidonax albigularis,
+		30	Myiozetetes similis,
+		31	Tyrannus melancholicus,
+		32	Sayornis nigricans,
+		33	Mitrephanes phaeocercus,
+		34	Myiarchus tuberculifer,
+		35	Pyrocephalus rubinus,
+		36	Melanotis hypoleucus,
+		37	Dumetella carolinensis,
+		38	Mimus gilvus,
+		39	Turdus rufitorques,
+		40	Turdus grayi,
+		41	Turdus infuscatus,
+		42	Turdus plebejus,
+		43	Turdus rufopalliatus,
+		44	Myadestes occidentalis,
+		45	Catharus frantzii,
+		46	Sialia sialis,
+		47	Parkesia motacilla,
+		48	Parkesia noveboracensis,
+		49	Cardellina pusilla,
+		50	Cardellina canadensis,
+		51	Cardellina versicolor,
+		52	Leiothlypis ruficapilla,
+		53	Oreothlypis superciliosa,
+		54	Setophaga magnolia,
+		55	Setophaga coronata,
+		56	Setophaga townsendi,
+		57	Setophaga virens,
+		58	Setophaga chrysoparia,
+		59	Setophaga occidentalis,
+		60	Setophaga petechia,
+		61	Geothlypis tolmiei,
+		62	Geothlypis trichas,
+		63	Myioborus pictus,
+		64	Myioborus miniatus,
+		65	Basileuterus belli,
+		66	Basileuterus rufifrons,
+		67	Ptiliogonys cinereus,
+		68	Cyclarhis gujanensis,
+		69	Vireo huttoni,
+		70	Vireo flavoviridis,
+		71	Vireo solitarius,
+		72	Spinus notatus,
+		73	Spinus atriceps,
+		74	Spinus pinus,
+		75	Spinus psaltria,
+		76	Loxia curvirostra,
+		77	Psaltriparus minimus,
+		78	Zonotrichia capensis,
+		79	Melospiza lincolnii,
+		80	Aimophila rufescens,
+		81	Atlapetes albinucha,
+		82	Pipilo maculatus,
+		83	Junco phaeonotus,
+		84	Melozone biarcuata,
+		85	Chlorospingus flavopectus,
+		86	Pheucticus ludovicianus,
+		87	Piranga flava,
+		88	Icterus chrysater,
+		89	Icterus mesomelas,
+		90	Icterus galbula,
+		91	Icterus pustulatus,
+		92	Amblycercus holosericeus,
+		93	Dives dives,
+		94	Quiscalus mexicanus,
+		95	Psarocolius wagleri,
+		96	Agelaius phoeniceus,
+		97	Molothrus aeneus,
+		98	Sturnella magna,
+		99	Certhia americana,
+		100	Lepidocolaptes affinis,
+		101	Passer domesticus,
+		102	Cairina moschata,
+		103	Anas platyrhynchos,
+		104	Tachybaptus dominicus,
+		105	Charadrius vociferus,
+		106	Rallus limicola,
+		107	Porzana carolina,
+		108	Ardea alba,
+		109	Ardea herodias,
+		110	Egretta thula,
+		111	Egretta caerulea,
+		112	Butorides virescens,
+		113	Sarcoramphus papa,
+		114	Coragyps atratus,
+		115	Cathartes aura,
+		116	Harpia harpyja,
+		117	Buteo jamaicensis,
+		118	Buteo brachyurus,
+		119	Rupornis magnirostris,
+		120	Elanus leucurus,
+		121	Elanoides forficatus,
+		122	Accipiter striatus,
+		123	Falco sparverius,
+		124	Meleagris gallopavo,
+		125	Gallus gallus,
+		126	Penelope purpurascens,
+		127	Crax rubra,
+		128	Penelopina nigra,
+		129	Ortalis vetula,
+		130	Colinus virginianus,
+		131	Dactylortyx thoracicus,
 		132	Crypturellus cinnamomeus,
 		133	Geococcyx velox,
 		134	Piaya cayana,
@@ -383,5 +383,5 @@ BEGIN TREES;
 		186	Aspatha gularis,
 		187	Momotus coeruliceps
 	;
-	TREE * UNTITLED = [&U] ((1:1,2:1)Anatidae:1,3:1,4:1,(5:1,6:1)Rallidae:1,((7:1,8:1)Ardea:1,(9:1,10:1)Egretta:1,11:1)Ardeidae:1,(12:1,13:1,14:1)Cathartidae:1,(15:1,(16:1,17:1)Buteo:1,18:1,19:1,20:1,21:1)Accipitridae:1,22:1,((23:1,24:1)Phasianidae:1,(25:1,26:1,27:1,28:1)Cracidae:1,(29:1,30:1)Odontophoridae:1)Galliformes:1,((31:1,32:1,33:1,(34:1,35:1)Cyanolyca:1,36:1,37:1)Corvidae:1,((38:1,39:1)Petrochelidon:1,40:1,41:1,(42:1,43:1)Tachycineta:1,44:1,45:1)Hirundinidae:1,((46:1,47:1,48:1)Contopus:1,(49:1,50:1)Empidonax:1,51:1,52:1,53:1,54:1,55:1,56:1)Tyrannidae:1,(57:1,(58:1,59:1)Troglodytes:1,60:1,61:1)Troglodytidae:1,(62:1,63:1,64:1)Mimidae:1,((65:1,66:1,67:1,68:1,69:1)Turdus:1,70:1,71:1,72:1)Turdidae:1,((73:1,74:1)Parkesia:1,(75:1,76:1,77:1)Cardellina:1,78:1,79:1,(80:1,81:1,82:1,83:1,84:1,85:1,86:1)Setophaga:1,(87:1,88:1)Geothlypis:1,(89:1,90:1)Myioborus:1,(91:1,92:1)Basileuterus:1)Parulidae:1,93:1,(94:1,(95:1,96:1,97:1)Vireo:1)Vireonidae:1,(98:1,(99:1,100:1)Saltator:1,101:1)Thraupidae:1,((102:1,103:1,104:1,105:1)Spinus:1,106:1)Fringillidae:1,107:1,(108:1,109:1,110:1,111:1,112:1,113:1,114:1,115:1)Passerellidae:1,(116:1,117:1)Cardinalidae:1,((118:1,119:1,120:1,121:1)Icterus:1,122:1,123:1,124:1,125:1,126:1,127:1,128:1)Icteridae:1,129:1,130:1,131:1)Passeriformes:1,132:1,(133:1,134:1,135:1)Cuculidae:1,(136:1,(137:1,138:1)Patagioenas:1,139:1,(140:1,141:1)Columbina:1,(142:1,143:1)Zenaida:1)Columbidae:1,(((144:1,145:1,146:1)Megascops:1,(147:1,148:1)Glaucidium:1,149:1,(150:1,151:1)Strix:1,152:1)Strigidae:1,153:1)Strigiformes:1,((154:1,(155:1,156:1)Chordeiles:1,157:1)Caprimulgidae:1,((158:1,159:1)Streptoprocne:1,160:1,161:1,162:1)Apodidae:1,(163:1,164:1,165:1,166:1,167:1)Trochilidae:1)Caprimulgiformes:1,(168:1,(169:1,170:1)Amazona:1,171:1,172:1,173:1)Psittacidae:1,((174:1,175:1,176:1)Ramphastidae:1,((177:1,178:1)Melanerpes:1,179:1,(180:1,181:1)Dryobates:1,(182:1,183:1)Colaptes:1)Picidae:1)Piciformes:1,(184:1,185:1)Trogon:1,(186:1,187:1)Momotidae:1)Aves;
+	TREE * UNTITLED = [&U] (((1:1,2:1,(3:1,4:1)Troglodytes:1,5:1)Troglodytidae:1,((6:1,7:1)Saltator:1,8:1,9:1)Thraupidae:1,(10:1,11:1,12:1,(13:1,14:1)Cyanolyca:1,15:1,16:1)Corvidae:1,((17:1,18:1)Petrochelidon:1,19:1,20:1,(21:1,22:1)Tachycineta:1,23:1,24:1)Hirundinidae:1,((25:1,26:1,27:1)Contopus:1,(28:1,29:1)Empidonax:1,30:1,31:1,32:1,33:1,34:1,35:1)Tyrannidae:1,(36:1,37:1,38:1)Mimidae:1,((39:1,40:1,41:1,42:1,43:1)Turdus:1,44:1,45:1,46:1)Turdidae:1,((47:1,48:1)Parkesia:1,(49:1,50:1,51:1)Cardellina:1,52:1,53:1,(54:1,55:1,56:1,57:1,58:1,59:1,60:1)Setophaga:1,(61:1,62:1)Geothlypis:1,(63:1,64:1)Myioborus:1,(65:1,66:1)Basileuterus:1)Parulidae:1,67:1,(68:1,(69:1,70:1,71:1)Vireo:1)Vireonidae:1,((72:1,73:1,74:1,75:1)Spinus:1,76:1)Fringillidae:1,77:1,(78:1,79:1,80:1,81:1,82:1,83:1,84:1,85:1)Passerellidae:1,(86:1,87:1)Cardinalidae:1,((88:1,89:1,90:1,91:1)Icterus:1,92:1,93:1,94:1,95:1,96:1,97:1,98:1)Icteridae:1,99:1,100:1,101:1)Passeriformes:1,(102:1,103:1)Anatidae:1,104:1,105:1,(106:1,107:1)Rallidae:1,((108:1,109:1)Ardea:1,(110:1,111:1)Egretta:1,112:1)Ardeidae:1,(113:1,114:1,115:1)Cathartidae:1,(116:1,(117:1,118:1)Buteo:1,119:1,120:1,121:1,122:1)Accipitridae:1,123:1,((124:1,125:1)Phasianidae:1,(126:1,127:1,128:1,129:1)Cracidae:1,(130:1,131:1)Odontophoridae:1)Galliformes:1,132:1,(133:1,134:1,135:1)Cuculidae:1,(136:1,(137:1,138:1)Patagioenas:1,139:1,(140:1,141:1)Columbina:1,(142:1,143:1)Zenaida:1)Columbidae:1,(((144:1,145:1,146:1)Megascops:1,(147:1,148:1)Glaucidium:1,149:1,(150:1,151:1)Strix:1,152:1)Strigidae:1,153:1)Strigiformes:1,((154:1,(155:1,156:1)Chordeiles:1,157:1)Caprimulgidae:1,((158:1,159:1)Streptoprocne:1,160:1,161:1,162:1)Apodidae:1,(163:1,164:1,165:1,166:1,167:1)Trochilidae:1)Caprimulgiformes:1,(168:1,(169:1,170:1)Amazona:1,171:1,172:1,173:1)Psittacidae:1,((174:1,175:1,176:1)Ramphastidae:1,((177:1,178:1)Melanerpes:1,179:1,(180:1,181:1)Dryobates:1,(182:1,183:1)Colaptes:1)Picidae:1)Piciformes:1,(184:1,185:1)Trogon:1,(186:1,187:1)Momotidae:1)Aves;
 END;

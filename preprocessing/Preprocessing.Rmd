@@ -9,8 +9,15 @@ output: html_notebook
 
 rm(list = ls())
 
-if (!requireNamespace("renv", quietly = TRUE)) install.packages("renv")
-renv::init()
+# This activates renv if it's not already activated. If it runs, it stops the rest of the code running and you'll you have to start it again.
+if (!requireNamespace("renv", quietly = TRUE)) {
+  stop("renv is not installed.")
+} else {
+  status <- renv::status()
+  if (length(status$missing) > 0) {
+    renv::activate()
+  }
+}
 
 library(tidyverse)
 library(here)
@@ -1997,7 +2004,8 @@ unacceptable_duplicates <- c(which(
   duplicated(
     tobelo_holman[,c("ScientificName", "IndexFG")])),
   which(tobelo_holman$ScientificName == "Dicrurus hottentottus")[1],
-  which(tobelo_holman$ScientificName == "Artamus leucorhynchus")[1])
+  which(tobelo_holman$ScientificName == "Artamus leucorhynchus")[1],
+  which(tobelo_holman$ScientificName == "Lorius roratus")[1])
 
 
 tobelo_holman <- tobelo_holman[-unacceptable_duplicates,] %>% 
@@ -3357,14 +3365,14 @@ for (language in languages) {
 
 Phylogeny subsets (250 trees)
 
-anindilyakwa - tree-pruner-ee9aeff3-6c7d-4b87-aa87-7d38474286fd - new
-montagnais - tree-pruner-65a824c3-96d0-4874-a14e-5c16cef86174 - good
-rangi - tree-pruner-a6edba71-4114-4d77-a124-33a41b5e040a - good
-saami - tree-pruner-9a0ae6e0-7769-4035-b94d-6990fd7a0130 - good
-tlingit - tree-pruner-d5b77082-3468-46aa-9dfc-1ea52bd48562 - new
-tobelo - tree-pruner-9c9972ae-a991-47a3-9d35-01692750c6e4 - good
-tzeltal - tree-pruner-c45e9238-3a1a-4eaa-a980-b810c0b1954c - good
-zapotec - tree-pruner-1546ad01-71c3-4e2b-a201-11f91ccccd83 - good
+anindilyakwa - tree-pruner-ee9aeff3-6c7d-4b87-aa87-7d38474286fd 
+montagnais - tree-pruner-65a824c3-96d0-4874-a14e-5c16cef86174 
+rangi - tree-pruner-a6edba71-4114-4d77-a124-33a41b5e040a
+saami - tree-pruner-9a0ae6e0-7769-4035-b94d-6990fd7a0130
+tlingit - tree-pruner-d5b77082-3468-46aa-9dfc-1ea52bd48562
+tobelo - tree-pruner-9c9972ae-a991-47a3-9d35-01692750c6e4 
+tzeltal - tree-pruner-c45e9238-3a1a-4eaa-a980-b810c0b1954c 
+zapotec - tree-pruner-1546ad01-71c3-4e2b-a201-11f91ccccd83 
 
 ```{r}
 
@@ -3708,8 +3716,9 @@ I'm going to do with the colours the same as what Andrea Santangeli et al. did a
 
 ```{r}
 
-colour_data <- read.csv(here("preprocessing/data/colour_data.csv")) %>% 
-  rename(ScientificName2021 = sciName_ebird2021,
+colour_data <- read.csv(here("preprocessing/data/colour_data.csv")) %>%  
+  rename(ScientificNameV3 = BirdTREE,
+         ScientificName2021 = sciName_ebird2021,
          cDiversity = n.loci,
          cElaboration = elaboration,
          cBlack = black,
@@ -3718,17 +3727,10 @@ colour_data <- read.csv(here("preprocessing/data/colour_data.csv")) %>%
   mutate(cRed = redD + redL,
          cBlue = blueD + blueL,
          cGreen = greenD + greenL) %>% 
-  group_by(ScientificName2021) %>% 
-  mutate(num = n()) %>% 
-  ungroup() %>% 
-  # If there is more than one listing for a bird, this ditches the measurements taken from the female bird
-  filter(num == 1 | (num > 1 & sex != "female")) %>% 
-  group_by(ScientificName2021) %>% 
-  mutate(num = n()) %>% 
-  ungroup() %>% 
-  filter(num == 1 | (num > 1 & (!is.na(cBlack))) & (sciname_ebird2019 != "Caracara plancus")) %>% 
-  # filter(sex != "female") %>% 
+filter(!is.na(cElaboration)) %>%
+  arrange(desc(cElaboration)) %>% 
   select(ScientificName2021,
+         ScientificNameV3,
          cBlack,
          cWhite,
          cYellow,
@@ -3738,7 +3740,9 @@ colour_data <- read.csv(here("preprocessing/data/colour_data.csv")) %>%
          cElaboration,
          cDiversity,
          sex,
-         sciname_ebird2019)
+         sciname_ebird2019) %>% 
+  # Keep the most colourful set of observations for each bird
+  distinct(ScientificName2021, .keep_all = TRUE)
 
 # They haven't split apart two gull species that ebird 2021 differentiates, I'll just double that guy's row for them both.
 duplicate_row <- colour_data[which(colour_data$ScientificName2021 == "Larus canus"),]
@@ -3746,12 +3750,18 @@ duplicate_row$ScientificName2021 <- "Larus brachyrhynchus"
 colour_data <- colour_data %>% rbind(duplicate_row)
 
 
-colour_data$ScientificName2021[colour_data$sciname_ebird2019 == "Saltator coerulescens"] <- "Saltator grandis"
-
-bird_data <- bird_data %>% 
-  left_join(colour_data %>% select(-c(sex,sciname_ebird2019)), 
+colours <- bird_data %>% 
+  left_join(colour_data %>% select(-c(sex,sciname_ebird2019,ScientificNameV3)), 
             by = "ScientificName2021",
             relationship = "many-to-one") 
+
+bird_data <- colours %>% 
+  filter(is.na(cElaboration)) %>% 
+  select(!c(cBlack:cDiversity)) %>% 
+  left_join(colour_data %>% select(-c(sex,sciname_ebird2019,ScientificName2021)), 
+            by = "ScientificNameV3",
+            relationship = "many-to-one") %>% 
+  rbind(colours %>% filter(!is.na(cElaboration)))
 
 ```
 
@@ -3943,7 +3953,6 @@ for (language in languages) {
 This makes trees out of the levels of the traditional taxonomies
 
 ## 1974 Trees
-
 
 ```{r}
 
