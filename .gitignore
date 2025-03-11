@@ -53,4 +53,4 @@ rsconnect/
 image2.png
 .Rhistory
 .Rprofile
-
+/renv/library/
