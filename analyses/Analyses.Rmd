@@ -33,7 +33,6 @@ library(apaTables)
 library(bbmle)
 library(janitor)      # for turning a row into column names
 library(MASS)
-library(audio)
 
 # set options
 options(na.action = "na.omit")
@@ -66,9 +65,6 @@ colour_pairs <- list(
   Zapotec = c("#f7e6ff", "#bf3eff"),             #darkorchid
   All = c( "#e8e0ef", "#675875")                 #plummy
   )
-
-bird <- load.wave(here("whip.wav"))
-play(bird)
 
 ```
 
@@ -1075,8 +1071,6 @@ table1 <- reduce(LanguageVals,
   
   writeLines(table_col, here("output/ResultsTableLR_col.tex"))
     
-    play(bird)
-
 ```
 
 Every model with predictors outperforms the null model.
@@ -1549,8 +1543,6 @@ for (i in seq_along(models)) {
   
 }
 
-play(bird)
-
 table4 <-  reduce(LanguageVals_LRmt, 
                   left_join, 
                   by = c("Model", "Variable", "Statistic")) %>% 
@@ -1713,7 +1705,7 @@ latex_table <- table4 %>%
     writeLines(latex_table, here("output/ResultsTableLRmt.tex"))
  
     
-    best_models_nb <- table4 %>% 
+    best_models_LRmt <- table4 %>% 
       filter(Statistic == "BIC") %>% 
       pivot_longer(cols = !c(Model, Variable, Statistic),
                    names_to = "Language",
@@ -1765,6 +1757,125 @@ latex_table <- table4 %>%
       
     table4_bics <- table4 %>% 
       filter(Statistic=="BIC")
+
+```
+
+### Get predictions for best models
+
+```{r}
+
+ languages_plus <- c(languages, "All")
+
+variables <- c("zIso74", "zIsoPer", "zIsoPhy")
+constant_values <- list(zIso74 = 0, zIsoPer = 0, zIsoPhy = 0)
+values <- c(-3, -2, -1, 0, 1, 2)
+all_predictions <- list()
+
+for (language in languages_plus) {
+
+# Find the best model
+language_models <- models_LRmt[[language]]
+best_model_index <- best_models_LRmt$Model[
+  best_models_LRmt$Language == language & best_models_LRmt$Model != "null"]
+best_model <- language_models[best_model_index]
+
+  language_predictions <- list()
+
+# Make an empty dataframe to put predictions into
+predictions_df <- data.frame(Language = character(),
+                             Model = character(),
+                             Predictor = character(),
+                             `-3sd` = numeric(),
+                             `-2sd` = numeric(),
+                             `-1sd` = numeric(),
+                             `Mean` = numeric(),
+                             `+1sd` = numeric(),
+                             `+2sd` = numeric(),
+                               stringsAsFactors = FALSE,
+                             check.names = FALSE)
+  
+
+  for (i in seq_along(best_model)) {
+    model <- best_model[[i]]
+    model_name <- best_model_index[i]
+    pred_vars <- all.vars(formula(model))[-1] 
+    
+    for (var in pred_vars) {
+      
+      if (var == "Language"){
+        
+        return(NULL)
+        
+      } else {
+      # Create a newdata dataframe with the correct number of rows
+      newdata <- data.frame(matrix(rep(NA, length(pred_vars) * length(values)),
+                                   nrow = length(values), 
+                                   ncol = length(pred_vars)))
+      colnames(newdata) <- pred_vars
+      # Assign the constant values to all predictors
+      for (pred_var in pred_vars) {
+        newdata[[pred_var]] <- constant_values[[pred_var]]
+      }
+      }
+      
+      # Vary the current predictor variable
+      newdata[[var]] <- values
+      
+      # Make predictions
+      predictions <- format_sensibly(predict(model,
+                                     type = "response",
+                                   newdata = newdata,
+                                   re.form = NA))
+      
+      # Combine model name, predictor name, and predictions into columns
+      temp_df <- data.frame(Language = language,
+                            Model = model_name,
+                            Predictor = var,
+                            `-3sd` = predictions[1],
+                            `-2sd` = predictions[2],
+                            `-1sd` = predictions[3],
+                            `Mean` = predictions[4],
+                            `+1sd` = predictions[5],
+                            `+2sd` = predictions[6],
+                            stringsAsFactors = FALSE,
+                            check.names = FALSE)
+      
+      #mash them into a dataframe together
+      predictions_df <- rbind(predictions_df, temp_df)
+    }
+  }
+  
+ all_predictions[[language]] <- predictions_df
+ 
+}
+
+# I do not know why but the last one won't go into the list. This should make it do so.
+ all_predictions[[language]] <- predictions_df
+
+ # Make a table with all predictions
+table_lrmt_preds <- reduce(all_predictions, rbind) %>% 
+  select(-Model) %>% 
+  mutate(Predictor = gsub("zIso","",Predictor)) %>% 
+  group_by(Language) %>% 
+  mutate(Language = ifelse(row_number()==1,
+                           Language,
+                           ""))
+
+   latex_preds <- table_lrmt_preds %>%
+     rename(" " = Language,
+            "  " = Predictor) %>%
+     kable(format = "latex",
+           align = c("l", "l", "c", "c", "c", "c", "c", "c", "c"),
+           booktabs = TRUE,
+           linesep = "",
+           escape = FALSE,
+           caption = "The effects of predictors on pairs of birds sharing a name",
+           label = "table:predsLR") %>%
+     kable_styling(latex_options = c("hold_position", "scale_down")) %>%
+     add_header_above(c("Language" = 1, "Predictor" = 1, "Value of Predictor" = 6))
+   
+
+    writeLines(latex_preds, here("output/PredictionsLRmt.tex"))
 
 ```
 
@@ -3053,8 +3164,6 @@ latex_table <- table5 %>%
 
 table5_bics <- table5 %>% 
   filter(Statistic=="BIC")
-
-play(bird)
 
 ```
 
