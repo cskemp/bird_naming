@@ -51,4 +51,6 @@ rsconnect/
 # Other things
 *LAPTOP*
 image2.png
+.Rhistory
+.Rprofile
 
