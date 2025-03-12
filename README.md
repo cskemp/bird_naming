@@ -20,5 +20,7 @@ This folder contains a notebook with all of the code used to prepare the raw dat
 
 # Installing R Libraries
 From within the R console, run
+>renv::install("gitcreds")
+then
 >renv::restore()
 This will install all of the packages used by the code in this repository.
