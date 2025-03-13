@@ -27,6 +27,7 @@ library(rdist)
 library(phytools)
 library(treeio)
 library(Rtsne)
+library(tidytree)
 
 select <- dplyr::select
 
