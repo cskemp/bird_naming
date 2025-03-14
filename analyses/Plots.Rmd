@@ -7,18 +7,6 @@ output: html_notebook
 
 ```{r}
 
-rm(list = ls())
-
-# This activates renv if it's not already activated. If it runs, it stops the rest of the code running and you'll you have to start it again.
-if (!requireNamespace("renv", quietly = TRUE)) {
-  stop("renv is not installed.")
-} else {
-  status <- renv::status()
-  if (length(status$missing) > 0) {
-    renv::activate()
-  }
-}
-
 library(tidyverse)
 library(here)
 library(ape)
@@ -395,7 +383,7 @@ avo_plot_2
 
 ```
 
-# Analysis 2: Predicting name-sharing
+# Analysis 1: Predicting name-sharing
 
 ## Violin plots individual predictors
 
@@ -466,7 +454,7 @@ plot_violin2 <- plot_data %>%
 
 ```
 
-# Analysis 3a: Predicting singleton categories
+# Analysis 2: Predicting singleton categories
 
 ## Violin plots for logistic regression 
 
@@ -535,7 +523,7 @@ violin_2
 
 ```
 
-# Analysis 3b: Predicting companion count
+# Analysis 2a: Predicting companion count
 
 ## Predictions from models
 These predictions come from nb models, with predictions from the truncated NB models added to see how they perform when not considering the monotypic birds
