@@ -1,11 +1,15 @@
 ---
 title: "Plots"
-output: html_notebook
+output:
+  html_document:
+    df_print: paged
 ---
 
 # Setup
 
 ```{r}
+
+rm(list = ls())
 
 library(tidyverse)
 library(here)
