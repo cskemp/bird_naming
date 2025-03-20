@@ -9,16 +9,6 @@ output: html_notebook
 
 rm(list = ls())
 
-# This activates renv if it's not already activated. If it runs, it stops the rest of the code running and you'll you have to start it again.
-if (!requireNamespace("renv", quietly = TRUE)) {
-  stop("renv is not installed.")
-} else {
-  status <- renv::status()
-  if (length(status$missing) > 0) {
-    renv::activate()
-  }
-}
-
 library(tidyverse)
 library(here)
 library(Hmisc)
@@ -27,6 +17,7 @@ library(rdist)
 library(phytools)
 library(treeio)
 library(Rtsne)
+library(tidytree)
 
 select <- dplyr::select
 

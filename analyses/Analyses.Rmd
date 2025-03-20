@@ -1,8 +1,10 @@
 ---
 title: "Analyses"
 output:
-  pdf_document: default
+  html_document:
+    df_print: paged
   html_notebook: default
+  pdf_document: default
 ---
 
 # Setup
@@ -85,7 +87,7 @@ Shapiro <- bird_data %>%
 
 ```
 
-# Analysis 1: Hunn Correspondence Measure
+# Hunn Correspondence Measure
 
 Use Hunn's measure to compare folk categories with Clements 1974 and Clements 2023 taxonomies
 
@@ -504,7 +506,7 @@ table_hunn
 
 ```
 
-# Analysis 2: Predicting name-sharing
+# Analysis 1: Predicting name-sharing
 
 ## Define functions
 
@@ -1272,7 +1274,7 @@ for(language in names(bird_similarity)) {
 
 ```
 
-# Analysis 3a: Predicting singleton categories
+# Analysis 2: Predicting singleton categories
 
 ## Prepare dataset
 
@@ -2213,7 +2215,7 @@ bird_preds <- data.frame(
 
 ```
 
-# Analysis 3b: Predicting companion count
+# Analysis 2a: Predicting companion count
 
 ## Run analyses with full datasets
 
