@@ -1,0 +1,805 @@
+---
+title: "Brown (1992) British names for American birds - similarity measures"
+output: html_notebook
+---
+
+Computes perceptual similarity (AVONET Euclidean distance) and taxonomic
+similarity (Clements 1974 and 2023) for every pair of birds within each of the 26
+arrays of Brown's (1992) similarity judgement experiment (`brown_table3.csv`).
+
+The measures replicate those in `preprocessing/Preprocessing.Rmd`, so that Brown's
+subject judgements can be compared against the same similarity measures used
+elsewhere in this repository. Nothing outside `brown_britishnames/` is written to;
+the reference taxonomies under `preprocessing/data/` are read only.
+
+# Setup
+
+```{r}
+
+rm(list = ls())
+
+library(tidyverse)
+library(here)
+library(rdist)
+
+select <- dplyr::select
+
+```
+
+# Define Functions
+
+`TaxSimCalc` is copied verbatim from `preprocessing/Preprocessing.Rmd` so that the
+taxonomic distances here are identical to those used for the language datasets.
+(The source is an .Rmd and so cannot be `source()`d.) `MinVal` is not needed - we
+want pairwise distances, not isolation measures.
+
+```{r}
+
+# This one calculates similarity based on matches and mismatches in a taxonomy. You just give it a dataframe and a list of the columns to compare. The columns should be Order, Family, Genus and Species if you're just comparing birds. Species should be the binomial species name (including both the genus and the species) because the second part of the species name on its own can match between totally unrelated species (e.g., Dromaius novaehollandiae & Larus novaehollandiae)
+
+TaxSimCalc <- function(data, columns_to_compare) {
+
+    # Function to take numbers and punctuation out of names - I had to add this because I have sometimes added numbers to the ends of species to make them unique in the datasets.
+  clean <- function(str) {
+    # Remove punctuation and numbers
+    cleaned_str <- gsub("[[:punct:]0-9]", "", str)
+    # Convert to lowercase for case-insensitive matching - probably not necessary but just in case
+    tolower(cleaned_str)
+  }
+
+  data <- data %>% drop_na(columns_to_compare)
+
+  # Create an empty matrix
+  matrix <- matrix(0, nrow = nrow(data), ncol = nrow(data))
+
+  # Calculate matches for taxa
+  for (i in 1:(nrow(data) - 1)) {
+    for (j in (i + 1):nrow(data)) {
+
+      # Clean and preprocess strings for comparison
+      cleaned_i <- clean(data[i, columns_to_compare])
+      cleaned_j <- clean(data[j, columns_to_compare])
+
+      # Count the number of matching values across columns
+      matches <- sum(cleaned_i == cleaned_j)
+
+      # Store the matches count in the matrix
+      matrix[i, j] <- matches
+      matrix[j, i] <- matches
+    }
+
+    # Make the diagonal terms all perfect matches
+    matrix[i, i] <- length(columns_to_compare)
+  }
+
+  # Make it so that perfect match = 0 and perfect mismatch = how many steps up the taxonomic tree you have to get to before they are in the same taxon. (Which in the case of birds species would always be 4 because they're all in the same class - Aves)
+  matrix <- length(columns_to_compare) - matrix
+
+  # Convert the matrix to a data frame
+  df <- as.data.frame(matrix)
+
+  # Put the names back in
+  colnames(df) <- data$CanonicalName
+  df$Species1 <- data$CanonicalName
+
+  # Create pairwise list
+  list <- df %>%
+    pivot_longer(cols = -contains("Species1"),
+                 names_to = "Species2",
+                 values_to = "Dist") %>%
+    mutate(s1 = pmin(Species1, Species2),
+           s2 = pmax(Species1, Species2)) %>%
+    select(s1, s2, Dist) %>%
+    distinct() %>%
+    filter(s1 != s2) %>%
+    rename(Species1 = s1,
+           Species2 = s2) %>%
+    mutate(ScaleDist = scale(Dist)[,1])
+
+  return(list(matrix = df, pairs = list))
+}
+
+```
+
+# Import Brown's data
+
+Each array pairs one British target bird with six candidate American birds, so
+every array holds 7 birds and 21 within-array pairs (546 pairs over 26 arrays).
+
+```{r}
+
+brown_table3 <- read.csv(here("brown_britishnames/brown_table3.csv"))
+
+# Long list of array membership: 7 rows per array
+
+brown_arrays <- bind_rows(
+  brown_table3 %>%
+    distinct(array,
+             BrownName = british_binomial,
+             CommonNameBrown = british_target) %>%
+    mutate(role = "target"),
+  brown_table3 %>%
+    distinct(array,
+             BrownName = american_binomial,
+             CommonNameBrown = american_bird) %>%
+    mutate(role = "candidate")
+) %>%
+  arrange(array, role != "target", BrownName)
+
+# The unique birds that need taxonomies and AVONET measurements
+
+brown_birds <- brown_arrays %>%
+  distinct(BrownName, CommonNameBrown)
+
+stopifnot(
+  # every array has 1 target and 6 candidates
+  all(brown_arrays %>% count(array) %>% pull(n) == 7),
+  # each binomial carries a single common name throughout the table
+  nrow(brown_birds) == n_distinct(brown_birds$BrownName)
+)
+
+nrow(brown_birds)
+
+```
+
+# Import reference taxonomies
+
+The same reference files that `preprocessing/Preprocessing.Rmd` uses, read the same
+way.
+
+```{r}
+
+# Full Clements 2023 taxonomy for Family and Order. Restricted to species rows so
+# that subspecies/group rows cannot duplicate a match.
+
+clements_2023 <- read.csv(here("preprocessing/data/clements_2023.csv")) %>%
+  filter(category == "species") %>%
+  rename(Order2023 = order,
+         ScientificName2023 = scientific.name,
+         CommonName2023 = English.name) %>%
+  mutate(Family2023 = str_trim(str_extract(family, "\\b\\w+"))) %>%
+  select(ScientificName2023, CommonName2023, Family2023, Order2023) %>%
+  distinct()
+
+# Matching 1974 and 2023 Clements names
+
+eBird_1974_2023 <- read.csv(here("preprocessing/data/eBird_1974_2023.csv"))
+changes_74_23 <- eBird_1974_2023
+
+# Matching 2021 and 2023 Clements names (2021 is what AVONET is keyed on)
+
+changes_21_23 <- read.csv(here("preprocessing/data/Changes_Clements21_Clements23.csv"))
+
+# Match genuses with families from 1974
+
+GenusMatch1974 <- read.csv(here("preprocessing/data/genus_match_1974.csv"))
+
+# 1974 Orders
+
+orders_74 <- read.csv(here("preprocessing/data/clements_1974_orders.csv")) %>%
+  rename(Family1974 = Family,
+         Order1974 = Order) %>%
+  mutate(Order1974 = str_trim(Order1974),
+         Family1974 = str_trim(Family1974)) %>%
+  select(Family1974, Order1974) %>%
+  distinct()
+
+```
+
+# Resolve taxonomies
+
+Brown took his binomials from Peterson (1980) and the Hamlyn Guide (1986), so they
+are essentially AOU/Clements names of that era. 84 of the 99 are still current 2023
+names; 12 more are retired 1974 names that the change file maps forward.
+
+## Clements 2023
+
+```{r}
+
+# The three names that neither the 2023 checklist nor the 1974-2023 change file
+# resolves. Each was checked by hand:
+#  - Capella gallinago  appears in the 1974 list (Common Snipe) but with no 2023
+#    partner, because the 1974 species was later split; the Old World bird Brown
+#    illustrates is Gallinago gallinago.
+#  - Picoides pubescens and Quiscalus quiscalus appear in neither list. The Downy
+#    Woodpecker moved to Dryobates, and Quiscalus quiscalus is the older spelling
+#    of Quiscalus quiscula (Common Grackle).
+
+manual_2023 <- tribble(
+  ~BrownName,             ~ManualName2023,
+  "Capella gallinago",    "Gallinago gallinago",
+  "Picoides pubescens",   "Dryobates pubescens",
+  "Quiscalus quiscalus",  "Quiscalus quiscula"
+)
+
+# 1974 -> 2023 name changes, one row per retired name
+
+forward_74_23 <- changes_74_23 %>%
+  filter(ScientificName1974 != "", ScientificName2023 != "") %>%
+  select(ScientificName1974, ChangeName2023 = ScientificName2023) %>%
+  distinct()
+
+brown_birds <- brown_birds %>%
+  left_join(forward_74_23,
+            by = c("BrownName" = "ScientificName1974")) %>%
+  left_join(manual_2023, by = "BrownName") %>%
+  mutate(
+    NameSource = case_when(
+      BrownName %in% clements_2023$ScientificName2023 ~ "current in Clements 2023",
+      !is.na(ChangeName2023)                          ~ "eBird_1974_2023 change file",
+      !is.na(ManualName2023)                          ~ "manual override"),
+    ScientificName2023 = case_when(
+      BrownName %in% clements_2023$ScientificName2023 ~ BrownName,
+      !is.na(ChangeName2023)                          ~ ChangeName2023,
+      TRUE                                            ~ ManualName2023)) %>%
+  select(-ChangeName2023, -ManualName2023) %>%
+  left_join(clements_2023, by = "ScientificName2023") %>%
+  mutate(Genus2023 = str_extract(ScientificName2023, "\\b\\w+\\b"))
+
+stopifnot(
+  nrow(brown_birds) == 99,
+  !any(is.na(brown_birds$ScientificName2023)),
+  !any(is.na(brown_birds$Family2023)),
+  !any(is.na(brown_birds$Order2023)),
+  # the 2023 names must stay unique, otherwise TaxSimCalc's CanonicalName breaks
+  n_distinct(brown_birds$ScientificName2023) == 99
+)
+
+count(brown_birds, NameSource)
+
+```
+
+A quick look at how Brown's common names line up with the 2023 ones. Two differ,
+and both are expected: Brown's "sparrow hawk" is *Falco sparverius*, now called the
+American Kestrel (the arrays deliberately contrast it with the British sparrowhawk,
+*Accipiter nisus*), and "woodlark" is Clements' "Wood Lark".
+
+```{r}
+
+brown_birds %>%
+  filter(!str_detect(tolower(CommonName2023),
+                     word(tolower(CommonNameBrown), -1))) %>%
+  select(BrownName, CommonNameBrown, ScientificName2023, CommonName2023)
+
+```
+
+## Clements 1974
+
+Where Brown's binomial is itself in the 1974 checklist we keep it (54 birds).
+Otherwise we follow the pipeline's rule: map the 2023 name back through the change
+file, and where there is no entry the name is unchanged between 1974 and 2023.
+
+```{r}
+
+names_1974 <- changes_74_23 %>%
+  filter(ScientificName1974 != "") %>%
+  pull(ScientificName1974) %>%
+  unique()
+
+back_23_74 <- changes_74_23 %>%
+  filter(ScientificName1974 != "", ScientificName2023 != "") %>%
+  select(ScientificName2023, BackName1974 = ScientificName1974) %>%
+  distinct()
+
+# Two 1974 genera are absent from genus_match_1974.csv. Both are unambiguous:
+# Hylocichla mustelina (wood thrush) is a thrush, and Limnodromus scolopaceus
+# (long-billed dowitcher) is a sandpiper.
+
+manual_family_1974 <- tribble(
+  ~Genus1974,     ~ManualFamily1974,
+  "Hylocichla",   "Turdidae",
+  "Limnodromus",  "Scolopacidae"
+)
+
+brown_birds <- brown_birds %>%
+  left_join(back_23_74, by = "ScientificName2023") %>%
+  mutate(ScientificName1974 = case_when(
+    BrownName %in% names_1974 ~ BrownName,
+    !is.na(BackName1974)      ~ BackName1974,
+    TRUE                      ~ ScientificName2023)) %>%
+  select(-BackName1974) %>%
+  mutate(Genus1974 = str_extract(ScientificName1974, "\\b\\w+\\b")) %>%
+  left_join(GenusMatch1974 %>% distinct(Genus1974, Family1974),
+            by = "Genus1974") %>%
+  left_join(manual_family_1974, by = "Genus1974") %>%
+  mutate(Family1974 = coalesce(Family1974, ManualFamily1974)) %>%
+  select(-ManualFamily1974) %>%
+  left_join(orders_74, by = "Family1974")
+
+stopifnot(
+  nrow(brown_birds) == 99,
+  !any(is.na(brown_birds$ScientificName1974)),
+  !any(is.na(brown_birds$Family1974)),
+  !any(is.na(brown_birds$Order1974))
+)
+
+```
+
+## Clements 2021
+
+Only needed to key into AVONET.
+
+```{r}
+
+back_23_21 <- changes_21_23 %>%
+  filter(ScientificName2021 != "", ScientificName2023 != "") %>%
+  select(ScientificName2023, BackName2021 = ScientificName2021) %>%
+  distinct()
+
+brown_birds <- brown_birds %>%
+  left_join(back_23_21, by = "ScientificName2023") %>%
+  mutate(ScientificName2021 = coalesce(BackName2021, ScientificName2023)) %>%
+  select(-BackName2021) %>%
+  mutate(CanonicalName = ScientificName2023)
+
+stopifnot(
+  nrow(brown_birds) == 99,
+  !any(is.na(brown_birds$ScientificName2021))
+)
+
+```
+
+# Perceptual similarity
+
+## Add AVONET data
+
+```{r}
+
+AVONET <- read.csv(here("preprocessing/data/AVONET2_eBird.csv")) %>%
+  rename(
+    c(ScientificName = "Species2",
+      BeakLengthCulmen = "Beak.Length_Culmen",
+      BeakLengthNares = "Beak.Length_Nares",
+      BeakWidth = "Beak.Width",
+      BeakDepth = "Beak.Depth",
+      TarsusLength = "Tarsus.Length",
+      WingLength = "Wing.Length",
+      KippsDistance = "Kipps.Distance",
+      Secondary = "Secondary1",
+      HandWingIndex = "Hand.Wing.Index",
+      TailLength = "Tail.Length")) %>%
+  select(ScientificName,
+         BeakLengthCulmen,
+         BeakLengthNares,
+         BeakWidth,
+         BeakDepth,
+         TarsusLength,
+         WingLength,
+         KippsDistance,
+         Secondary,
+         HandWingIndex,
+         TailLength,
+         Mass)
+
+brown_birds <- brown_birds %>%
+  left_join(AVONET, by = c("ScientificName2021" = "ScientificName"))
+
+# All 99 birds have all 11 traits, so nothing is dropped from the arrays
+
+stopifnot(
+  nrow(brown_birds) == 99,
+  !any(is.na(brown_birds %>% select(BeakLengthCulmen:Mass)))
+)
+
+```
+
+## Calculate perceptual distances
+
+As in the pipeline: log transform the skewed variables, un-transform the
+hand-wing index, then z-score. Brown's 99 birds are treated as one dataset (the
+analogue of one language), so distances are on a common scale across all 26
+arrays rather than being rescaled array by array.
+
+```{r}
+
+per_data <- brown_birds %>%
+  select(CanonicalName, BeakLengthCulmen:Mass) %>%
+  mutate_if(is.numeric, log) %>% # log transform the skewed variables
+  mutate(HandWingIndex = exp(HandWingIndex)) %>% # un-transform the variable that isn't skewed
+  mutate_if(is.numeric, ~scale(.)[,1])
+
+# Make a matrix with euclidean distances between all birds based on their AVONET traits
+
+per_matrix <- per_data %>%
+  select(BeakLengthCulmen:Mass) %>%
+  data.matrix() %>%
+  pdist(metric = "euclidean", p = 2) %>%
+  as.data.frame()
+
+rownames(per_matrix) <- per_data$CanonicalName
+colnames(per_matrix) <- per_data$CanonicalName
+
+# Put the values into a long dataframe
+
+per_dist_list <- data.frame(t(combn(names(per_matrix), 2)),
+                            DistPer = t(per_matrix)[lower.tri(per_matrix)]) %>%
+  mutate(Species1 = pmin(X1, X2),
+         Species2 = pmax(X1, X2)) %>%
+  select(Species1, Species2, DistPer)
+
+```
+
+# Taxonomic similarity
+
+Run over all 99 birds at once rather than array by array; taxonomic distance
+between two birds does not depend on which other birds are present, and doing it
+once keeps a single consistent set of values.
+
+```{r}
+
+birds_for_tax <- as.data.frame(brown_birds)
+
+similarity_2023 <- TaxSimCalc(birds_for_tax,
+                              c("Order2023",
+                                "Family2023",
+                                "Genus2023",
+                                "ScientificName2023"))
+
+similarity_1974 <- TaxSimCalc(birds_for_tax,
+                              c("Order1974",
+                                "Family1974",
+                                "Genus1974",
+                                "ScientificName1974"))
+
+tax_23_list <- similarity_2023$pairs %>%
+  select(Species1, Species2, Dist23 = Dist)
+
+tax_74_list <- similarity_1974$pairs %>%
+  select(Species1, Species2, Dist74 = Dist)
+
+```
+
+`TaxSimCalc` also returns a `ScaleDist` scaled over all 4851 pairs of the 99 birds.
+We drop it and rescale below over the 546 within-array pairs instead, since the
+cross-array pairs are not part of Brown's design.
+
+# Within-array pairs
+
+```{r}
+
+canonical <- setNames(brown_birds$CanonicalName, brown_birds$BrownName)
+common    <- setNames(brown_birds$CommonNameBrown, brown_birds$BrownName)
+
+targets <- brown_arrays %>%
+  filter(role == "target") %>%
+  select(array, TargetName = BrownName)
+
+array_pairs <- do.call(rbind, lapply(split(brown_arrays, brown_arrays$array),
+  function(d) {
+    pairs <- t(combn(d$BrownName, 2))
+    data.frame(array = d$array[1],
+               BrownName1 = pairs[, 1],
+               BrownName2 = pairs[, 2],
+               stringsAsFactors = FALSE)
+  })) %>%
+  remove_rownames() %>%
+  left_join(targets, by = "array") %>%
+  mutate(pair_type = if_else(BrownName1 == TargetName | BrownName2 == TargetName,
+                             "target-candidate",
+                             "candidate-candidate"),
+         Species1 = pmin(canonical[BrownName1], canonical[BrownName2]),
+         Species2 = pmax(canonical[BrownName1], canonical[BrownName2])) %>%
+  select(-TargetName)
+
+brown_pairs <- array_pairs %>%
+  left_join(per_dist_list, by = c("Species1", "Species2")) %>%
+  left_join(tax_23_list, by = c("Species1", "Species2")) %>%
+  left_join(tax_74_list, by = c("Species1", "Species2")) %>%
+  mutate(zDistPer = round(scale(DistPer)[,1], 2),
+         zDist23 = round(scale(Dist23)[,1], 2),
+         zDist74 = round(scale(Dist74)[,1], 2),
+         DistPer = round(DistPer, 2),
+         # Species1/Species2 are sorted alphabetically, so the common names have to
+         # follow that order rather than the order the pair was constructed in
+         Species1Common = if_else(Species1 == canonical[BrownName1],
+                                  common[BrownName1], common[BrownName2]),
+         Species2Common = if_else(Species2 == canonical[BrownName1],
+                                  common[BrownName1], common[BrownName2])) %>%
+  select(array, Species1, Species2, Species1Common, Species2Common,
+         BrownName1, BrownName2, pair_type,
+         DistPer, zDistPer, Dist23, zDist23, Dist74, zDist74) %>%
+  arrange(array, pair_type, Species1, Species2)
+
+stopifnot(
+  nrow(brown_pairs) == 546,
+  !any(is.na(brown_pairs$DistPer)),
+  !any(is.na(brown_pairs$Dist23)),
+  !any(is.na(brown_pairs$Dist74)),
+  sum(brown_pairs$pair_type == "target-candidate") == 156
+)
+
+```
+
+# Join the distances back onto Brown's table
+
+```{r}
+
+brown_table3_similarity <- brown_table3 %>%
+  mutate(british_scientificname2023 = canonical[british_binomial],
+         american_scientificname2023 = canonical[american_binomial],
+         Species1 = pmin(british_scientificname2023, american_scientificname2023),
+         Species2 = pmax(british_scientificname2023, american_scientificname2023)) %>%
+  left_join(brown_pairs %>%
+              select(array, Species1, Species2,
+                     DistPer, zDistPer, Dist23, zDist23, Dist74, zDist74),
+            by = c("array", "Species1", "Species2")) %>%
+  select(-Species1, -Species2)
+
+stopifnot(
+  nrow(brown_table3_similarity) == 156,
+  !any(is.na(brown_table3_similarity$DistPer))
+)
+
+# 25 of the 26 arrays account for all 34 subjects. Array 25 (swift) sums to 33
+# (97.1%) in Brown's printed Table 3 as well as here, so one subject's response is
+# unaccounted for in the original article. Nothing to fix at this end.
+
+brown_table3_similarity %>%
+  group_by(array) %>%
+  summarise(subjects = sum(n), percent = sum(percent)) %>%
+  filter(subjects != 34)
+
+```
+
+# Rank the candidates within each array
+
+Within each array the six American birds are ranked by their distance to the
+British target, 1 being the closest. Ranks are fractional (`ties.method =
+"average"`), which matters a great deal for the taxonomic measures: those are small
+integers, so several candidates in an array routinely share a value and it would be
+arbitrary to break the tie by row order.
+
+`RankHuman` ranks the same six candidates by how many subjects chose them, 1 being
+the most chosen, so that rank 1 on a distance measure can be compared against
+rank 1 from the subjects.
+
+```{r}
+
+brown_table3_similarity <- brown_table3_similarity %>%
+  group_by(array) %>%
+  mutate(RankPer = rank(DistPer, ties.method = "average"),
+         Rank23 = rank(Dist23, ties.method = "average"),
+         Rank74 = rank(Dist74, ties.method = "average"),
+         RankHuman = rank(-n, ties.method = "average")) %>%
+  ungroup()
+
+# Every array ranks 6 candidates, so the ranks must sum to 1+2+...+6 = 21
+# whatever the ties
+
+stopifnot(
+  all(brown_table3_similarity %>%
+        group_by(array) %>%
+        summarise(across(c(RankPer, Rank23, Rank74, RankHuman), sum)) %>%
+        select(-array) == 21)
+)
+
+# How much tying each measure produces: the number of distinct values per array
+
+brown_table3_similarity %>%
+  group_by(array) %>%
+  summarise(across(c(DistPer, Dist23, Dist74), n_distinct)) %>%
+  summarise(across(c(DistPer, Dist23, Dist74),
+                   list(mean_distinct_values = mean, min = min)))
+
+```
+
+This is worth pausing on before reading the histograms. Perceptual distance almost
+always separates all six candidates, but the taxonomic measures average fewer than
+two distinct values per array, and in some arrays all six candidates are the same
+taxonomic distance from the target. That is by design: Brown built most arrays out
+of candidates drawn from the target's own family, so taxonomy has very little room
+to discriminate within an array. Every candidate tied means a fractional rank of
+3.5 for all of them, which is why the taxonomic histograms below have a large spike
+at 3.5.
+
+# Rank of the top human choice
+
+For each array, take the candidate the most subjects chose and look up where each
+measure ranked it. A measure that predicts the subjects well piles up at rank 1.
+
+Array 14 (house sparrow) is the one array with a tied modal choice - Harris'
+sparrow and chipping sparrow both got 10 of the 34 votes - so both are kept,
+giving 27 observations across the 26 arrays for each measure.
+
+```{r}
+
+top_choice <- brown_table3_similarity %>%
+  group_by(array) %>%
+  filter(n == max(n)) %>%
+  ungroup()
+
+top_choice_ranks <- top_choice %>%
+  select(array, british_target, american_bird, n, RankPer, Rank23, Rank74) %>%
+  pivot_longer(cols = c(RankPer, Rank23, Rank74),
+               names_to = "Measure",
+               values_to = "Rank") %>%
+  mutate(Measure = factor(Measure,
+                          levels = c("RankPer", "Rank23", "Rank74"),
+                          labels = c("Perceptual (AVONET)",
+                                     "Taxonomic (Clements 2023)",
+                                     "Taxonomic (Clements 1974)")))
+
+nrow(top_choice)
+
+```
+
+```{r fig.width = 9, fig.height = 3.4}
+
+# Fractional ranks of 6 candidates always fall on a 0.5 grid, so half-unit bins
+# centred on each possible rank show the distribution exactly. The dashed line at
+# 3.5 is the mean rank expected if a measure ordered the candidates at random.
+
+rank_histograms <- ggplot(top_choice_ranks, aes(x = Rank)) +
+  geom_histogram(binwidth = 0.5, boundary = 0.25,
+                 fill = "steelblue", colour = "white", linewidth = 0.3) +
+  geom_vline(xintercept = 3.5, linetype = "dashed", colour = "grey40") +
+  facet_wrap(~ Measure) +
+  scale_x_continuous(breaks = 1:6) +
+  scale_y_continuous(breaks = scales::breaks_width(2),
+                     expand = expansion(mult = c(0, 0.05))) +
+  # coord_cartesian rather than scale limits: setting limits on the x scale would
+  # widen the binning range and then drop the empty edge bins with a warning
+  coord_cartesian(xlim = c(0.5, 6.5)) +
+  theme_bw() +
+  labs(x = "Rank of the top human choice (1 = closest)",
+       y = "Number of top choices")
+
+rank_histograms
+
+```
+
+Mean rank of the top human choice under each measure, and how often each measure
+put it first. `at_rank_1` counts outright firsts; `rank_1_or_tied_first` also
+counts the arrays where it was tied for closest (fractional rank below 2).
+
+```{r}
+
+top_choice_ranks %>%
+  group_by(Measure) %>%
+  summarise(observations = n(),
+            mean_rank = round(mean(Rank), 2),
+            at_rank_1 = sum(Rank == 1),
+            rank_1_or_tied_first = sum(Rank < 2))
+
+```
+
+# Rank of every choice the subjects made
+
+The histograms above throw away most of the data: each array contributes only its
+winning candidate, so a candidate chosen by 15 of the 34 subjects and one chosen by
+a single subject count the same.
+
+These histograms use every choice instead. Each of the 156 candidates contributes
+its rank once per subject who chose it, so in array 1 the gray-cheeked thrush
+(15 subjects, and the closest bird on the perceptual measure) contributes fifteen
+1s while the American robin (1 subject, ranked fourth) contributes a single 4.
+Candidates that nobody chose drop out. That gives 883 observations per measure -
+34 subjects x 26 arrays, less the one response array 25 is missing in Brown's
+printed table.
+
+```{r}
+
+all_choice_ranks <- brown_table3_similarity %>%
+  filter(n > 0) %>%
+  select(array, british_target, american_bird, n, RankPer, Rank23, Rank74) %>%
+  pivot_longer(cols = c(RankPer, Rank23, Rank74),
+               names_to = "Measure",
+               values_to = "Rank") %>%
+  mutate(Measure = factor(Measure,
+                          levels = c("RankPer", "Rank23", "Rank74"),
+                          labels = c("Perceptual (AVONET)",
+                                     "Taxonomic (Clements 2023)",
+                                     "Taxonomic (Clements 1974)")))
+
+stopifnot(
+  all(all_choice_ranks %>%
+        group_by(Measure) %>%
+        summarise(subjects = sum(n)) %>%
+        pull(subjects) == 883)
+)
+
+```
+
+```{r fig.width = 9, fig.height = 3.4}
+
+# Same bins and chance line as the top-choice histograms, but each row is weighted
+# by the number of subjects who picked that candidate
+
+all_choice_histograms <- ggplot(all_choice_ranks, aes(x = Rank, weight = n)) +
+  geom_histogram(binwidth = 0.5, boundary = 0.25,
+                 fill = "darkseagreen4", colour = "white", linewidth = 0.3) +
+  geom_vline(xintercept = 3.5, linetype = "dashed", colour = "grey40") +
+  facet_wrap(~ Measure) +
+  scale_x_continuous(breaks = 1:6) +
+  scale_y_continuous(breaks = scales::breaks_width(50),
+                     expand = expansion(mult = c(0, 0.05))) +
+  coord_cartesian(xlim = c(0.5, 6.5)) +
+  theme_bw() +
+  labs(x = "Rank of the chosen bird (1 = closest)",
+       y = "Number of subject choices")
+
+all_choice_histograms
+
+```
+
+Weighting by subject means these means are directly comparable with the top-choice
+table above, and 3.5 is again the value expected if a measure ordered the
+candidates at random.
+
+```{r}
+
+all_choice_ranks %>%
+  group_by(Measure) %>%
+  summarise(choices = sum(n),
+            mean_rank = round(weighted.mean(Rank, n), 2),
+            at_rank_1 = sum(n[Rank == 1]),
+            proportion_at_rank_1 = round(sum(n[Rank == 1]) / sum(n), 3))
+
+```
+
+# Checks
+
+Three pairs whose taxonomic distances can be worked out by hand. They also show
+why the 1974 and 2023 values differ, which is the point of carrying both.
+
+```{r}
+
+# spoonbill x roseate spoonbill
+#   Dist23 = 1: Ajaia ajaja became Platalea ajaja, so in 2023 it shares the genus
+#               Platalea with the British spoonbill (Platalea leucorodia)
+#   Dist74 = 2: in 1974 it was still Ajaia, so same family, different genus
+# blackbird x rusty blackbird
+#   Dist23 = Dist74 = 3: Turdus merula (Turdidae) and Euphagus carolinus
+#               (Icteridae) are different families but both Passeriformes
+# great spotted woodpecker x downy woodpecker
+#   Dist23 = 2: Dendrocopos major and Dryobates pubescens, both Picidae
+#   Dist74 = 1: in 1974 the downy woodpecker was Dendrocopos pubescens, so the
+#               two shared a genus
+
+brown_table3_similarity %>%
+  filter((british_target == "spoonbill" & american_bird == "roseate spoonbill") |
+         (british_target == "blackbird" & american_bird == "rusty blackbird") |
+         (british_target == "great spotted woodpecker" &
+            american_bird == "downy woodpecker")) %>%
+  select(british_target, american_bird, percent, DistPer, Dist23, Dist74)
+
+```
+
+Array 24 is the one array where all 34 subjects agreed (spoonbill -> roseate
+spoonbill), so the roseate spoonbill should also be the perceptually closest of
+the six candidates.
+
+```{r}
+
+brown_table3_similarity %>%
+  filter(array == 24) %>%
+  select(american_bird, n, percent, DistPer, Dist23, Dist74) %>%
+  arrange(DistPer)
+
+```
+
+# Export
+
+```{r}
+
+brown_bird_taxonomy <- brown_birds %>%
+  select(BrownName, CommonNameBrown, NameSource,
+         ScientificName2023, CommonName2023, Genus2023, Family2023, Order2023,
+         ScientificName1974, Genus1974, Family1974, Order1974,
+         ScientificName2021,
+         BeakLengthCulmen:Mass) %>%
+  arrange(BrownName)
+
+write.csv(brown_bird_taxonomy,
+          here("brown_britishnames/brown_bird_taxonomy.csv"),
+          row.names = FALSE)
+
+write.csv(brown_pairs,
+          here("brown_britishnames/brown_similarity_pairs.csv"),
+          row.names = FALSE)
+
+write.csv(brown_table3_similarity,
+          here("brown_britishnames/brown_table3_similarity.csv"),
+          row.names = FALSE)
+
+```
