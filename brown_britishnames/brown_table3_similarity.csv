@@ -1,157 +1,157 @@
-"array","british_target","british_family","british_binomial","american_bird","american_family","american_binomial","n","percent","binomial_as_printed","british_scientificname2023","american_scientificname2023","DistPer","zDistPer","Dist23","zDist23","Dist74","zDist74","RankPer","Rank23","Rank74","RankHuman"
-1,"song thrush","Turdidae","Turdus philomelos","American robin","Turdidae","Turdus migratorius",1,2.9,"","Turdus philomelos","Turdus migratorius",0.62,-1.12,1,-2.15,1,-1.89,1,1,1,4.5
-1,"song thrush","Turdidae","Turdus philomelos","gray-cheeked thrush","Turdidae","Catharus minimus",15,44.1,"","Turdus philomelos","Catharus minimus",1.21,-0.67,2,-0.89,2,-0.65,3,3.5,4,1
-1,"song thrush","Turdidae","Turdus philomelos","Swainson's thrush","Turdidae","Catharus ustulatus",13,38.2,"","Turdus philomelos","Catharus ustulatus",1.33,-0.58,2,-0.89,2,-0.65,4,3.5,4,2
-1,"song thrush","Turdidae","Turdus philomelos","wood thrush","Turdidae","Hylocichla mustelina",4,11.8,"","Turdus philomelos","Hylocichla mustelina",0.67,-1.09,2,-0.89,2,-0.65,2,3.5,4,3
-1,"song thrush","Turdidae","Turdus philomelos","Townsend's solitaire","Turdidae","Myadestes townsendi",0,0,"","Turdus philomelos","Myadestes townsendi",1.38,-0.54,2,-0.89,2,-0.65,5,3.5,4,6
-1,"song thrush","Turdidae","Turdus philomelos","northern wheatear","Turdidae","Oenanthe oenanthe",1,2.9,"","Turdus philomelos","Oenanthe oenanthe",1.65,-0.34,3,0.36,2,-0.65,6,6,4,4.5
-2,"mistle thrush","Turdidae","Turdus viscivorus","American robin","Turdidae","Turdus migratorius",8,23.5,"","Turdus viscivorus","Turdus migratorius",0.99,-0.84,1,-2.15,1,-1.89,1,1,1,3
-2,"mistle thrush","Turdidae","Turdus viscivorus","gray-cheeked thrush","Turdidae","Catharus minimus",5,14.7,"","Turdus viscivorus","Catharus minimus",2.42,0.25,2,-0.89,2,-0.65,4,3.5,4,4
-2,"mistle thrush","Turdidae","Turdus viscivorus","Swainson's thrush","Turdidae","Catharus ustulatus",9,26.5,"","Turdus viscivorus","Catharus ustulatus",2.5,0.32,2,-0.89,2,-0.65,5,3.5,4,2
-2,"mistle thrush","Turdidae","Turdus viscivorus","wood thrush","Turdidae","Hylocichla mustelina",10,29.4,"","Turdus viscivorus","Hylocichla mustelina",1.93,-0.12,2,-0.89,2,-0.65,2,3.5,4,1
-2,"mistle thrush","Turdidae","Turdus viscivorus","Townsend's solitaire","Turdidae","Myadestes townsendi",0,0,"","Turdus viscivorus","Myadestes townsendi",2.15,0.05,2,-0.89,2,-0.65,3,3.5,4,6
-2,"mistle thrush","Turdidae","Turdus viscivorus","northern wheatear","Turdidae","Oenanthe oenanthe",2,5.9,"","Turdus viscivorus","Oenanthe oenanthe",2.85,0.58,3,0.36,2,-0.65,6,6,4,5
-3,"blackbird","Turdidae","Turdus merula","American robin","Turdidae","Turdus migratorius",8,23.5,"","Turdus merula","Turdus migratorius",0.83,-0.96,1,-2.15,1,-1.89,1,1,1,3
-3,"blackbird","Turdidae","Turdus merula","wood thrush","Turdidae","Hylocichla mustelina",3,8.8,"","Turdus merula","Hylocichla mustelina",1.5,-0.45,2,-0.89,2,-0.65,5,2,2.5,4
-3,"blackbird","Turdidae","Turdus merula","rusty blackbird","Icteridae","Euphagus carolinus",12,35.3,"","Turdus merula","Euphagus carolinus",0.93,-0.88,3,0.36,3,0.59,2,4.5,5,1
-3,"blackbird","Turdidae","Turdus merula","Brewer's blackbird","Icteridae","Euphagus cyanocephalus",9,26.5,"","Turdus merula","Euphagus cyanocephalus",1.04,-0.81,3,0.36,3,0.59,3,4.5,5,2
-3,"blackbird","Turdidae","Turdus merula","northern wheatear","Turdidae","Oenanthe oenanthe",2,5.9,"","Turdus merula","Oenanthe oenanthe",2.75,0.5,3,0.36,2,-0.65,6,4.5,2.5,5
-3,"blackbird","Turdidae","Turdus merula","common grackle","Icteridae","Quiscalus quiscalus",0,0,"","Turdus merula","Quiscalus quiscula",1.08,-0.77,3,0.36,3,0.59,4,4.5,5,6
-4,"sparrowhawk","Accipitridae","Accipiter nisus","sparrow hawk","Falconidae","Falco sparverius",0,0,"Falco Sparverius","Accipiter nisus","Falco sparverius",1.49,-0.46,4,1.62,3,0.59,3,6,6,5.5
-4,"sparrowhawk","Accipitridae","Accipiter nisus","sharp-shinned hawk","Accipitridae","Accipiter striatus",13,38.2,"Accipter striatus","Accipiter nisus","Accipiter striatus",0.88,-0.93,1,-2.15,1,-1.89,1,2,2,2
-4,"sparrowhawk","Accipitridae","Accipiter nisus","Cooper's hawk","Accipitridae","Accipiter cooperii",14,41.2,"Accipter cooperii","Accipiter nisus","Accipiter cooperii",1.13,-0.74,1,-2.15,1,-1.89,2,2,2,1
-4,"sparrowhawk","Accipitridae","Accipiter nisus","northern goshawk","Accipitridae","Accipiter gentilis",6,17.7,"Accipter gentilis","Accipiter nisus","Accipiter gentilis",2.62,0.41,1,-2.15,1,-1.89,4,2,2,3
-4,"sparrowhawk","Accipitridae","Accipiter nisus","Swainson's hawk","Accipitridae","Buteo swainsoni",1,2.9,"","Accipiter nisus","Buteo swainsoni",2.97,0.68,2,-0.89,2,-0.65,5,4.5,4.5,4
-4,"sparrowhawk","Accipitridae","Accipiter nisus","Ferruginous hawk","Accipitridae","Buteo regalis",0,0,"","Accipiter nisus","Buteo regalis",3.83,1.33,2,-0.89,2,-0.65,6,4.5,4.5,5.5
-5,"redstart","Turdidae","Phoenicurus phoenicurus","American robin","Turdidae","Turdus migratorius",4,11.8,"","Phoenicurus phoenicurus","Turdus migratorius",3.03,0.72,3,0.36,2,-0.65,6,4,3,4
-5,"redstart","Turdidae","Phoenicurus phoenicurus","hermit thrush","Turdidae","Catharus guttatus",0,0,"","Phoenicurus phoenicurus","Catharus guttatus",1.07,-0.78,3,0.36,2,-0.65,1.5,4,3,5.5
-5,"redstart","Turdidae","Phoenicurus phoenicurus","wood thrush","Turdidae","Hylocichla mustelina",0,0,"","Phoenicurus phoenicurus","Hylocichla mustelina",2.11,0.02,3,0.36,2,-0.65,5,4,3,5.5
-5,"redstart","Turdidae","Phoenicurus phoenicurus","American redstart","Parulidae","Setophaga ruticilla",6,17.7,"","Phoenicurus phoenicurus","Setophaga ruticilla",1.07,-0.78,3,0.36,3,0.59,1.5,4,6,3
-5,"redstart","Turdidae","Phoenicurus phoenicurus","eastern bluebird","Turdidae","Sialia sialis",8,23.5,"","Phoenicurus phoenicurus","Sialia sialis",1.32,-0.59,3,0.36,2,-0.65,4,4,3,2
-5,"redstart","Turdidae","Phoenicurus phoenicurus","northern wheatear","Turdidae","Oenanthe oenanthe",16,47.1,"","Phoenicurus phoenicurus","Oenanthe oenanthe",1.22,-0.67,2,-0.89,2,-0.65,3,1,3,1
-6,"black redstart","Turdidae","Phoenicurus ochruros","American robin","Turdidae","Turdus migratorius",2,5.9,"","Phoenicurus ochruros","Turdus migratorius",3.12,0.79,3,0.36,2,-0.65,6,4,3,4
-6,"black redstart","Turdidae","Phoenicurus ochruros","hermit thrush","Turdidae","Catharus guttatus",0,0,"","Phoenicurus ochruros","Catharus guttatus",1.07,-0.78,3,0.36,2,-0.65,1,4,3,5.5
-6,"black redstart","Turdidae","Phoenicurus ochruros","wood thrush","Turdidae","Hylocichla mustelina",0,0,"","Phoenicurus ochruros","Hylocichla mustelina",2.24,0.12,3,0.36,2,-0.65,5,4,3,5.5
-6,"black redstart","Turdidae","Phoenicurus ochruros","American redstart","Parulidae","Setophaga ruticilla",16,47.1,"","Phoenicurus ochruros","Setophaga ruticilla",1.42,-0.51,3,0.36,3,0.59,3,4,6,1
-6,"black redstart","Turdidae","Phoenicurus ochruros","eastern bluebird","Turdidae","Sialia sialis",3,8.8,"","Phoenicurus ochruros","Sialia sialis",1.66,-0.33,3,0.36,2,-0.65,4,4,3,3
-6,"black redstart","Turdidae","Phoenicurus ochruros","northern wheatear","Turdidae","Oenanthe oenanthe",13,38.2,"","Phoenicurus ochruros","Oenanthe oenanthe",1.4,-0.52,2,-0.89,2,-0.65,2,1,3,2
-7,"sedge warbler","Sylviidae","Acrocephalus schoenobaenus","ruby-crowned kinglet","Sylviidae","Regulus calendula",0,0,"","Acrocephalus schoenobaenus","Corthylio calendula",1.25,-0.64,3,0.36,2,-0.65,4,3.5,2,5
-7,"sedge warbler","Sylviidae","Acrocephalus schoenobaenus","golden-crowned kinglet","Sylviidae","Regulus satrapa",1,2.9,"","Acrocephalus schoenobaenus","Regulus satrapa",1.5,-0.45,3,0.36,2,-0.65,5,3.5,2,3
-7,"sedge warbler","Sylviidae","Acrocephalus schoenobaenus","blue-gray gnatcatcher","Sylviidae","Polioptila caerulea",0,0,"","Acrocephalus schoenobaenus","Polioptila caerulea",1.61,-0.37,3,0.36,2,-0.65,6,3.5,2,5
-7,"sedge warbler","Sylviidae","Acrocephalus schoenobaenus","blackpoll warbler","Parulidae","Dendroica striata",23,67.7,"","Acrocephalus schoenobaenus","Setophaga striata",0.78,-1,3,0.36,3,0.59,1,3.5,5,1
-7,"sedge warbler","Sylviidae","Acrocephalus schoenobaenus","Nashville warbler","Parulidae","Vermivora ruficapilla",0,0,"","Acrocephalus schoenobaenus","Leiothlypis ruficapilla",1.1,-0.76,3,0.36,3,0.59,3,3.5,5,5
-7,"sedge warbler","Sylviidae","Acrocephalus schoenobaenus","bay-breasted warbler","Parulidae","Dendroica castanea",10,29.4,"","Acrocephalus schoenobaenus","Setophaga castanea",0.89,-0.92,3,0.36,3,0.59,2,3.5,5,2
-8,"grasshopper warbler","Sylviidae","Locustella naevia","ruby-crowned kinglet","Sylviidae","Regulus calendula",0,0,"","Locustella naevia","Corthylio calendula",1.21,-0.67,3,0.36,2,-0.65,4,3.5,2,4.5
-8,"grasshopper warbler","Sylviidae","Locustella naevia","golden-crowned kinglet","Sylviidae","Regulus satrapa",0,0,"","Locustella naevia","Regulus satrapa",1.38,-0.54,3,0.36,2,-0.65,5,3.5,2,4.5
-8,"grasshopper warbler","Sylviidae","Locustella naevia","blue-gray gnatcatcher","Sylviidae","Polioptila caerulea",0,0,"","Locustella naevia","Polioptila caerulea",1.45,-0.49,3,0.36,2,-0.65,6,3.5,2,4.5
-8,"grasshopper warbler","Sylviidae","Locustella naevia","blackpoll warbler","Parulidae","Dendroica striata",28,82.4,"","Locustella naevia","Setophaga striata",1.1,-0.76,3,0.36,3,0.59,2,3.5,5,1
-8,"grasshopper warbler","Sylviidae","Locustella naevia","Nashville warbler","Parulidae","Vermivora ruficapilla",0,0,"","Locustella naevia","Leiothlypis ruficapilla",1.05,-0.79,3,0.36,3,0.59,1,3.5,5,4.5
-8,"grasshopper warbler","Sylviidae","Locustella naevia","bay-breasted warbler","Parulidae","Dendroica castanea",6,17.7,"","Locustella naevia","Setophaga castanea",1.13,-0.73,3,0.36,3,0.59,3,3.5,5,2
-9,"Cetti's warbler","Sylviidae","Cettia cetti","ruby-crowned kinglet","Sylviidae","Regulus calendula",0,0,"","Cettia cetti","Corthylio calendula",1.49,-0.46,3,0.36,2,-0.65,3,3.5,2,5.5
-9,"Cetti's warbler","Sylviidae","Cettia cetti","golden-crowned kinglet","Sylviidae","Regulus satrapa",0,0,"","Cettia cetti","Regulus satrapa",1.71,-0.29,3,0.36,2,-0.65,5,3.5,2,5.5
-9,"Cetti's warbler","Sylviidae","Cettia cetti","blue-gray gnatcatcher","Sylviidae","Polioptila caerulea",1,2.9,"","Cettia cetti","Polioptila caerulea",1.3,-0.6,3,0.36,2,-0.65,1,3.5,2,4
-9,"Cetti's warbler","Sylviidae","Cettia cetti","blackpoll warbler","Parulidae","Dendroica striata",8,23.5,"","Cettia cetti","Setophaga striata",2.24,0.12,3,0.36,3,0.59,6,3.5,5,2
-9,"Cetti's warbler","Sylviidae","Cettia cetti","Tennessee warbler","Parulidae","Vermivora peregrina",22,64.7,"","Cettia cetti","Leiothlypis peregrina",1.67,-0.32,3,0.36,3,0.59,4,3.5,5,1
-9,"Cetti's warbler","Sylviidae","Cettia cetti","Nashville warbler","Parulidae","Vermivora ruficapilla",3,8.8,"","Cettia cetti","Leiothlypis ruficapilla",1.48,-0.46,3,0.36,3,0.59,2,3.5,5,3
-10,"reed warbler","Sylviidae","Acrocephalus scirpaceus","ruby-crowned kinglet","Sylviidae","Regulus calendula",1,2.9,"","Acrocephalus scirpaceus","Corthylio calendula",1.44,-0.49,3,0.36,2,-0.65,4,3.5,2,4.5
-10,"reed warbler","Sylviidae","Acrocephalus scirpaceus","golden-crowned kinglet","Sylviidae","Regulus satrapa",0,0,"","Acrocephalus scirpaceus","Regulus satrapa",1.83,-0.2,3,0.36,2,-0.65,6,3.5,2,6
-10,"reed warbler","Sylviidae","Acrocephalus scirpaceus","blue-gray gnatcatcher","Sylviidae","Polioptila caerulea",1,2.9,"","Acrocephalus scirpaceus","Polioptila caerulea",1.68,-0.31,3,0.36,2,-0.65,5,3.5,2,4.5
-10,"reed warbler","Sylviidae","Acrocephalus scirpaceus","blackpoll warbler","Parulidae","Dendroica striata",7,20.6,"","Acrocephalus scirpaceus","Setophaga striata",0.85,-0.95,3,0.36,3,0.59,1,3.5,5,2
-10,"reed warbler","Sylviidae","Acrocephalus scirpaceus","Tennessee warbler","Parulidae","Vermivora peregrina",22,64.7,"","Acrocephalus scirpaceus","Leiothlypis peregrina",1.01,-0.83,3,0.36,3,0.59,3,3.5,5,1
-10,"reed warbler","Sylviidae","Acrocephalus scirpaceus","bay-breasted warbler","Parulidae","Dendroica castanea",3,8.8,"","Acrocephalus scirpaceus","Setophaga castanea",0.93,-0.89,3,0.36,3,0.59,2,3.5,5,3
-11,"pied flycatcher","Muscicapidae","Ficedula hypoleuca","Townsend's solitaire","Turdidae","Myadestes townsendi",6,17.7,"","Ficedula hypoleuca","Myadestes townsendi",2.15,0.05,3,0.36,3,0.59,6,3.5,3.5,3
-11,"pied flycatcher","Muscicapidae","Ficedula hypoleuca","ruby-crowned kinglet","Sylviidae","Regulus calendula",6,17.7,"","Ficedula hypoleuca","Corthylio calendula",1.88,-0.16,3,0.36,3,0.59,5,3.5,3.5,3
-11,"pied flycatcher","Muscicapidae","Ficedula hypoleuca","least flycatcher","Tyrannidae","Empidonax minimus",13,38.2,"","Ficedula hypoleuca","Empidonax minimus",1.41,-0.52,3,0.36,3,0.59,3,3.5,3.5,1
-11,"pied flycatcher","Muscicapidae","Ficedula hypoleuca","Acadian flycatcher","Tyrannidae","Empidonax virescens",3,8.8,"Empidonax verescens","Ficedula hypoleuca","Empidonax virescens",1.23,-0.65,3,0.36,3,0.59,2,3.5,3.5,5
-11,"pied flycatcher","Muscicapidae","Ficedula hypoleuca","willow flycatcher","Tyrannidae","Empidonax traillii",6,17.7,"","Ficedula hypoleuca","Empidonax traillii",1.45,-0.49,3,0.36,3,0.59,4,3.5,3.5,3
-11,"pied flycatcher","Muscicapidae","Ficedula hypoleuca","pine warbler","Parulidae","Dendroica pinus",0,0,"","Ficedula hypoleuca","Setophaga pinus",0.79,-0.99,3,0.36,3,0.59,1,3.5,3.5,6
-12,"spotted flycatcher","Muscicapidae","Muscicapa striata","Townsend's solitaire","Turdidae","Myadestes townsendi",7,20.6,"","Muscicapa striata","Myadestes townsendi",1.71,-0.29,3,0.36,3,0.59,5,3.5,3.5,3
-12,"spotted flycatcher","Muscicapidae","Muscicapa striata","ruby-crowned kinglet","Sylviidae","Regulus calendula",0,0,"","Muscicapa striata","Corthylio calendula",2.44,0.27,3,0.36,3,0.59,6,3.5,3.5,6
-12,"spotted flycatcher","Muscicapidae","Muscicapa striata","least flycatcher","Tyrannidae","Empidonax minimus",1,2.9,"","Muscicapa striata","Empidonax minimus",1.57,-0.39,3,0.36,3,0.59,4,3.5,3.5,5
-12,"spotted flycatcher","Muscicapidae","Muscicapa striata","Acadian flycatcher","Tyrannidae","Empidonax virescens",15,44.1,"Empidonax verescens","Muscicapa striata","Empidonax virescens",1.07,-0.78,3,0.36,3,0.59,1,3.5,3.5,1
-12,"spotted flycatcher","Muscicapidae","Muscicapa striata","willow flycatcher","Tyrannidae","Empidonax traillii",8,23.5,"","Muscicapa striata","Empidonax traillii",1.39,-0.54,3,0.36,3,0.59,3,3.5,3.5,2
-12,"spotted flycatcher","Muscicapidae","Muscicapa striata","pine warbler","Parulidae","Dendroica pinus",3,8.8,"","Muscicapa striata","Setophaga pinus",1.12,-0.74,3,0.36,3,0.59,2,3.5,3.5,4
-13,"golden oriole","Oriolidae","Oriolus oriolus","American robin","Turdidae","Turdus migratorius",1,2.9,"","Oriolus oriolus","Turdus migratorius",1.77,-0.24,3,0.36,3,0.59,2,3.5,3.5,5.5
-13,"golden oriole","Oriolidae","Oriolus oriolus","yellow-headed blackbird","Icteridae","Xanthocephalus xanthocephalus",13,38.2,"Xanthocephalus x.","Oriolus oriolus","Xanthocephalus xanthocephalus",1.73,-0.28,3,0.36,3,0.59,1,3.5,3.5,1
-13,"golden oriole","Oriolidae","Oriolus oriolus","spotted oriole","Icteridae","Icterus pectoralis",1,2.9,"","Oriolus oriolus","Icterus pectoralis",2.88,0.61,3,0.36,3,0.59,5,3.5,3.5,5.5
-13,"golden oriole","Oriolidae","Oriolus oriolus","orchard oriole","Icteridae","Icterus spurius",8,23.5,"","Oriolus oriolus","Icterus spurius",3.31,0.94,3,0.36,3,0.59,6,3.5,3.5,2
-13,"golden oriole","Oriolidae","Oriolus oriolus","northern oriole","Icteridae","Icterus galbula",7,20.6,"","Oriolus oriolus","Icterus galbula",2.44,0.27,3,0.36,3,0.59,4,3.5,3.5,3
-13,"golden oriole","Oriolidae","Oriolus oriolus","eastern meadowlark","Icteridae","Sturnella magna",4,11.7,"","Oriolus oriolus","Sturnella magna",2.22,0.1,3,0.36,3,0.59,3,3.5,3.5,4
-14,"house sparrow","Passeridae","Passer domesticus","Harris' sparrow","Fringillidae","Zonotrichia querula",10,29.4,"","Passer domesticus","Zonotrichia querula",1.22,-0.67,3,0.36,3,0.59,3,3.5,3.5,1.5
-14,"house sparrow","Passeridae","Passer domesticus","chipping sparrow","Fringillidae","Spizella passerina",10,29.4,"","Passer domesticus","Spizella passerina",1.42,-0.51,3,0.36,3,0.59,4,3.5,3.5,1.5
-14,"house sparrow","Passeridae","Passer domesticus","swamp sparrow","Fringillidae","Melospiza georgiana",4,11.7,"","Passer domesticus","Melospiza georgiana",1.62,-0.36,3,0.36,3,0.59,6,3.5,3.5,4
-14,"house sparrow","Passeridae","Passer domesticus","dickcissel","Fringillidae","Spiza americana",5,14.7,"","Passer domesticus","Spiza americana",0.55,-1.18,3,0.36,3,0.59,1,3.5,3.5,3
-14,"house sparrow","Passeridae","Passer domesticus","Smith's longspur","Fringillidae","Calcarius lapponicus",3,8.8,"Calcarious lapponicus","Passer domesticus","Calcarius lapponicus",0.98,-0.85,3,0.36,3,0.59,2,3.5,3.5,5
-14,"house sparrow","Passeridae","Passer domesticus","pine siskin","Fringillidae","Carduelis pinus",2,5.9,"","Passer domesticus","Spinus pinus",1.48,-0.47,3,0.36,3,0.59,5,3.5,3.5,6
-15,"tree sparrow","Passeridae","Passer montanus","Harris' sparrow","Fringillidae","Zonotrichia querula",13,38.2,"","Passer montanus","Zonotrichia querula",1.54,-0.42,3,0.36,3,0.59,6,3.5,3.5,1
-15,"tree sparrow","Passeridae","Passer montanus","chipping sparrow","Fringillidae","Spizella passerina",9,26.5,"","Passer montanus","Spizella passerina",0.94,-0.88,3,0.36,3,0.59,2,3.5,3.5,2
-15,"tree sparrow","Passeridae","Passer montanus","swamp sparrow","Fringillidae","Melospiza georgiana",3,8.8,"","Passer montanus","Melospiza georgiana",1.17,-0.7,3,0.36,3,0.59,3,3.5,3.5,5
-15,"tree sparrow","Passeridae","Passer montanus","dickcissel","Fringillidae","Spiza americana",5,14.7,"","Passer montanus","Spiza americana",0.88,-0.93,3,0.36,3,0.59,1,3.5,3.5,3
-15,"tree sparrow","Passeridae","Passer montanus","Smith's longspur","Fringillidae","Calcarius lapponicus",4,11.8,"Calcarious lapponicus","Passer montanus","Calcarius lapponicus",1.47,-0.47,3,0.36,3,0.59,5,3.5,3.5,4
-15,"tree sparrow","Passeridae","Passer montanus","pine siskin","Fringillidae","Carduelis pinus",0,0,"","Passer montanus","Spinus pinus",1.37,-0.55,3,0.36,3,0.59,4,3.5,3.5,6
-16,"cuckoo","Cuculidae","Cuculus canorus","yellow-billed cuckoo","Cuculidae","Coccyzus americanus",9,26.5,"","Cuculus canorus","Coccyzus americanus",1.09,-0.77,2,-0.89,2,-0.65,1,2,2,2
-16,"cuckoo","Cuculidae","Cuculus canorus","black-billed cuckoo","Cuculidae","Coccyzus erythropthalmus",13,38.2,"C. erythropthalmus","Cuculus canorus","Coccyzus erythropthalmus",1.38,-0.54,2,-0.89,2,-0.65,2,2,2,1
-16,"cuckoo","Cuculidae","Cuculus canorus","greater roadrunner","Cuculidae","Geococcyx californianus",4,11.8,"Geococcyx Californianus","Cuculus canorus","Geococcyx californianus",5.38,2.53,2,-0.89,2,-0.65,6,2,2,3.5
-16,"cuckoo","Cuculidae","Cuculus canorus","Mississippi kite","Accipitridae","Ictinia mississippiensis",3,8.8,"","Cuculus canorus","Ictinia mississippiensis",2.27,0.14,4,1.62,4,1.83,3,5,5,5
-16,"cuckoo","Cuculidae","Cuculus canorus","snail kite","Accipitridae","Rostrhamus sociabilis",4,11.8,"","Cuculus canorus","Rostrhamus sociabilis",2.94,0.65,4,1.62,4,1.83,4,5,5,3.5
-16,"cuckoo","Cuculidae","Cuculus canorus","Swainson's hawk","Accipitridae","Buteo swainsoni",1,2.9,"","Cuculus canorus","Buteo swainsoni",3.82,1.33,4,1.62,4,1.83,5,5,5,6
-17,"jay","Corvidae","Garrulus glandarius","American robin","Turdidae","Turdus migratorius",6,17.7,"","Garrulus glandarius","Turdus migratorius",2.6,0.39,3,0.36,3,0.59,4,5.5,5.5,2
-17,"jay","Corvidae","Garrulus glandarius","eastern bluebird","Turdidae","Sialia sialis",5,14.7,"","Garrulus glandarius","Sialia sialis",4.62,1.94,3,0.36,3,0.59,6,5.5,5.5,3
-17,"jay","Corvidae","Garrulus glandarius","blue jay","Corvidae","Cyanocitta cristata",2,5.9,"","Garrulus glandarius","Cyanocitta cristata",1.4,-0.53,2,-0.89,2,-0.65,2,2.5,2.5,4.5
-17,"jay","Corvidae","Garrulus glandarius","scrub jay","Corvidae","Aphelocoma coerulescens",2,5.9,"","Garrulus glandarius","Aphelocoma coerulescens",1.65,-0.34,2,-0.89,2,-0.65,3,2.5,2.5,4.5
-17,"jay","Corvidae","Garrulus glandarius","gray jay","Corvidae","Perisoreus canadensis",18,52.9,"","Garrulus glandarius","Perisoreus canadensis",1.29,-0.61,2,-0.89,2,-0.65,1,2.5,2.5,1
-17,"jay","Corvidae","Garrulus glandarius","American crow","Corvidae","Corvus brachyrhynchos",1,2.9,"","Garrulus glandarius","Corvus brachyrhynchos",2.84,0.57,2,-0.89,2,-0.65,5,2.5,2.5,6
-18,"kingfisher","Alcedinidae","Alcedo atthis","eastern bluebird","Turdidae","Sialia sialis",1,2.9,"","Alcedo atthis","Sialia sialis",3.29,0.92,4,1.62,4,1.83,2,4,4,4.5
-18,"kingfisher","Alcedinidae","Alcedo atthis","common grackle","Icteridae","Quiscalus quiscalus",0,0,"","Alcedo atthis","Quiscalus quiscula",4.29,1.69,4,1.62,4,1.83,5,4,4,6
-18,"kingfisher","Alcedinidae","Alcedo atthis","belted kingfisher","Alcedinidae","Megaceryle alcyon",22,64.7,"","Alcedo atthis","Megaceryle alcyon",3.9,1.39,2,-0.89,2,-0.65,3,1,1,1
-18,"kingfisher","Alcedinidae","Alcedo atthis","pileated woodpecker","Picidae","Dryocopus pileatus",1,2.9,"","Alcedo atthis","Dryocopus pileatus",5.91,2.93,4,1.62,4,1.83,6,4,4,4.5
-18,"kingfisher","Alcedinidae","Alcedo atthis","common flicker","Picidae","Colaptes auratus",8,23.5,"","Alcedo atthis","Colaptes auratus",4.24,1.65,4,1.62,4,1.83,4,4,4,2
-18,"kingfisher","Alcedinidae","Alcedo atthis","downy woodpecker","Picidae","Picoides pubescens",2,5.9,"","Alcedo atthis","Dryobates pubescens",2.62,0.41,4,1.62,4,1.83,1,4,4,3
-19,"red kite","Accipitridae","Milvus milvus","sparrow hawk","Falconidae","Falco sparverius",2,5.9,"","Milvus milvus","Falco sparverius",4.6,1.92,4,1.62,3,0.59,5,6,6,3
-19,"red kite","Accipitridae","Milvus milvus","sharp-shinned hawk","Accipitridae","Accipiter striatus",4,11.8,"Accipter striatus","Milvus milvus","Accipiter striatus",4.81,2.09,2,-0.89,2,-0.65,6,3,3,2
-19,"red kite","Accipitridae","Milvus milvus","Mississippi kite","Accipitridae","Ictinia mississippiensis",1,2.9,"Ictinia m.","Milvus milvus","Ictinia mississippiensis",2.93,0.64,2,-0.89,2,-0.65,3,3,3,4.5
-19,"red kite","Accipitridae","Milvus milvus","white-tailed kite","Accipitridae","Elanus leucurus",0,0,"","Milvus milvus","Elanus leucurus",2.94,0.66,2,-0.89,2,-0.65,4,3,3,6
-19,"red kite","Accipitridae","Milvus milvus","snail kite","Accipitridae","Rostrhamus sociabilis",1,2.9,"Rostrhanus sociabilis","Milvus milvus","Rostrhamus sociabilis",2.32,0.18,2,-0.89,2,-0.65,2,3,3,4.5
-19,"red kite","Accipitridae","Milvus milvus","Swainson's hawk","Accipitridae","Buteo swainsoni",26,76.5,"","Milvus milvus","Buteo swainsoni",1.37,-0.55,2,-0.89,2,-0.65,1,3,3,1
-20,"woodlark","Alaudidae","Lullula arborea","gray-cheeked thrush","Turdidae","Catharus minimus",1,2.9,"","Lullula arborea","Catharus minimus",1.12,-0.74,3,0.36,3,0.59,2,4,4,5.5
-20,"woodlark","Alaudidae","Lullula arborea","Swainson's thrush","Turdidae","Catharus ustulatus",4,11.8,"","Lullula arborea","Catharus ustulatus",1.13,-0.73,3,0.36,3,0.59,3,4,4,3
-20,"woodlark","Alaudidae","Lullula arborea","hermit thrush","Turdidae","Catharus guttatus",3,8.8,"Cathatus guttatus","Lullula arborea","Catharus guttatus",0.9,-0.91,3,0.36,3,0.59,1,4,4,4
-20,"woodlark","Alaudidae","Lullula arborea","bobolink","Icteridae","Dolichonyx oryzivorus",1,2.9,"Bolichonyx oryzivorus","Lullula arborea","Dolichonyx oryzivorus",1.94,-0.11,3,0.36,3,0.59,5,4,4,5.5
-20,"woodlark","Alaudidae","Lullula arborea","eastern meadowlark","Icteridae","Sturnella magna",5,14.7,"","Lullula arborea","Sturnella magna",3,0.7,3,0.36,3,0.59,6,4,4,2
-20,"woodlark","Alaudidae","Lullula arborea","horned lark","Alaudidae","Eremophila alpestris",20,58.8,"","Lullula arborea","Eremophila alpestris",1.52,-0.43,2,-0.89,2,-0.65,4,1,1,1
-21,"skylark","Alaudidae","Alauda arvensis","gray-cheeked thrush","Turdidae","Catharus minimus",4,11.8,"","Alauda arvensis","Catharus minimus",0.68,-1.07,3,0.36,3,0.59,3,4,4,2.5
-21,"skylark","Alaudidae","Alauda arvensis","Swainson's thrush","Turdidae","Catharus ustulatus",4,11.8,"","Alauda arvensis","Catharus ustulatus",0.61,-1.13,3,0.36,3,0.59,2,4,4,2.5
-21,"skylark","Alaudidae","Alauda arvensis","hermit thrush","Turdidae","Catharus guttatus",3,8.8,"Cathatus guttatus","Alauda arvensis","Catharus guttatus",1.25,-0.64,3,0.36,3,0.59,5,4,4,4.5
-21,"skylark","Alaudidae","Alauda arvensis","bobolink","Icteridae","Dolichonyx oryzivorus",2,5.9,"Bolichonyx oryzivorus","Alauda arvensis","Dolichonyx oryzivorus",1.24,-0.65,3,0.36,3,0.59,4,4,4,6
-21,"skylark","Alaudidae","Alauda arvensis","eastern meadowlark","Icteridae","Sturnella magna",3,8.8,"","Alauda arvensis","Sturnella magna",2.53,0.34,3,0.36,3,0.59,6,4,4,4.5
-21,"skylark","Alaudidae","Alauda arvensis","horned lark","Alaudidae","Eremophila alpestris",18,52.9,"","Alauda arvensis","Eremophila alpestris",0.56,-1.17,2,-0.89,2,-0.65,1,1,1,1
-22,"great spotted woodpecker","Picidae","Dendrocopos major","scissor-tailed flycatcher","Tyrannidae","Muscivora forficata",0,0,"Muscivora f.","Dendrocopos major","Tyrannus forficatus",2.4,0.24,4,1.62,4,1.83,4,5,5,5.5
-22,"great spotted woodpecker","Picidae","Dendrocopos major","olive-sided flycatcher","Tyrannidae","Nuttallornis borealis",0,0,"Nuttallornis b.","Dendrocopos major","Contopus cooperi",2.08,0,4,1.62,4,1.83,2,5,5,5.5
-22,"great spotted woodpecker","Picidae","Dendrocopos major","belted kingfisher","Alcedinidae","Megaceryle alcyon",2,5.9,"","Dendrocopos major","Megaceryle alcyon",2.21,0.09,4,1.62,4,1.83,3,5,5,4
-22,"great spotted woodpecker","Picidae","Dendrocopos major","red-headed woodpecker","Picidae","Melanerpes erythrocephalus",10,29.4,"Melanerpes e.","Dendrocopos major","Melanerpes erythrocephalus",0.59,-1.15,2,-0.89,2,-0.65,1,2,2.5,2
-22,"great spotted woodpecker","Picidae","Dendrocopos major","pileated woodpecker","Picidae","Dryocopus pileatus",7,20.6,"","Dendrocopos major","Dryocopus pileatus",2.78,0.53,2,-0.89,2,-0.65,6,2,2.5,3
-22,"great spotted woodpecker","Picidae","Dendrocopos major","downy woodpecker","Picidae","Picoides pubescens",15,44.1,"Picoides pubsecens","Dendrocopos major","Dryobates pubescens",2.74,0.5,2,-0.89,1,-1.89,5,2,1,1
-23,"robin","Turdidae","Erithacus rubecula","American robin","Turdidae","Turdus migratorius",2,5.9,"","Erithacus rubecula","Turdus migratorius",3.38,0.99,3,0.36,2,-0.65,6,4,3.5,4
-23,"robin","Turdidae","Erithacus rubecula","Swainson's thrush","Turdidae","Catharus ustulatus",1,2.9,"","Erithacus rubecula","Catharus ustulatus",2.05,-0.03,3,0.36,2,-0.65,4,4,3.5,5
-23,"robin","Turdidae","Erithacus rubecula","wood thrush","Turdidae","Hylocichla mustelina",0,0,"Hylociehla mustelina","Erithacus rubecula","Hylocichla mustelina",2.45,0.28,3,0.36,2,-0.65,5,4,3.5,6
-23,"robin","Turdidae","Erithacus rubecula","eastern bluebird","Turdidae","Sialia sialis",16,47.1,"","Erithacus rubecula","Sialia sialis",2.03,-0.05,3,0.36,2,-0.65,3,4,3.5,1
-23,"robin","Turdidae","Erithacus rubecula","northern wheatear","Turdidae","Oenanthe oenanthe",6,17.7,"","Erithacus rubecula","Oenanthe oenanthe",1.82,-0.21,2,-0.89,2,-0.65,1,1,3.5,3
-23,"robin","Turdidae","Erithacus rubecula","veery","Turdidae","Catharus fuscescens",9,26.5,"","Erithacus rubecula","Catharus fuscescens",1.87,-0.16,3,0.36,2,-0.65,2,4,3.5,2
-24,"spoonbill","Threskiornithidae","Platalea leucorodia","roseate spoonbill","Threskiornithidae","Ajaia ajaja",34,100,"","Platalea leucorodia","Platalea ajaja",1.15,-0.72,1,-2.15,2,-0.65,1,1,2,1
-24,"spoonbill","Threskiornithidae","Platalea leucorodia","glossy ibis","Threskiornithidae","Plegadis falcinellus",0,0,"","Platalea leucorodia","Plegadis falcinellus",2.52,0.33,2,-0.89,2,-0.65,3,2.5,2,4
-24,"spoonbill","Threskiornithidae","Platalea leucorodia","white ibis","Threskiornithidae","Eudocimus albus",0,0,"","Platalea leucorodia","Eudocimus albus",2.1,0.01,2,-0.89,2,-0.65,2,2.5,2,4
-24,"spoonbill","Threskiornithidae","Platalea leucorodia","American woodcock","Scolopacidae","Philohela minor",0,0,"","Platalea leucorodia","Scolopax minor",5.88,2.91,4,1.62,4,1.83,4,5,5,4
-24,"spoonbill","Threskiornithidae","Platalea leucorodia","common snipe","Scolopacidae","Capella gallinago",0,0,"","Platalea leucorodia","Gallinago gallinago",6.64,3.49,4,1.62,4,1.83,6,5,5,4
-24,"spoonbill","Threskiornithidae","Platalea leucorodia","long-billed dowitcher","Scolopacidae","Limnodromus scolopaceus",0,0,"Limnodromus s.","Platalea leucorodia","Limnodromus scolopaceus",6.3,3.23,4,1.62,4,1.83,5,5,5,4
-25,"swift","Apodidae","Apus apus","bank swallow","Hirundinidae","Riparia riparia",9,26.5,"","Apus apus","Riparia riparia",2.47,0.29,4,1.62,4,1.83,2,4,4,2
-25,"swift","Apodidae","Apus apus","purple martin","Hirundinidae","Progne subis",5,14.7,"","Apus apus","Progne subis",2.9,0.63,4,1.62,4,1.83,3,4,4,3
-25,"swift","Apodidae","Apus apus","common grackle","Icteridae","Quiscalus quiscalus",0,0,"","Apus apus","Quiscalus quiscula",6.77,3.59,4,1.62,4,1.83,6,4,4,5.5
-25,"swift","Apodidae","Apus apus","northern junco","Fringillidae","Junco hyemalis",0,0,"","Apus apus","Junco hyemalis",5.87,2.9,4,1.62,4,1.83,4,4,4,5.5
-25,"swift","Apodidae","Apus apus","white-tailed kite","Accipitridae","Elanus leucurus",2,5.9,"","Apus apus","Elanus leucurus",6.38,3.29,4,1.62,4,1.83,5,4,4,4
-25,"swift","Apodidae","Apus apus","chimney swift","Apodidae","Chaetura pelagica",17,50,"","Apus apus","Chaetura pelagica",1.73,-0.27,2,-0.89,2,-0.65,1,1,1,1
-26,"woodcock","Scolopacidae","Scolopax rusticola","American woodcock","Scolopacidae","Philohela minor",30,88.2,"","Scolopax rusticola","Scolopax minor",1.63,-0.35,1,-2.15,2,-0.65,1,1,3.5,1
-26,"woodcock","Scolopacidae","Scolopax rusticola","common snipe","Scolopacidae","Capella gallinago",3,8.8,"","Scolopax rusticola","Gallinago gallinago",2.18,0.07,2,-0.89,2,-0.65,5,4,3.5,2
-26,"woodcock","Scolopacidae","Scolopax rusticola","long-billed dowitcher","Scolopacidae","Limnodromus scolopaceus",0,0,"Limnodromus s.","Scolopax rusticola","Limnodromus scolopaceus",2.17,0.06,2,-0.89,2,-0.65,4,4,3.5,5
-26,"woodcock","Scolopacidae","Scolopax rusticola","red knot","Scolopacidae","Calidris canutus",0,0,"","Scolopax rusticola","Calidris canutus",3.03,0.72,2,-0.89,2,-0.65,6,4,3.5,5
-26,"woodcock","Scolopacidae","Scolopax rusticola","marbled godwit","Scolopacidae","Limosa fedoa",0,0,"","Scolopax rusticola","Limosa fedoa",2.14,0.04,2,-0.89,2,-0.65,3,4,3.5,5
-26,"woodcock","Scolopacidae","Scolopax rusticola","willet","Scolopacidae","Catoptrophorus semipalmatus",1,2.9,"Cataptrophorus semipalmatus","Scolopax rusticola","Tringa semipalmata",1.84,-0.19,2,-0.89,2,-0.65,2,4,3.5,3
+"array","british_target","british_family","british_binomial","american_bird","american_family","american_binomial","n","percent","binomial_as_printed","british_scientificname2023","american_scientificname2023","DistPer","zDistPer","DistPhy","zDistPhy","Dist23","zDist23","Dist74","zDist74","RankPer","RankPhy","Rank23","Rank74","RankHuman"
+1,"song thrush","Turdidae","Turdus philomelos","American robin","Turdidae","Turdus migratorius",1,2.9,"","Turdus philomelos","Turdus migratorius",0.62,-1.12,43.77,-1.06,1,-2.15,1,-1.89,1,2,1,1,4.5
+1,"song thrush","Turdidae","Turdus philomelos","gray-cheeked thrush","Turdidae","Catharus minimus",15,44.1,"","Turdus philomelos","Catharus minimus",1.21,-0.67,53.99,-0.81,2,-0.89,2,-0.65,3,3,3.5,4,1
+1,"song thrush","Turdidae","Turdus philomelos","Swainson's thrush","Turdidae","Catharus ustulatus",13,38.2,"","Turdus philomelos","Catharus ustulatus",1.33,-0.58,56.31,-0.75,2,-0.89,2,-0.65,4,5,3.5,4,2
+1,"song thrush","Turdidae","Turdus philomelos","wood thrush","Turdidae","Hylocichla mustelina",4,11.8,"","Turdus philomelos","Hylocichla mustelina",0.67,-1.09,61.78,-0.61,2,-0.89,2,-0.65,2,6,3.5,4,3
+1,"song thrush","Turdidae","Turdus philomelos","Townsend's solitaire","Turdidae","Myadestes townsendi",0,0,"","Turdus philomelos","Myadestes townsendi",1.38,-0.54,39.43,-1.17,2,-0.89,2,-0.65,5,1,3.5,4,6
+1,"song thrush","Turdidae","Turdus philomelos","northern wheatear","Turdidae","Oenanthe oenanthe",1,2.9,"","Turdus philomelos","Oenanthe oenanthe",1.65,-0.34,54.67,-0.79,3,0.36,2,-0.65,6,4,6,4,4.5
+2,"mistle thrush","Turdidae","Turdus viscivorus","American robin","Turdidae","Turdus migratorius",8,23.5,"","Turdus viscivorus","Turdus migratorius",0.99,-0.84,32.73,-1.34,1,-2.15,1,-1.89,1,1,1,1,3
+2,"mistle thrush","Turdidae","Turdus viscivorus","gray-cheeked thrush","Turdidae","Catharus minimus",5,14.7,"","Turdus viscivorus","Catharus minimus",2.42,0.25,49.05,-0.93,2,-0.89,2,-0.65,4,3,3.5,4,4
+2,"mistle thrush","Turdidae","Turdus viscivorus","Swainson's thrush","Turdidae","Catharus ustulatus",9,26.5,"","Turdus viscivorus","Catharus ustulatus",2.5,0.32,54.31,-0.8,2,-0.89,2,-0.65,5,4,3.5,4,2
+2,"mistle thrush","Turdidae","Turdus viscivorus","wood thrush","Turdidae","Hylocichla mustelina",10,29.4,"","Turdus viscivorus","Hylocichla mustelina",1.93,-0.12,59.78,-0.66,2,-0.89,2,-0.65,2,6,3.5,4,1
+2,"mistle thrush","Turdidae","Turdus viscivorus","Townsend's solitaire","Turdidae","Myadestes townsendi",0,0,"","Turdus viscivorus","Myadestes townsendi",2.15,0.05,44.09,-1.05,2,-0.89,2,-0.65,3,2,3.5,4,6
+2,"mistle thrush","Turdidae","Turdus viscivorus","northern wheatear","Turdidae","Oenanthe oenanthe",2,5.9,"","Turdus viscivorus","Oenanthe oenanthe",2.85,0.58,55.49,-0.77,3,0.36,2,-0.65,6,5,6,4,5
+3,"blackbird","Turdidae","Turdus merula","American robin","Turdidae","Turdus migratorius",8,23.5,"","Turdus merula","Turdus migratorius",0.83,-0.96,29.52,-1.42,1,-2.15,1,-1.89,1,1,1,1,3
+3,"blackbird","Turdidae","Turdus merula","wood thrush","Turdidae","Hylocichla mustelina",3,8.8,"","Turdus merula","Hylocichla mustelina",1.5,-0.45,59.61,-0.67,2,-0.89,2,-0.65,5,2,2,2.5,4
+3,"blackbird","Turdidae","Turdus merula","rusty blackbird","Icteridae","Euphagus carolinus",12,35.3,"","Turdus merula","Euphagus carolinus",0.93,-0.88,88.39,0.05,3,0.36,3,0.59,2,4,4.5,5,1
+3,"blackbird","Turdidae","Turdus merula","Brewer's blackbird","Icteridae","Euphagus cyanocephalus",9,26.5,"","Turdus merula","Euphagus cyanocephalus",1.04,-0.81,90.14,0.09,3,0.36,3,0.59,3,5.5,4.5,5,2
+3,"blackbird","Turdidae","Turdus merula","northern wheatear","Turdidae","Oenanthe oenanthe",2,5.9,"","Turdus merula","Oenanthe oenanthe",2.75,0.5,61.82,-0.61,3,0.36,2,-0.65,6,3,4.5,2.5,5
+3,"blackbird","Turdidae","Turdus merula","common grackle","Icteridae","Quiscalus quiscalus",0,0,"","Turdus merula","Quiscalus quiscula",1.08,-0.77,90.14,0.09,3,0.36,3,0.59,4,5.5,4.5,5,6
+4,"sparrowhawk","Accipitridae","Accipiter nisus","sparrow hawk","Falconidae","Falco sparverius",0,0,"Falco Sparverius","Accipiter nisus","Falco sparverius",1.49,-0.46,161.06,1.85,4,1.62,3,0.59,3,6,6,6,5.5
+4,"sparrowhawk","Accipitridae","Accipiter nisus","sharp-shinned hawk","Accipitridae","Accipiter striatus",13,38.2,"Accipter striatus","Accipiter nisus","Accipiter striatus",0.88,-0.93,91.76,0.13,1,-2.15,1,-1.89,1,3,2,2,2
+4,"sparrowhawk","Accipitridae","Accipiter nisus","Cooper's hawk","Accipitridae","Accipiter cooperii",14,41.2,"Accipter cooperii","Accipiter nisus","Accipiter cooperii",1.13,-0.74,47.55,-0.97,1,-2.15,1,-1.89,2,2,2,2,1
+4,"sparrowhawk","Accipitridae","Accipiter nisus","northern goshawk","Accipitridae","Accipiter gentilis",6,17.7,"Accipter gentilis","Accipiter nisus","Accipiter gentilis",2.62,0.41,39.38,-1.17,1,-2.15,1,-1.89,4,1,2,2,3
+4,"sparrowhawk","Accipitridae","Accipiter nisus","Swainson's hawk","Accipitridae","Buteo swainsoni",1,2.9,"","Accipiter nisus","Buteo swainsoni",2.97,0.68,125.58,0.97,2,-0.89,2,-0.65,5,4,4.5,4.5,4
+4,"sparrowhawk","Accipitridae","Accipiter nisus","Ferruginous hawk","Accipitridae","Buteo regalis",0,0,"","Accipiter nisus","Buteo regalis",3.83,1.33,126.37,0.99,2,-0.89,2,-0.65,6,5,4.5,4.5,5.5
+5,"redstart","Turdidae","Phoenicurus phoenicurus","American robin","Turdidae","Turdus migratorius",4,11.8,"","Phoenicurus phoenicurus","Turdus migratorius",3.03,0.72,59.11,-0.68,3,0.36,2,-0.65,6,3,4,3,4
+5,"redstart","Turdidae","Phoenicurus phoenicurus","hermit thrush","Turdidae","Catharus guttatus",0,0,"","Phoenicurus phoenicurus","Catharus guttatus",1.07,-0.78,63.35,-0.58,3,0.36,2,-0.65,1.5,4,4,3,5.5
+5,"redstart","Turdidae","Phoenicurus phoenicurus","wood thrush","Turdidae","Hylocichla mustelina",0,0,"","Phoenicurus phoenicurus","Hylocichla mustelina",2.11,0.02,69.19,-0.43,3,0.36,2,-0.65,5,5,4,3,5.5
+5,"redstart","Turdidae","Phoenicurus phoenicurus","American redstart","Parulidae","Setophaga ruticilla",6,17.7,"","Phoenicurus phoenicurus","Setophaga ruticilla",1.07,-0.78,87.68,0.03,3,0.36,3,0.59,1.5,6,4,6,3
+5,"redstart","Turdidae","Phoenicurus phoenicurus","eastern bluebird","Turdidae","Sialia sialis",8,23.5,"","Phoenicurus phoenicurus","Sialia sialis",1.32,-0.59,37.9,-1.21,3,0.36,2,-0.65,4,2,4,3,2
+5,"redstart","Turdidae","Phoenicurus phoenicurus","northern wheatear","Turdidae","Oenanthe oenanthe",16,47.1,"","Phoenicurus phoenicurus","Oenanthe oenanthe",1.22,-0.67,27.47,-1.47,2,-0.89,2,-0.65,3,1,1,3,1
+6,"black redstart","Turdidae","Phoenicurus ochruros","American robin","Turdidae","Turdus migratorius",2,5.9,"","Phoenicurus ochruros","Turdus migratorius",3.12,0.79,59.07,-0.68,3,0.36,2,-0.65,6,3,4,3,4
+6,"black redstart","Turdidae","Phoenicurus ochruros","hermit thrush","Turdidae","Catharus guttatus",0,0,"","Phoenicurus ochruros","Catharus guttatus",1.07,-0.78,63.31,-0.58,3,0.36,2,-0.65,1,4,4,3,5.5
+6,"black redstart","Turdidae","Phoenicurus ochruros","wood thrush","Turdidae","Hylocichla mustelina",0,0,"","Phoenicurus ochruros","Hylocichla mustelina",2.24,0.12,69.14,-0.43,3,0.36,2,-0.65,5,5,4,3,5.5
+6,"black redstart","Turdidae","Phoenicurus ochruros","American redstart","Parulidae","Setophaga ruticilla",16,47.1,"","Phoenicurus ochruros","Setophaga ruticilla",1.42,-0.51,87.68,0.03,3,0.36,3,0.59,3,6,4,6,1
+6,"black redstart","Turdidae","Phoenicurus ochruros","eastern bluebird","Turdidae","Sialia sialis",3,8.8,"","Phoenicurus ochruros","Sialia sialis",1.66,-0.33,36.84,-1.23,3,0.36,2,-0.65,4,2,4,3,3
+6,"black redstart","Turdidae","Phoenicurus ochruros","northern wheatear","Turdidae","Oenanthe oenanthe",13,38.2,"","Phoenicurus ochruros","Oenanthe oenanthe",1.4,-0.52,30.82,-1.38,2,-0.89,2,-0.65,2,1,1,3,2
+7,"sedge warbler","Sylviidae","Acrocephalus schoenobaenus","ruby-crowned kinglet","Sylviidae","Regulus calendula",0,0,"","Acrocephalus schoenobaenus","Corthylio calendula",1.25,-0.64,101.6,0.37,3,0.36,2,-0.65,4,4.5,3.5,2,5
+7,"sedge warbler","Sylviidae","Acrocephalus schoenobaenus","golden-crowned kinglet","Sylviidae","Regulus satrapa",1,2.9,"","Acrocephalus schoenobaenus","Regulus satrapa",1.5,-0.45,104.47,0.45,3,0.36,2,-0.65,5,6,3.5,2,3
+7,"sedge warbler","Sylviidae","Acrocephalus schoenobaenus","blue-gray gnatcatcher","Sylviidae","Polioptila caerulea",0,0,"","Acrocephalus schoenobaenus","Polioptila caerulea",1.61,-0.37,101.6,0.37,3,0.36,2,-0.65,6,4.5,3.5,2,5
+7,"sedge warbler","Sylviidae","Acrocephalus schoenobaenus","blackpoll warbler","Parulidae","Dendroica striata",23,67.7,"","Acrocephalus schoenobaenus","Setophaga striata",0.78,-1,84.32,-0.05,3,0.36,3,0.59,1,2.5,3.5,5,1
+7,"sedge warbler","Sylviidae","Acrocephalus schoenobaenus","Nashville warbler","Parulidae","Vermivora ruficapilla",0,0,"","Acrocephalus schoenobaenus","Leiothlypis ruficapilla",1.1,-0.76,83.36,-0.08,3,0.36,3,0.59,3,1,3.5,5,5
+7,"sedge warbler","Sylviidae","Acrocephalus schoenobaenus","bay-breasted warbler","Parulidae","Dendroica castanea",10,29.4,"","Acrocephalus schoenobaenus","Setophaga castanea",0.89,-0.92,84.32,-0.05,3,0.36,3,0.59,2,2.5,3.5,5,2
+8,"grasshopper warbler","Sylviidae","Locustella naevia","ruby-crowned kinglet","Sylviidae","Regulus calendula",0,0,"","Locustella naevia","Corthylio calendula",1.21,-0.67,101.6,0.37,3,0.36,2,-0.65,4,4.5,3.5,2,4.5
+8,"grasshopper warbler","Sylviidae","Locustella naevia","golden-crowned kinglet","Sylviidae","Regulus satrapa",0,0,"","Locustella naevia","Regulus satrapa",1.38,-0.54,104.47,0.45,3,0.36,2,-0.65,5,6,3.5,2,4.5
+8,"grasshopper warbler","Sylviidae","Locustella naevia","blue-gray gnatcatcher","Sylviidae","Polioptila caerulea",0,0,"","Locustella naevia","Polioptila caerulea",1.45,-0.49,101.6,0.37,3,0.36,2,-0.65,6,4.5,3.5,2,4.5
+8,"grasshopper warbler","Sylviidae","Locustella naevia","blackpoll warbler","Parulidae","Dendroica striata",28,82.4,"","Locustella naevia","Setophaga striata",1.1,-0.76,88.64,0.05,3,0.36,3,0.59,2,2.5,3.5,5,1
+8,"grasshopper warbler","Sylviidae","Locustella naevia","Nashville warbler","Parulidae","Vermivora ruficapilla",0,0,"","Locustella naevia","Leiothlypis ruficapilla",1.05,-0.79,87.7,0.03,3,0.36,3,0.59,1,1,3.5,5,4.5
+8,"grasshopper warbler","Sylviidae","Locustella naevia","bay-breasted warbler","Parulidae","Dendroica castanea",6,17.7,"","Locustella naevia","Setophaga castanea",1.13,-0.73,88.64,0.05,3,0.36,3,0.59,3,2.5,3.5,5,2
+9,"Cetti's warbler","Sylviidae","Cettia cetti","ruby-crowned kinglet","Sylviidae","Regulus calendula",0,0,"","Cettia cetti","Corthylio calendula",1.49,-0.46,101.6,0.37,3,0.36,2,-0.65,3,4.5,3.5,2,5.5
+9,"Cetti's warbler","Sylviidae","Cettia cetti","golden-crowned kinglet","Sylviidae","Regulus satrapa",0,0,"","Cettia cetti","Regulus satrapa",1.71,-0.29,104.47,0.45,3,0.36,2,-0.65,5,6,3.5,2,5.5
+9,"Cetti's warbler","Sylviidae","Cettia cetti","blue-gray gnatcatcher","Sylviidae","Polioptila caerulea",1,2.9,"","Cettia cetti","Polioptila caerulea",1.3,-0.6,101.6,0.37,3,0.36,2,-0.65,1,4.5,3.5,2,4
+9,"Cetti's warbler","Sylviidae","Cettia cetti","blackpoll warbler","Parulidae","Dendroica striata",8,23.5,"","Cettia cetti","Setophaga striata",2.24,0.12,82.39,-0.1,3,0.36,3,0.59,6,3,3.5,5,2
+9,"Cetti's warbler","Sylviidae","Cettia cetti","Tennessee warbler","Parulidae","Vermivora peregrina",22,64.7,"","Cettia cetti","Leiothlypis peregrina",1.67,-0.32,81.36,-0.13,3,0.36,3,0.59,4,1.5,3.5,5,1
+9,"Cetti's warbler","Sylviidae","Cettia cetti","Nashville warbler","Parulidae","Vermivora ruficapilla",3,8.8,"","Cettia cetti","Leiothlypis ruficapilla",1.48,-0.46,81.36,-0.13,3,0.36,3,0.59,2,1.5,3.5,5,3
+10,"reed warbler","Sylviidae","Acrocephalus scirpaceus","ruby-crowned kinglet","Sylviidae","Regulus calendula",1,2.9,"","Acrocephalus scirpaceus","Corthylio calendula",1.44,-0.49,101.6,0.37,3,0.36,2,-0.65,4,4.5,3.5,2,4.5
+10,"reed warbler","Sylviidae","Acrocephalus scirpaceus","golden-crowned kinglet","Sylviidae","Regulus satrapa",0,0,"","Acrocephalus scirpaceus","Regulus satrapa",1.83,-0.2,104.47,0.45,3,0.36,2,-0.65,6,6,3.5,2,6
+10,"reed warbler","Sylviidae","Acrocephalus scirpaceus","blue-gray gnatcatcher","Sylviidae","Polioptila caerulea",1,2.9,"","Acrocephalus scirpaceus","Polioptila caerulea",1.68,-0.31,101.6,0.37,3,0.36,2,-0.65,5,4.5,3.5,2,4.5
+10,"reed warbler","Sylviidae","Acrocephalus scirpaceus","blackpoll warbler","Parulidae","Dendroica striata",7,20.6,"","Acrocephalus scirpaceus","Setophaga striata",0.85,-0.95,87.89,0.03,3,0.36,3,0.59,1,2.5,3.5,5,2
+10,"reed warbler","Sylviidae","Acrocephalus scirpaceus","Tennessee warbler","Parulidae","Vermivora peregrina",22,64.7,"","Acrocephalus scirpaceus","Leiothlypis peregrina",1.01,-0.83,86.93,0.01,3,0.36,3,0.59,3,1,3.5,5,1
+10,"reed warbler","Sylviidae","Acrocephalus scirpaceus","bay-breasted warbler","Parulidae","Dendroica castanea",3,8.8,"","Acrocephalus scirpaceus","Setophaga castanea",0.93,-0.89,87.89,0.03,3,0.36,3,0.59,2,2.5,3.5,5,3
+11,"pied flycatcher","Muscicapidae","Ficedula hypoleuca","Townsend's solitaire","Turdidae","Myadestes townsendi",6,17.7,"","Ficedula hypoleuca","Myadestes townsendi",2.15,0.05,51.06,-0.88,3,0.36,3,0.59,6,1,3.5,3.5,3
+11,"pied flycatcher","Muscicapidae","Ficedula hypoleuca","ruby-crowned kinglet","Sylviidae","Regulus calendula",6,17.7,"","Ficedula hypoleuca","Corthylio calendula",1.88,-0.16,95.26,0.22,3,0.36,3,0.59,5,3,3.5,3.5,3
+11,"pied flycatcher","Muscicapidae","Ficedula hypoleuca","least flycatcher","Tyrannidae","Empidonax minimus",13,38.2,"","Ficedula hypoleuca","Empidonax minimus",1.41,-0.52,137.89,1.28,3,0.36,3,0.59,3,5,3.5,3.5,1
+11,"pied flycatcher","Muscicapidae","Ficedula hypoleuca","Acadian flycatcher","Tyrannidae","Empidonax virescens",3,8.8,"Empidonax verescens","Ficedula hypoleuca","Empidonax virescens",1.23,-0.65,137.89,1.28,3,0.36,3,0.59,2,5,3.5,3.5,5
+11,"pied flycatcher","Muscicapidae","Ficedula hypoleuca","willow flycatcher","Tyrannidae","Empidonax traillii",6,17.7,"","Ficedula hypoleuca","Empidonax traillii",1.45,-0.49,137.89,1.28,3,0.36,3,0.59,4,5,3.5,3.5,3
+11,"pied flycatcher","Muscicapidae","Ficedula hypoleuca","pine warbler","Parulidae","Dendroica pinus",0,0,"","Ficedula hypoleuca","Setophaga pinus",0.79,-0.99,91.22,0.12,3,0.36,3,0.59,1,2,3.5,3.5,6
+12,"spotted flycatcher","Muscicapidae","Muscicapa striata","Townsend's solitaire","Turdidae","Myadestes townsendi",7,20.6,"","Muscicapa striata","Myadestes townsendi",1.71,-0.29,61.83,-0.61,3,0.36,3,0.59,5,1,3.5,3.5,3
+12,"spotted flycatcher","Muscicapidae","Muscicapa striata","ruby-crowned kinglet","Sylviidae","Regulus calendula",0,0,"","Muscicapa striata","Corthylio calendula",2.44,0.27,95.26,0.22,3,0.36,3,0.59,6,3,3.5,3.5,6
+12,"spotted flycatcher","Muscicapidae","Muscicapa striata","least flycatcher","Tyrannidae","Empidonax minimus",1,2.9,"","Muscicapa striata","Empidonax minimus",1.57,-0.39,137.89,1.28,3,0.36,3,0.59,4,5,3.5,3.5,5
+12,"spotted flycatcher","Muscicapidae","Muscicapa striata","Acadian flycatcher","Tyrannidae","Empidonax virescens",15,44.1,"Empidonax verescens","Muscicapa striata","Empidonax virescens",1.07,-0.78,137.89,1.28,3,0.36,3,0.59,1,5,3.5,3.5,1
+12,"spotted flycatcher","Muscicapidae","Muscicapa striata","willow flycatcher","Tyrannidae","Empidonax traillii",8,23.5,"","Muscicapa striata","Empidonax traillii",1.39,-0.54,137.89,1.28,3,0.36,3,0.59,3,5,3.5,3.5,2
+12,"spotted flycatcher","Muscicapidae","Muscicapa striata","pine warbler","Parulidae","Dendroica pinus",3,8.8,"","Muscicapa striata","Setophaga pinus",1.12,-0.74,91.1,0.11,3,0.36,3,0.59,2,2,3.5,3.5,4
+13,"golden oriole","Oriolidae","Oriolus oriolus","American robin","Turdidae","Turdus migratorius",1,2.9,"","Oriolus oriolus","Turdus migratorius",1.77,-0.24,114.69,0.7,3,0.36,3,0.59,2,1,3.5,3.5,5.5
+13,"golden oriole","Oriolidae","Oriolus oriolus","yellow-headed blackbird","Icteridae","Xanthocephalus xanthocephalus",13,38.2,"Xanthocephalus x.","Oriolus oriolus","Xanthocephalus xanthocephalus",1.73,-0.28,114.85,0.7,3,0.36,3,0.59,1,4,3.5,3.5,1
+13,"golden oriole","Oriolidae","Oriolus oriolus","spotted oriole","Icteridae","Icterus pectoralis",1,2.9,"","Oriolus oriolus","Icterus pectoralis",2.88,0.61,114.85,0.7,3,0.36,3,0.59,5,4,3.5,3.5,5.5
+13,"golden oriole","Oriolidae","Oriolus oriolus","orchard oriole","Icteridae","Icterus spurius",8,23.5,"","Oriolus oriolus","Icterus spurius",3.31,0.94,114.85,0.7,3,0.36,3,0.59,6,4,3.5,3.5,2
+13,"golden oriole","Oriolidae","Oriolus oriolus","northern oriole","Icteridae","Icterus galbula",7,20.6,"","Oriolus oriolus","Icterus galbula",2.44,0.27,114.85,0.7,3,0.36,3,0.59,4,4,3.5,3.5,3
+13,"golden oriole","Oriolidae","Oriolus oriolus","eastern meadowlark","Icteridae","Sturnella magna",4,11.7,"","Oriolus oriolus","Sturnella magna",2.22,0.1,114.85,0.7,3,0.36,3,0.59,3,4,3.5,3.5,4
+14,"house sparrow","Passeridae","Passer domesticus","Harris' sparrow","Fringillidae","Zonotrichia querula",10,29.4,"","Passer domesticus","Zonotrichia querula",1.22,-0.67,67.41,-0.48,3,0.36,3,0.59,3,6,3.5,3.5,1.5
+14,"house sparrow","Passeridae","Passer domesticus","chipping sparrow","Fringillidae","Spizella passerina",10,29.4,"","Passer domesticus","Spizella passerina",1.42,-0.51,60.19,-0.65,3,0.36,3,0.59,4,4,3.5,3.5,1.5
+14,"house sparrow","Passeridae","Passer domesticus","swamp sparrow","Fringillidae","Melospiza georgiana",4,11.7,"","Passer domesticus","Melospiza georgiana",1.62,-0.36,62.52,-0.6,3,0.36,3,0.59,6,5,3.5,3.5,4
+14,"house sparrow","Passeridae","Passer domesticus","dickcissel","Fringillidae","Spiza americana",5,14.7,"","Passer domesticus","Spiza americana",0.55,-1.18,57.16,-0.73,3,0.36,3,0.59,1,3,3.5,3.5,3
+14,"house sparrow","Passeridae","Passer domesticus","Smith's longspur","Fringillidae","Calcarius lapponicus",3,8.8,"Calcarious lapponicus","Passer domesticus","Calcarius lapponicus",0.98,-0.85,56.04,-0.76,3,0.36,3,0.59,2,2,3.5,3.5,5
+14,"house sparrow","Passeridae","Passer domesticus","pine siskin","Fringillidae","Carduelis pinus",2,5.9,"","Passer domesticus","Spinus pinus",1.48,-0.47,54.92,-0.79,3,0.36,3,0.59,5,1,3.5,3.5,6
+15,"tree sparrow","Passeridae","Passer montanus","Harris' sparrow","Fringillidae","Zonotrichia querula",13,38.2,"","Passer montanus","Zonotrichia querula",1.54,-0.42,65.18,-0.53,3,0.36,3,0.59,6,6,3.5,3.5,1
+15,"tree sparrow","Passeridae","Passer montanus","chipping sparrow","Fringillidae","Spizella passerina",9,26.5,"","Passer montanus","Spizella passerina",0.94,-0.88,57.46,-0.72,3,0.36,3,0.59,2,4,3.5,3.5,2
+15,"tree sparrow","Passeridae","Passer montanus","swamp sparrow","Fringillidae","Melospiza georgiana",3,8.8,"","Passer montanus","Melospiza georgiana",1.17,-0.7,59.79,-0.66,3,0.36,3,0.59,3,5,3.5,3.5,5
+15,"tree sparrow","Passeridae","Passer montanus","dickcissel","Fringillidae","Spiza americana",5,14.7,"","Passer montanus","Spiza americana",0.88,-0.93,49.69,-0.92,3,0.36,3,0.59,1,3,3.5,3.5,3
+15,"tree sparrow","Passeridae","Passer montanus","Smith's longspur","Fringillidae","Calcarius lapponicus",4,11.8,"Calcarious lapponicus","Passer montanus","Calcarius lapponicus",1.47,-0.47,48.24,-0.95,3,0.36,3,0.59,5,2,3.5,3.5,4
+15,"tree sparrow","Passeridae","Passer montanus","pine siskin","Fringillidae","Carduelis pinus",0,0,"","Passer montanus","Spinus pinus",1.37,-0.55,46.48,-1,3,0.36,3,0.59,4,1,3.5,3.5,6
+16,"cuckoo","Cuculidae","Cuculus canorus","yellow-billed cuckoo","Cuculidae","Coccyzus americanus",9,26.5,"","Cuculus canorus","Coccyzus americanus",1.09,-0.77,111.58,0.62,2,-0.89,2,-0.65,1,2,2,2,2
+16,"cuckoo","Cuculidae","Cuculus canorus","black-billed cuckoo","Cuculidae","Coccyzus erythropthalmus",13,38.2,"C. erythropthalmus","Cuculus canorus","Coccyzus erythropthalmus",1.38,-0.54,121.41,0.87,2,-0.89,2,-0.65,2,3,2,2,1
+16,"cuckoo","Cuculidae","Cuculus canorus","greater roadrunner","Cuculidae","Geococcyx californianus",4,11.8,"Geococcyx Californianus","Cuculus canorus","Geococcyx californianus",5.38,2.53,92.05,0.14,2,-0.89,2,-0.65,6,1,2,2,3.5
+16,"cuckoo","Cuculidae","Cuculus canorus","Mississippi kite","Accipitridae","Ictinia mississippiensis",3,8.8,"","Cuculus canorus","Ictinia mississippiensis",2.27,0.14,166.7,1.99,4,1.62,4,1.83,3,5,5,5,5
+16,"cuckoo","Cuculidae","Cuculus canorus","snail kite","Accipitridae","Rostrhamus sociabilis",4,11.8,"","Cuculus canorus","Rostrhamus sociabilis",2.94,0.65,166.7,1.99,4,1.62,4,1.83,4,5,5,5,3.5
+16,"cuckoo","Cuculidae","Cuculus canorus","Swainson's hawk","Accipitridae","Buteo swainsoni",1,2.9,"","Cuculus canorus","Buteo swainsoni",3.82,1.33,166.7,1.99,4,1.62,4,1.83,5,5,5,5,6
+17,"jay","Corvidae","Garrulus glandarius","American robin","Turdidae","Turdus migratorius",6,17.7,"","Garrulus glandarius","Turdus migratorius",2.6,0.39,114.34,0.69,3,0.36,3,0.59,4,5,5.5,5.5,2
+17,"jay","Corvidae","Garrulus glandarius","eastern bluebird","Turdidae","Sialia sialis",5,14.7,"","Garrulus glandarius","Sialia sialis",4.62,1.94,114.5,0.7,3,0.36,3,0.59,6,6,5.5,5.5,3
+17,"jay","Corvidae","Garrulus glandarius","blue jay","Corvidae","Cyanocitta cristata",2,5.9,"","Garrulus glandarius","Cyanocitta cristata",1.4,-0.53,67.53,-0.47,2,-0.89,2,-0.65,2,3,2.5,2.5,4.5
+17,"jay","Corvidae","Garrulus glandarius","scrub jay","Corvidae","Aphelocoma coerulescens",2,5.9,"","Garrulus glandarius","Aphelocoma coerulescens",1.65,-0.34,49,-0.93,2,-0.89,2,-0.65,3,2,2.5,2.5,4.5
+17,"jay","Corvidae","Garrulus glandarius","gray jay","Corvidae","Perisoreus canadensis",18,52.9,"","Garrulus glandarius","Perisoreus canadensis",1.29,-0.61,76.18,-0.26,2,-0.89,2,-0.65,1,4,2.5,2.5,1
+17,"jay","Corvidae","Garrulus glandarius","American crow","Corvidae","Corvus brachyrhynchos",1,2.9,"","Garrulus glandarius","Corvus brachyrhynchos",2.84,0.57,46.66,-0.99,2,-0.89,2,-0.65,5,1,2.5,2.5,6
+18,"kingfisher","Alcedinidae","Alcedo atthis","eastern bluebird","Turdidae","Sialia sialis",1,2.9,"","Alcedo atthis","Sialia sialis",3.29,0.92,158.38,1.79,4,1.62,4,1.83,2,5.5,4,4,4.5
+18,"kingfisher","Alcedinidae","Alcedo atthis","common grackle","Icteridae","Quiscalus quiscalus",0,0,"","Alcedo atthis","Quiscalus quiscula",4.29,1.69,158.38,1.79,4,1.62,4,1.83,5,5.5,4,4,6
+18,"kingfisher","Alcedinidae","Alcedo atthis","belted kingfisher","Alcedinidae","Megaceryle alcyon",22,64.7,"","Alcedo atthis","Megaceryle alcyon",3.9,1.39,47.77,-0.96,2,-0.89,2,-0.65,3,1,1,1,1
+18,"kingfisher","Alcedinidae","Alcedo atthis","pileated woodpecker","Picidae","Dryocopus pileatus",1,2.9,"","Alcedo atthis","Dryocopus pileatus",5.91,2.93,94.43,0.2,4,1.62,4,1.83,6,4,4,4,4.5
+18,"kingfisher","Alcedinidae","Alcedo atthis","common flicker","Picidae","Colaptes auratus",8,23.5,"","Alcedo atthis","Colaptes auratus",4.24,1.65,93.81,0.18,4,1.62,4,1.83,4,3,4,4,2
+18,"kingfisher","Alcedinidae","Alcedo atthis","downy woodpecker","Picidae","Picoides pubescens",2,5.9,"","Alcedo atthis","Dryobates pubescens",2.62,0.41,86.85,0.01,4,1.62,4,1.83,1,2,4,4,3
+19,"red kite","Accipitridae","Milvus milvus","sparrow hawk","Falconidae","Falco sparverius",2,5.9,"","Milvus milvus","Falco sparverius",4.6,1.92,158.71,1.79,4,1.62,3,0.59,5,6,6,6,3
+19,"red kite","Accipitridae","Milvus milvus","sharp-shinned hawk","Accipitridae","Accipiter striatus",4,11.8,"Accipter striatus","Milvus milvus","Accipiter striatus",4.81,2.09,128.54,1.04,2,-0.89,2,-0.65,6,4,3,3,2
+19,"red kite","Accipitridae","Milvus milvus","Mississippi kite","Accipitridae","Ictinia mississippiensis",1,2.9,"Ictinia m.","Milvus milvus","Ictinia mississippiensis",2.93,0.64,114.8,0.7,2,-0.89,2,-0.65,3,2,3,3,4.5
+19,"red kite","Accipitridae","Milvus milvus","white-tailed kite","Accipitridae","Elanus leucurus",0,0,"","Milvus milvus","Elanus leucurus",2.94,0.66,145.28,1.46,2,-0.89,2,-0.65,4,5,3,3,6
+19,"red kite","Accipitridae","Milvus milvus","snail kite","Accipitridae","Rostrhamus sociabilis",1,2.9,"Rostrhanus sociabilis","Milvus milvus","Rostrhamus sociabilis",2.32,0.18,124.73,0.95,2,-0.89,2,-0.65,2,3,3,3,4.5
+19,"red kite","Accipitridae","Milvus milvus","Swainson's hawk","Accipitridae","Buteo swainsoni",26,76.5,"","Milvus milvus","Buteo swainsoni",1.37,-0.55,90.42,0.1,2,-0.89,2,-0.65,1,1,3,3,1
+20,"woodlark","Alaudidae","Lullula arborea","gray-cheeked thrush","Turdidae","Catharus minimus",1,2.9,"","Lullula arborea","Catharus minimus",1.12,-0.74,96.66,0.25,3,0.36,3,0.59,2,4,4,4,5.5
+20,"woodlark","Alaudidae","Lullula arborea","Swainson's thrush","Turdidae","Catharus ustulatus",4,11.8,"","Lullula arborea","Catharus ustulatus",1.13,-0.73,97.11,0.26,3,0.36,3,0.59,3,6,4,4,3
+20,"woodlark","Alaudidae","Lullula arborea","hermit thrush","Turdidae","Catharus guttatus",3,8.8,"Cathatus guttatus","Lullula arborea","Catharus guttatus",0.9,-0.91,97.03,0.26,3,0.36,3,0.59,1,5,4,4,4
+20,"woodlark","Alaudidae","Lullula arborea","bobolink","Icteridae","Dolichonyx oryzivorus",1,2.9,"Bolichonyx oryzivorus","Lullula arborea","Dolichonyx oryzivorus",1.94,-0.11,92.87,0.16,3,0.36,3,0.59,5,2.5,4,4,5.5
+20,"woodlark","Alaudidae","Lullula arborea","eastern meadowlark","Icteridae","Sturnella magna",5,14.7,"","Lullula arborea","Sturnella magna",3,0.7,92.87,0.16,3,0.36,3,0.59,6,2.5,4,4,2
+20,"woodlark","Alaudidae","Lullula arborea","horned lark","Alaudidae","Eremophila alpestris",20,58.8,"","Lullula arborea","Eremophila alpestris",1.52,-0.43,42.54,-1.09,2,-0.89,2,-0.65,4,1,1,1,1
+21,"skylark","Alaudidae","Alauda arvensis","gray-cheeked thrush","Turdidae","Catharus minimus",4,11.8,"","Alauda arvensis","Catharus minimus",0.68,-1.07,96.66,0.25,3,0.36,3,0.59,3,4,4,4,2.5
+21,"skylark","Alaudidae","Alauda arvensis","Swainson's thrush","Turdidae","Catharus ustulatus",4,11.8,"","Alauda arvensis","Catharus ustulatus",0.61,-1.13,97.11,0.26,3,0.36,3,0.59,2,6,4,4,2.5
+21,"skylark","Alaudidae","Alauda arvensis","hermit thrush","Turdidae","Catharus guttatus",3,8.8,"Cathatus guttatus","Alauda arvensis","Catharus guttatus",1.25,-0.64,97.03,0.26,3,0.36,3,0.59,5,5,4,4,4.5
+21,"skylark","Alaudidae","Alauda arvensis","bobolink","Icteridae","Dolichonyx oryzivorus",2,5.9,"Bolichonyx oryzivorus","Alauda arvensis","Dolichonyx oryzivorus",1.24,-0.65,92.87,0.16,3,0.36,3,0.59,4,2.5,4,4,6
+21,"skylark","Alaudidae","Alauda arvensis","eastern meadowlark","Icteridae","Sturnella magna",3,8.8,"","Alauda arvensis","Sturnella magna",2.53,0.34,92.87,0.16,3,0.36,3,0.59,6,2.5,4,4,4.5
+21,"skylark","Alaudidae","Alauda arvensis","horned lark","Alaudidae","Eremophila alpestris",18,52.9,"","Alauda arvensis","Eremophila alpestris",0.56,-1.17,32.28,-1.35,2,-0.89,2,-0.65,1,1,1,1,1
+22,"great spotted woodpecker","Picidae","Dendrocopos major","scissor-tailed flycatcher","Tyrannidae","Muscivora forficata",0,0,"Muscivora f.","Dendrocopos major","Tyrannus forficatus",2.4,0.24,148.93,1.55,4,1.62,4,1.83,4,5,5,5,5.5
+22,"great spotted woodpecker","Picidae","Dendrocopos major","olive-sided flycatcher","Tyrannidae","Nuttallornis borealis",0,0,"Nuttallornis b.","Dendrocopos major","Contopus cooperi",2.08,0,157.04,1.75,4,1.62,4,1.83,2,6,5,5,5.5
+22,"great spotted woodpecker","Picidae","Dendrocopos major","belted kingfisher","Alcedinidae","Megaceryle alcyon",2,5.9,"","Dendrocopos major","Megaceryle alcyon",2.21,0.09,87.8,0.03,4,1.62,4,1.83,3,4,5,5,4
+22,"great spotted woodpecker","Picidae","Dendrocopos major","red-headed woodpecker","Picidae","Melanerpes erythrocephalus",10,29.4,"Melanerpes e.","Dendrocopos major","Melanerpes erythrocephalus",0.59,-1.15,49.74,-0.91,2,-0.89,2,-0.65,1,2,2,2.5,2
+22,"great spotted woodpecker","Picidae","Dendrocopos major","pileated woodpecker","Picidae","Dryocopus pileatus",7,20.6,"","Dendrocopos major","Dryocopus pileatus",2.78,0.53,53.75,-0.81,2,-0.89,2,-0.65,6,3,2,2.5,3
+22,"great spotted woodpecker","Picidae","Dendrocopos major","downy woodpecker","Picidae","Picoides pubescens",15,44.1,"Picoides pubsecens","Dendrocopos major","Dryobates pubescens",2.74,0.5,38.46,-1.19,2,-0.89,1,-1.89,5,1,2,1,1
+23,"robin","Turdidae","Erithacus rubecula","American robin","Turdidae","Turdus migratorius",2,5.9,"","Erithacus rubecula","Turdus migratorius",3.38,0.99,59.07,-0.68,3,0.36,2,-0.65,6,3,4,3.5,4
+23,"robin","Turdidae","Erithacus rubecula","Swainson's thrush","Turdidae","Catharus ustulatus",1,2.9,"","Erithacus rubecula","Catharus ustulatus",2.05,-0.03,64.66,-0.54,3,0.36,2,-0.65,4,5,4,3.5,5
+23,"robin","Turdidae","Erithacus rubecula","wood thrush","Turdidae","Hylocichla mustelina",0,0,"Hylociehla mustelina","Erithacus rubecula","Hylocichla mustelina",2.45,0.28,69.14,-0.43,3,0.36,2,-0.65,5,6,4,3.5,6
+23,"robin","Turdidae","Erithacus rubecula","eastern bluebird","Turdidae","Sialia sialis",16,47.1,"","Erithacus rubecula","Sialia sialis",2.03,-0.05,34.86,-1.28,3,0.36,2,-0.65,3,2,4,3.5,1
+23,"robin","Turdidae","Erithacus rubecula","northern wheatear","Turdidae","Oenanthe oenanthe",6,17.7,"","Erithacus rubecula","Oenanthe oenanthe",1.82,-0.21,32.86,-1.33,2,-0.89,2,-0.65,1,1,1,3.5,3
+23,"robin","Turdidae","Erithacus rubecula","veery","Turdidae","Catharus fuscescens",9,26.5,"","Erithacus rubecula","Catharus fuscescens",1.87,-0.16,61.67,-0.62,3,0.36,2,-0.65,2,4,4,3.5,2
+24,"spoonbill","Threskiornithidae","Platalea leucorodia","roseate spoonbill","Threskiornithidae","Ajaia ajaja",34,100,"","Platalea leucorodia","Platalea ajaja",1.15,-0.72,105.43,0.47,1,-2.15,2,-0.65,1,2,1,2,1
+24,"spoonbill","Threskiornithidae","Platalea leucorodia","glossy ibis","Threskiornithidae","Plegadis falcinellus",0,0,"","Platalea leucorodia","Plegadis falcinellus",2.52,0.33,97.37,0.27,2,-0.89,2,-0.65,3,1,2.5,2,4
+24,"spoonbill","Threskiornithidae","Platalea leucorodia","white ibis","Threskiornithidae","Eudocimus albus",0,0,"","Platalea leucorodia","Eudocimus albus",2.1,0.01,121.6,0.87,2,-0.89,2,-0.65,2,3,2.5,2,4
+24,"spoonbill","Threskiornithidae","Platalea leucorodia","American woodcock","Scolopacidae","Philohela minor",0,0,"","Platalea leucorodia","Scolopax minor",5.88,2.91,164.78,1.94,4,1.62,4,1.83,4,5,5,5,4
+24,"spoonbill","Threskiornithidae","Platalea leucorodia","common snipe","Scolopacidae","Capella gallinago",0,0,"","Platalea leucorodia","Gallinago gallinago",6.64,3.49,164.78,1.94,4,1.62,4,1.83,6,5,5,5,4
+24,"spoonbill","Threskiornithidae","Platalea leucorodia","long-billed dowitcher","Scolopacidae","Limnodromus scolopaceus",0,0,"Limnodromus s.","Platalea leucorodia","Limnodromus scolopaceus",6.3,3.23,164.78,1.94,4,1.62,4,1.83,5,5,5,5,4
+25,"swift","Apodidae","Apus apus","bank swallow","Hirundinidae","Riparia riparia",9,26.5,"","Apus apus","Riparia riparia",2.47,0.29,153.95,1.68,4,1.62,4,1.83,2,3.5,4,4,2
+25,"swift","Apodidae","Apus apus","purple martin","Hirundinidae","Progne subis",5,14.7,"","Apus apus","Progne subis",2.9,0.63,153.95,1.68,4,1.62,4,1.83,3,3.5,4,4,3
+25,"swift","Apodidae","Apus apus","common grackle","Icteridae","Quiscalus quiscalus",0,0,"","Apus apus","Quiscalus quiscula",6.77,3.59,153.95,1.68,4,1.62,4,1.83,6,3.5,4,4,5.5
+25,"swift","Apodidae","Apus apus","northern junco","Fringillidae","Junco hyemalis",0,0,"","Apus apus","Junco hyemalis",5.87,2.9,153.95,1.68,4,1.62,4,1.83,4,3.5,4,4,5.5
+25,"swift","Apodidae","Apus apus","white-tailed kite","Accipitridae","Elanus leucurus",2,5.9,"","Apus apus","Elanus leucurus",6.38,3.29,165.71,1.97,4,1.62,4,1.83,5,6,4,4,4
+25,"swift","Apodidae","Apus apus","chimney swift","Apodidae","Chaetura pelagica",17,50,"","Apus apus","Chaetura pelagica",1.73,-0.27,66.93,-0.49,2,-0.89,2,-0.65,1,1,1,1,1
+26,"woodcock","Scolopacidae","Scolopax rusticola","American woodcock","Scolopacidae","Philohela minor",30,88.2,"","Scolopax rusticola","Scolopax minor",1.63,-0.35,36.96,-1.23,1,-2.15,2,-0.65,1,1,1,3.5,1
+26,"woodcock","Scolopacidae","Scolopax rusticola","common snipe","Scolopacidae","Capella gallinago",3,8.8,"","Scolopax rusticola","Gallinago gallinago",2.18,0.07,60.62,-0.64,2,-0.89,2,-0.65,5,2,4,3.5,2
+26,"woodcock","Scolopacidae","Scolopax rusticola","long-billed dowitcher","Scolopacidae","Limnodromus scolopaceus",0,0,"Limnodromus s.","Scolopax rusticola","Limnodromus scolopaceus",2.17,0.06,64.14,-0.56,2,-0.89,2,-0.65,4,3,4,3.5,5
+26,"woodcock","Scolopacidae","Scolopax rusticola","red knot","Scolopacidae","Calidris canutus",0,0,"","Scolopax rusticola","Calidris canutus",3.03,0.72,71.32,-0.38,2,-0.89,2,-0.65,6,5,4,3.5,5
+26,"woodcock","Scolopacidae","Scolopax rusticola","marbled godwit","Scolopacidae","Limosa fedoa",0,0,"","Scolopax rusticola","Limosa fedoa",2.14,0.04,75.62,-0.27,2,-0.89,2,-0.65,3,6,4,3.5,5
+26,"woodcock","Scolopacidae","Scolopax rusticola","willet","Scolopacidae","Catoptrophorus semipalmatus",1,2.9,"Cataptrophorus semipalmatus","Scolopax rusticola","Tringa semipalmata",1.84,-0.19,69.89,-0.41,2,-0.89,2,-0.65,2,4,4,3.5,3

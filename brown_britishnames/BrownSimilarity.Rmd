@@ -3,14 +3,22 @@ title: "Brown (1992) British names for American birds - similarity measures"
 output: html_notebook
 ---
 
-Computes perceptual similarity (AVONET Euclidean distance) and taxonomic
-similarity (Clements 1974 and 2023) for every pair of birds within each of the 26
-arrays of Brown's (1992) similarity judgement experiment (`brown_table3.csv`).
+Computes perceptual similarity (AVONET Euclidean distance), phylogenetic similarity
+(mean cophenetic distance over BirdTree posterior samples) and taxonomic similarity
+(Clements 1974 and 2023) for every pair of birds within each of the 26 arrays of
+Brown's (1992) similarity judgement experiment (`brown_table3.csv`). It then ranks
+the candidates in each array by each measure and plots where the measures put the
+birds Brown's subjects actually chose.
 
 The measures replicate those in `preprocessing/Preprocessing.Rmd`, so that Brown's
 subject judgements can be compared against the same similarity measures used
 elsewhere in this repository. Nothing outside `brown_britishnames/` is written to;
 the reference taxonomies under `preprocessing/data/` are read only.
+
+The phylogenetic measure reads `nexus_brown.nex`, the BirdTree tree-pruner download
+covering Brown's 99 birds that sits alongside this notebook - see the phylogenetic
+section below for how it was produced. If it is removed the notebook still runs and
+reports the other three measures.
 
 # Setup
 
@@ -21,8 +29,12 @@ rm(list = ls())
 library(tidyverse)
 library(here)
 library(rdist)
+library(ape)
 
 select <- dplyr::select
+
+# The bootstraps below resample arrays at random
+set.seed(302)
 
 ```
 
@@ -97,6 +109,175 @@ TaxSimCalc <- function(data, columns_to_compare) {
     mutate(ScaleDist = scale(Dist)[,1])
 
   return(list(matrix = df, pairs = list))
+}
+
+```
+
+The functions below bootstrap the mean ranks reported later on. Two resampling
+schemes are used throughout, because they answer different questions and it is worth
+seeing both:
+
+- **Over arrays** - draw 26 arrays with replacement, keeping every subject inside a
+  drawn array. This asks how the measures would compare on *a different set of bird
+  arrays*, treating Brown's 26 stimulus sets as a sample. It is the conservative
+  scheme, and the one that matches the scientific claim about naming in general.
+- **Over subjects** - hold the 26 arrays fixed and resample each array's 34 subject
+  choices with replacement. This asks how the measures would compare if *different
+  people* had judged these same pictures. It gives much tighter intervals, but says
+  nothing about whether the result would hold on other birds.
+
+Neither is the "right" one. Intervals from the subject scheme will be far narrower;
+that is a consequence of the easier question, not better evidence.
+
+```{r}
+
+# Resampling over ARRAYS. Takes a long data frame with columns array, Measure, Rank
+# and w (the weight given to each row - 1 to weight every row equally, or the number
+# of subjects to weight by votes) and returns a B x measures matrix of bootstrap
+# replicates of the mean rank. Each replicate draws 26 arrays with replacement and
+# recomputes the weighted mean from whichever arrays came up.
+
+BootstrapMeanRankArrays <- function(ranks, B = 10000) {
+
+  measure_levels <- levels(ranks$Measure)
+
+  # Collapse to one row per array per measure first, so a replicate is just a sum
+  # over the drawn arrays
+  cells <- ranks %>%
+    group_by(array, Measure) %>%
+    summarise(S = sum(w * Rank), W = sum(w), .groups = "drop")
+
+  to_matrix <- function(value_col) {
+    cells %>%
+      select(array, Measure, all_of(value_col)) %>%
+      pivot_wider(names_from = Measure, values_from = all_of(value_col)) %>%
+      arrange(array) %>%
+      column_to_rownames("array") %>%
+      as.matrix() %>%
+      .[, measure_levels, drop = FALSE]
+  }
+
+  S <- to_matrix("S")
+  W <- to_matrix("W")
+
+  n_arrays <- nrow(S)
+  draws <- matrix(NA_real_, nrow = B, ncol = length(measure_levels),
+                  dimnames = list(NULL, measure_levels))
+
+  for (b in seq_len(B)) {
+    i <- sample.int(n_arrays, n_arrays, replace = TRUE)
+    draws[b, ] <- colSums(S[i, , drop = FALSE]) / colSums(W[i, , drop = FALSE])
+  }
+
+  draws
+}
+
+# Every pair of measures, compared on the same bootstrap replicates. Because the
+# same resampled arrays are used for all measures within a replicate the comparison
+# is paired, which is what we want - the measures are being scored on identical
+# data. The p value is the usual percentile-bootstrap achieved significance
+# level: the share of replicates in which the difference falls on the other side of
+# zero, doubled for a two-sided test, with a (1 + k)/(B + 1) correction so it can
+# never be reported as exactly zero.
+
+BootstrapCompare <- function(draws, observed) {
+
+  pairs <- combn(colnames(draws), 2)
+  B <- nrow(draws)
+
+  map_dfr(seq_len(ncol(pairs)), function(k) {
+
+    a <- pairs[1, k]
+    b <- pairs[2, k]
+    d <- draws[, a] - draws[, b]
+
+    p <- 2 * min((1 + sum(d <= 0)) / (B + 1),
+                 (1 + sum(d >= 0)) / (B + 1))
+
+    tibble(Measure_A = a,
+           Measure_B = b,
+           difference = observed[[a]] - observed[[b]],
+           ci_lower = unname(quantile(d, 0.025)),
+           ci_upper = unname(quantile(d, 0.975)),
+           p_value = min(1, p))
+  })
+}
+
+# Resampling over SUBJECTS, with the arrays held fixed. Within each array the
+# subjects' choices are drawn with replacement, which for aggregated counts is a
+# multinomial draw of that array's N choices over its six candidates. A candidate
+# nobody picked has probability zero and so can never be picked in a replicate -
+# that is what a nonparametric bootstrap of the observed choices does.
+#
+# `statistic` picks which of the two summaries is recomputed in each replicate:
+#   "weighted" - every choice contributes its rank, weighted by the resampled votes
+#   "top"      - only each array's modal candidate(s) count, ties all included, to
+#                match how the observed top-choice statistic is defined
+
+BootstrapMeanRankSubjects <- function(ranks, statistic = c("weighted", "top"),
+                                      B = 10000) {
+
+  statistic <- match.arg(statistic)
+  measure_levels <- levels(ranks$Measure)
+
+  # One row per array per candidate, with the rank each measure gives it
+  wide <- ranks %>%
+    pivot_wider(names_from = Measure, values_from = Rank) %>%
+    arrange(array)
+
+  R <- as.matrix(wide[, measure_levels, drop = FALSE])
+  arrays <- unique(wide$array)
+
+  # Resample each array's subject choices: a 6 x B matrix of counts per array,
+  # stacked into one candidates x B matrix
+  counts <- matrix(0L, nrow = nrow(wide), ncol = B)
+  for (a in arrays) {
+    i <- which(wide$array == a)
+    n_a <- wide$n[i]
+    counts[i, ] <- rmultinom(B, sum(n_a), prob = n_a / sum(n_a))
+  }
+
+  if (statistic == "weighted") {
+
+    numerator <- crossprod(counts, R)          # B x measures
+    denominator <- colSums(counts)             # B
+    draws <- numerator / denominator
+
+  } else {
+
+    # Per array, flag the candidate(s) with the most votes in that replicate
+    keep <- matrix(FALSE, nrow = nrow(wide), ncol = B)
+    for (a in arrays) {
+      i <- which(wide$array == a)
+      block <- counts[i, , drop = FALSE]
+      keep[i, ] <- block == rep(apply(block, 2, max), each = length(i))
+    }
+
+    numerator <- crossprod(keep, R)
+    denominator <- colSums(keep)
+    draws <- numerator / denominator
+  }
+
+  colnames(draws) <- measure_levels
+  draws
+}
+
+# Pull a percentile out of a draws matrix in the order a summary table's Measure
+# column happens to be in
+
+CiFrom <- function(draws, measure, probs) {
+  unname(apply(draws, 2, quantile, probs)[as.character(measure)])
+}
+
+# Attach a 95% interval from one set of bootstrap draws to a summary table, so the
+# same summary can be shown once per resampling scheme
+
+AddCi <- function(summary_table, draws) {
+  summary_table %>%
+    mutate(ci_lower = CiFrom(draws, Measure, 0.025),
+           ci_upper = CiFrom(draws, Measure, 0.975),
+           across(c(mean_rank, ci_lower, ci_upper), ~round(.x, 2))) %>%
+    relocate(ci_lower, ci_upper, .after = mean_rank)
 }
 
 ```
@@ -339,6 +520,55 @@ stopifnot(
 
 ```
 
+## BirdLife V3
+
+Needed for BirdTree, whose tip labels follow the V3 taxonomy. Same pattern again:
+map the 2023 name back through the change file, and where there is no entry the
+name did not change.
+
+```{r}
+
+taxonomy_V3 <- read.csv(here("preprocessing/data/taxonomy_V3.csv")) %>%
+  filter(Recognised == "R")
+
+changes_V3_23 <- read.csv(here("preprocessing/data/changes_V3_Clements23.csv"))
+
+back_23_V3 <- changes_V3_23 %>%
+  filter(ScientificNameV3 != "", ScientificName2023 != "") %>%
+  select(ScientificName2023, BackNameV3 = ScientificNameV3) %>%
+  distinct()
+
+brown_birds <- brown_birds %>%
+  left_join(back_23_V3, by = "ScientificName2023") %>%
+  mutate(ScientificNameV3 = coalesce(BackNameV3, ScientificName2023)) %>%
+  select(-BackNameV3)
+
+# Every bird must land on a recognised V3 name, and the 99 must stay distinct -
+# BirdTree tip labels are the join key for the phylogenetic distances below
+
+stopifnot(
+  nrow(brown_birds) == 99,
+  all(brown_birds$ScientificNameV3 %in% taxonomy_V3$ScientificNameV3),
+  n_distinct(brown_birds$ScientificNameV3) == 99
+)
+
+# All 99 are also in the BirdTree taxonomy, so the tree pruner will find them all
+
+taxonomy_birdtree <- read.csv(here("preprocessing/data/taxonomy_birdtree.csv"))
+
+stopifnot(all(brown_birds$ScientificNameV3 %in% taxonomy_birdtree$ScientificNameBT))
+
+# The species list to paste into the BirdTree tree pruner (see the phylogenetic
+# section below)
+
+write.csv(brown_birds %>%
+            select(ScientificNameV3, ScientificName2023, CommonNameBrown) %>%
+            arrange(ScientificNameV3),
+          here("brown_britishnames/brown_birdtree_species.csv"),
+          row.names = FALSE)
+
+```
+
 # Perceptual similarity
 
 ## Add AVONET data
@@ -453,6 +683,85 @@ tax_74_list <- similarity_1974$pairs %>%
 We drop it and rescale below over the 546 within-array pairs instead, since the
 cross-array pairs are not part of Brown's design.
 
+# Phylogenetic similarity
+
+Mean cophenetic distance over a posterior sample of BirdTree phylogenies, exactly
+as `preprocessing/Preprocessing.Rmd` does it for each language.
+
+The trees are in `nexus_brown.nex`: 250 posterior samples from **Hackett All
+Species**, pruned to Brown's 99 birds by the tree pruner at <https://birdtree.org>.
+The pipeline's own trees were downloaded the same way, one job per language (the job
+IDs are recorded in `Preprocessing.Rmd`). Brown's birds needed their own job because
+the eight existing per-language trees between them cover only 35 of the 99, and
+cophenetic distances cannot be combined across separate pruner downloads.
+
+To reproduce that download: paste the `ScientificNameV3` column of
+`brown_birdtree_species.csv` (written by the taxonomy section above, all 99 names
+checked against the BirdTree taxonomy) into the pruner, ask for **250 trees** from
+**Hackett All Species** - the 9993-OTU set, which is what
+`preprocessing/data/taxonomy_birdtree.csv` lists and the only option that covers
+species with no genetic data - and save the result as
+`brown_britishnames/nexus_brown.nex`.
+
+If that file is absent the notebook still runs and reports the other three
+measures, leaving out the phylogenetic columns and plot panels.
+
+```{r}
+
+nexus_path <- here("brown_britishnames/nexus_brown.nex")
+have_phylo <- file.exists(nexus_path)
+
+if (have_phylo) {
+
+  nexus <- read.nexus(nexus_path)
+
+  # turn it into a bunch of matrices, then average them
+  phylo_matrix_full <- lapply(nexus, function(tree) cophenetic(tree))
+  phylo_matrix <- Reduce("+", phylo_matrix_full) / length(phylo_matrix_full)
+
+  # BirdTree writes tip labels with underscores
+  rownames(phylo_matrix) <- gsub("_", " ", rownames(phylo_matrix))
+  colnames(phylo_matrix) <- gsub("_", " ", colnames(phylo_matrix))
+
+  # The tips are V3 names; everything downstream is keyed on CanonicalName
+  to_canonical <- setNames(brown_birds$CanonicalName, brown_birds$ScientificNameV3)
+
+  missing_tips <- setdiff(brown_birds$ScientificNameV3, rownames(phylo_matrix))
+  if (length(missing_tips) > 0) {
+    stop("nexus is missing ", length(missing_tips), " species: ",
+         paste(missing_tips, collapse = ", "))
+  }
+
+  phylo_matrix <- phylo_matrix[brown_birds$ScientificNameV3,
+                               brown_birds$ScientificNameV3]
+  rownames(phylo_matrix) <- to_canonical[rownames(phylo_matrix)]
+  colnames(phylo_matrix) <- to_canonical[colnames(phylo_matrix)]
+
+  phylo_matrix <- as.data.frame(phylo_matrix)
+
+  phy_dist_list <- data.frame(t(combn(names(phylo_matrix), 2)),
+                              DistPhy = t(phylo_matrix)[lower.tri(phylo_matrix)]) %>%
+    mutate(Species1 = pmin(X1, X2),
+           Species2 = pmax(X1, X2)) %>%
+    select(Species1, Species2, DistPhy)
+
+  cat("trees in the nexus:", length(nexus), "\n")
+
+} else {
+
+  # An empty list joins cleanly and leaves DistPhy as all NA
+  phy_dist_list <- tibble(Species1 = character(),
+                          Species2 = character(),
+                          DistPhy = numeric())
+
+  message("nexus_brown.nex not found - phylogenetic similarity will be skipped. ",
+          "See the instructions above.")
+}
+
+have_phylo
+
+```
+
 # Within-array pairs
 
 ```{r}
@@ -483,12 +792,15 @@ array_pairs <- do.call(rbind, lapply(split(brown_arrays, brown_arrays$array),
 
 brown_pairs <- array_pairs %>%
   left_join(per_dist_list, by = c("Species1", "Species2")) %>%
+  left_join(phy_dist_list, by = c("Species1", "Species2")) %>%
   left_join(tax_23_list, by = c("Species1", "Species2")) %>%
   left_join(tax_74_list, by = c("Species1", "Species2")) %>%
   mutate(zDistPer = round(scale(DistPer)[,1], 2),
+         zDistPhy = if (have_phylo) round(scale(DistPhy)[,1], 2) else NA_real_,
          zDist23 = round(scale(Dist23)[,1], 2),
          zDist74 = round(scale(Dist74)[,1], 2),
          DistPer = round(DistPer, 2),
+         DistPhy = round(DistPhy, 2),
          # Species1/Species2 are sorted alphabetically, so the common names have to
          # follow that order rather than the order the pair was constructed in
          Species1Common = if_else(Species1 == canonical[BrownName1],
@@ -497,7 +809,8 @@ brown_pairs <- array_pairs %>%
                                   common[BrownName1], common[BrownName2])) %>%
   select(array, Species1, Species2, Species1Common, Species2Common,
          BrownName1, BrownName2, pair_type,
-         DistPer, zDistPer, Dist23, zDist23, Dist74, zDist74) %>%
+         DistPer, zDistPer, DistPhy, zDistPhy,
+         Dist23, zDist23, Dist74, zDist74) %>%
   arrange(array, pair_type, Species1, Species2)
 
 stopifnot(
@@ -505,6 +818,7 @@ stopifnot(
   !any(is.na(brown_pairs$DistPer)),
   !any(is.na(brown_pairs$Dist23)),
   !any(is.na(brown_pairs$Dist74)),
+  !have_phylo || !any(is.na(brown_pairs$DistPhy)),
   sum(brown_pairs$pair_type == "target-candidate") == 156
 )
 
@@ -521,7 +835,8 @@ brown_table3_similarity <- brown_table3 %>%
          Species2 = pmax(british_scientificname2023, american_scientificname2023)) %>%
   left_join(brown_pairs %>%
               select(array, Species1, Species2,
-                     DistPer, zDistPer, Dist23, zDist23, Dist74, zDist74),
+                     DistPer, zDistPer, DistPhy, zDistPhy,
+                     Dist23, zDist23, Dist74, zDist74),
             by = c("array", "Species1", "Species2")) %>%
   select(-Species1, -Species2)
 
@@ -555,13 +870,28 @@ rank 1 from the subjects.
 
 ```{r}
 
+# The measures, in the order they are plotted. Phylogenetic drops out of every
+# table and plot below when the BirdTree nexus is not present.
+
+measures <- tribble(
+  ~DistColumn, ~RankColumn, ~Measure,
+  "DistPer",   "RankPer",   "Perceptual (AVONET)",
+  "DistPhy",   "RankPhy",   "Phylogenetic (BirdTree)",
+  "Dist23",    "Rank23",    "Taxonomic (Clements 2023)",
+  "Dist74",    "Rank74",    "Taxonomic (Clements 1974)"
+)
+
+if (!have_phylo) measures <- measures %>% filter(DistColumn != "DistPhy")
+
 brown_table3_similarity <- brown_table3_similarity %>%
   group_by(array) %>%
-  mutate(RankPer = rank(DistPer, ties.method = "average"),
-         Rank23 = rank(Dist23, ties.method = "average"),
-         Rank74 = rank(Dist74, ties.method = "average"),
+  mutate(across(all_of(measures$DistColumn),
+                ~rank(.x, ties.method = "average"),
+                .names = "Rank_{.col}"),
          RankHuman = rank(-n, ties.method = "average")) %>%
-  ungroup()
+  ungroup() %>%
+  rename_with(~measures$RankColumn[match(.x, paste0("Rank_", measures$DistColumn))],
+              paste0("Rank_", measures$DistColumn))
 
 # Every array ranks 6 candidates, so the ranks must sum to 1+2+...+6 = 21
 # whatever the ties
@@ -569,16 +899,29 @@ brown_table3_similarity <- brown_table3_similarity %>%
 stopifnot(
   all(brown_table3_similarity %>%
         group_by(array) %>%
-        summarise(across(c(RankPer, Rank23, Rank74, RankHuman), sum)) %>%
+        summarise(across(all_of(c(measures$RankColumn, "RankHuman")), sum)) %>%
         select(-array) == 21)
 )
+
+# Long format holding every candidate, including the 37 nobody chose. The subject
+# bootstrap needs all six alternatives of each array present; the plots and the
+# array bootstrap use the n > 0 subset built later.
+
+all_choice_ranks_full <- brown_table3_similarity %>%
+  select(array, american_bird, n, all_of(measures$RankColumn)) %>%
+  pivot_longer(cols = all_of(measures$RankColumn),
+               names_to = "RankColumn",
+               values_to = "Rank") %>%
+  mutate(Measure = factor(measures$Measure[match(RankColumn, measures$RankColumn)],
+                          levels = measures$Measure)) %>%
+  select(-RankColumn)
 
 # How much tying each measure produces: the number of distinct values per array
 
 brown_table3_similarity %>%
   group_by(array) %>%
-  summarise(across(c(DistPer, Dist23, Dist74), n_distinct)) %>%
-  summarise(across(c(DistPer, Dist23, Dist74),
+  summarise(across(all_of(measures$DistColumn), n_distinct)) %>%
+  summarise(across(all_of(measures$DistColumn),
                    list(mean_distinct_values = mean, min = min)))
 
 ```
@@ -609,21 +952,20 @@ top_choice <- brown_table3_similarity %>%
   ungroup()
 
 top_choice_ranks <- top_choice %>%
-  select(array, british_target, american_bird, n, RankPer, Rank23, Rank74) %>%
-  pivot_longer(cols = c(RankPer, Rank23, Rank74),
-               names_to = "Measure",
+  select(array, british_target, american_bird, n,
+         all_of(measures$RankColumn)) %>%
+  pivot_longer(cols = all_of(measures$RankColumn),
+               names_to = "RankColumn",
                values_to = "Rank") %>%
-  mutate(Measure = factor(Measure,
-                          levels = c("RankPer", "Rank23", "Rank74"),
-                          labels = c("Perceptual (AVONET)",
-                                     "Taxonomic (Clements 2023)",
-                                     "Taxonomic (Clements 1974)")))
+  mutate(Measure = factor(measures$Measure[match(RankColumn, measures$RankColumn)],
+                          levels = measures$Measure)) %>%
+  select(-RankColumn)
 
 nrow(top_choice)
 
 ```
 
-```{r fig.width = 9, fig.height = 3.4}
+```{r fig.width = 12, fig.height = 3.4}
 
 # Fractional ranks of 6 candidates always fall on a 0.5 grid, so half-unit bins
 # centred on each possible rank show the distribution exactly. The dashed line at
@@ -633,7 +975,7 @@ rank_histograms <- ggplot(top_choice_ranks, aes(x = Rank)) +
   geom_histogram(binwidth = 0.5, boundary = 0.25,
                  fill = "steelblue", colour = "white", linewidth = 0.3) +
   geom_vline(xintercept = 3.5, linetype = "dashed", colour = "grey40") +
-  facet_wrap(~ Measure) +
+  facet_wrap(~ Measure, nrow = 1) +
   scale_x_continuous(breaks = 1:6) +
   scale_y_continuous(breaks = scales::breaks_width(2),
                      expand = expansion(mult = c(0, 0.05))) +
@@ -654,12 +996,38 @@ counts the arrays where it was tied for closest (fractional rank below 2).
 
 ```{r}
 
-top_choice_ranks %>%
+# Every top choice counts once, so the array-bootstrap weight is 1. The subject
+# bootstrap recomputes which candidate is modal in each replicate.
+top_choice_draws_arrays <- BootstrapMeanRankArrays(top_choice_ranks %>% mutate(w = 1))
+top_choice_draws_subjects <- BootstrapMeanRankSubjects(
+  all_choice_ranks_full, statistic = "top")
+
+top_choice_base <- top_choice_ranks %>%
   group_by(Measure) %>%
   summarise(observations = n(),
-            mean_rank = round(mean(Rank), 2),
+            mean_rank = mean(Rank),
             at_rank_1 = sum(Rank == 1),
             rank_1_or_tied_first = sum(Rank < 2))
+
+```
+
+Resampling over arrays:
+
+```{r}
+
+top_choice_summary_arrays <- AddCi(top_choice_base, top_choice_draws_arrays)
+
+top_choice_summary_arrays
+
+```
+
+Resampling over subjects:
+
+```{r}
+
+top_choice_summary_subjects <- AddCi(top_choice_base, top_choice_draws_subjects)
+
+top_choice_summary_subjects
 
 ```
 
@@ -681,15 +1049,14 @@ printed table.
 
 all_choice_ranks <- brown_table3_similarity %>%
   filter(n > 0) %>%
-  select(array, british_target, american_bird, n, RankPer, Rank23, Rank74) %>%
-  pivot_longer(cols = c(RankPer, Rank23, Rank74),
-               names_to = "Measure",
+  select(array, british_target, american_bird, n,
+         all_of(measures$RankColumn)) %>%
+  pivot_longer(cols = all_of(measures$RankColumn),
+               names_to = "RankColumn",
                values_to = "Rank") %>%
-  mutate(Measure = factor(Measure,
-                          levels = c("RankPer", "Rank23", "Rank74"),
-                          labels = c("Perceptual (AVONET)",
-                                     "Taxonomic (Clements 2023)",
-                                     "Taxonomic (Clements 1974)")))
+  mutate(Measure = factor(measures$Measure[match(RankColumn, measures$RankColumn)],
+                          levels = measures$Measure)) %>%
+  select(-RankColumn)
 
 stopifnot(
   all(all_choice_ranks %>%
@@ -700,7 +1067,7 @@ stopifnot(
 
 ```
 
-```{r fig.width = 9, fig.height = 3.4}
+```{r fig.width = 12, fig.height = 3.4}
 
 # Same bins and chance line as the top-choice histograms, but each row is weighted
 # by the number of subjects who picked that candidate
@@ -709,7 +1076,7 @@ all_choice_histograms <- ggplot(all_choice_ranks, aes(x = Rank, weight = n)) +
   geom_histogram(binwidth = 0.5, boundary = 0.25,
                  fill = "darkseagreen4", colour = "white", linewidth = 0.3) +
   geom_vline(xintercept = 3.5, linetype = "dashed", colour = "grey40") +
-  facet_wrap(~ Measure) +
+  facet_wrap(~ Measure, nrow = 1) +
   scale_x_continuous(breaks = 1:6) +
   scale_y_continuous(breaks = scales::breaks_width(50),
                      expand = expansion(mult = c(0, 0.05))) +
@@ -728,14 +1095,142 @@ candidates at random.
 
 ```{r}
 
-all_choice_ranks %>%
+# Here each row carries the number of subjects who made that choice
+all_choice_draws_arrays <- BootstrapMeanRankArrays(all_choice_ranks %>% mutate(w = n))
+all_choice_draws_subjects <- BootstrapMeanRankSubjects(
+  all_choice_ranks_full, statistic = "weighted")
+
+all_choice_base <- all_choice_ranks %>%
   group_by(Measure) %>%
   summarise(choices = sum(n),
-            mean_rank = round(weighted.mean(Rank, n), 2),
+            mean_rank = weighted.mean(Rank, n),
             at_rank_1 = sum(n[Rank == 1]),
             proportion_at_rank_1 = round(sum(n[Rank == 1]) / sum(n), 3))
 
 ```
+
+Resampling over arrays:
+
+```{r}
+
+all_choice_summary_arrays <- AddCi(all_choice_base, all_choice_draws_arrays)
+
+all_choice_summary_arrays
+
+```
+
+Resampling over subjects:
+
+```{r}
+
+all_choice_summary_subjects <- AddCi(all_choice_base, all_choice_draws_subjects)
+
+all_choice_summary_subjects
+
+```
+
+The two tables carry the same mean ranks and differ only in the interval. The array
+intervals are several times wider, because there are only 26 arrays however many
+subjects sit inside them: 34 people judging the same six pictures pin down what
+humans think of *that array* very precisely, but supply only one piece of evidence
+about the measures.
+
+# Comparing the measures
+
+Each pair of measures, compared on the same bootstrap replicates - so the two are
+always scored on an identical draw of arrays, and the comparison is paired.
+`difference` is `Measure_A` minus `Measure_B`, so a negative value means A ranked
+the chosen birds closer than B did.
+
+```{r}
+
+# Unrounded means, so the reported differences are exact
+top_choice_observed <- setNames(top_choice_base$mean_rank,
+                                as.character(top_choice_base$Measure))
+all_choice_observed <- setNames(all_choice_base$mean_rank,
+                                as.character(all_choice_base$Measure))
+
+RoundComparisons <- function(comparisons) {
+  comparisons %>%
+    mutate(across(c(difference, ci_lower, ci_upper), ~round(.x, 2)),
+           p_value = round(p_value, 4))
+}
+
+```
+
+## Top choice only
+
+Resampling over arrays:
+
+```{r}
+
+top_choice_comparisons_arrays <-
+  BootstrapCompare(top_choice_draws_arrays, top_choice_observed)
+
+RoundComparisons(top_choice_comparisons_arrays)
+
+```
+
+Resampling over subjects:
+
+```{r}
+
+top_choice_comparisons_subjects <-
+  BootstrapCompare(top_choice_draws_subjects, top_choice_observed)
+
+RoundComparisons(top_choice_comparisons_subjects)
+
+```
+
+## All choices
+
+Resampling over arrays:
+
+```{r}
+
+all_choice_comparisons_arrays <-
+  BootstrapCompare(all_choice_draws_arrays, all_choice_observed)
+
+RoundComparisons(all_choice_comparisons_arrays)
+
+```
+
+Resampling over subjects:
+
+```{r}
+
+all_choice_comparisons_subjects <-
+  BootstrapCompare(all_choice_draws_subjects, all_choice_observed)
+
+RoundComparisons(all_choice_comparisons_subjects)
+
+```
+
+The p values are uncorrected, and there are six comparisons in each block, so a
+single p just under 0.05 is not worth much on its own.
+
+The two schemes disagree, and the disagreement is the point rather than a problem.
+
+Resampling **over arrays**, only the gaps involving Clements 1974 come out clearly:
+perceptual, phylogenetic and Clements 2023 each beat it, and Clements 2023 beats it
+most decisively. The three leading measures cannot be separated from each other at
+all - perceptual against phylogenetic, perceptual against Clements 2023 and
+phylogenetic against Clements 2023 all have intervals straddling zero by a wide
+margin. On this reading the apparent ordering in the summary table is noise, and
+those three should not be put in any order.
+
+Resampling **over subjects**, the same three gaps shrink their intervals by roughly
+a factor of four and perceptual against Clements 2023 becomes clearly non-zero,
+while perceptual against phylogenetic still does not. But this scheme holds the 26
+arrays fixed, so it only says that *these particular arrays*, judged by other
+people, would keep giving that answer. It is not evidence that the ordering would
+survive a different set of birds.
+
+Since the interesting claim is about naming in general rather than about Brown's 26
+stimulus sets, the array-resampled numbers are the ones to lean on, and they say
+the data are too thin to rank the three leading measures. The top-choice
+comparisons tell the same story more weakly again, as they should, using 27
+observations rather than 883.
 
 # Checks
 
@@ -782,11 +1277,18 @@ brown_table3_similarity %>%
 
 ```{r}
 
+# Without the BirdTree nexus the phylogenetic columns would be entirely NA, so
+# drop them rather than export empty columns
+
+drop_unused_phylo <- function(data) {
+  if (have_phylo) data else select(data, -any_of(c("DistPhy", "zDistPhy")))
+}
+
 brown_bird_taxonomy <- brown_birds %>%
   select(BrownName, CommonNameBrown, NameSource,
          ScientificName2023, CommonName2023, Genus2023, Family2023, Order2023,
          ScientificName1974, Genus1974, Family1974, Order1974,
-         ScientificName2021,
+         ScientificName2021, ScientificNameV3,
          BeakLengthCulmen:Mass) %>%
   arrange(BrownName)
 
@@ -794,11 +1296,11 @@ write.csv(brown_bird_taxonomy,
           here("brown_britishnames/brown_bird_taxonomy.csv"),
           row.names = FALSE)
 
-write.csv(brown_pairs,
+write.csv(brown_pairs %>% drop_unused_phylo(),
           here("brown_britishnames/brown_similarity_pairs.csv"),
           row.names = FALSE)
 
-write.csv(brown_table3_similarity,
+write.csv(brown_table3_similarity %>% drop_unused_phylo(),
           here("brown_britishnames/brown_table3_similarity.csv"),
           row.names = FALSE)
 

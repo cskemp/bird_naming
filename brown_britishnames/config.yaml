@@ -1,0 +1,117 @@
+job_id: tree-pruner-3e98e04b-259a-40c6-9738-ddcbcafa01cf
+email: cskemp@gmail.com
+tree_base: birdtree
+tree_set: HackettStage2Full
+sample_size: 250
+names: [Accipiter cooperii, Accipiter gentilis, Accipiter nisus, Accipiter striatus,
+  Acrocephalus schoenobaenus, Acrocephalus scirpaceus, Alauda arvensis, Alcedo atthis,
+  Aphelocoma coerulescens, Apus apus, Buteo regalis, Buteo swainsoni, Calcarius lapponicus,
+  Calidris canutus, Carduelis pinus, Catharus fuscescens, Catharus guttatus, Catharus
+    minimus, Catharus ustulatus, Catoptrophorus semipalmatus, Cettia cetti, Chaetura
+    pelagica, Coccyzus americanus, Coccyzus erythropthalmus, Colaptes auratus, Contopus
+    cooperi, Corvus brachyrhynchos, Cuculus canorus, Cyanocitta cristata, Dendrocopos
+    major, Dendroica castanea, Dendroica pinus, Dendroica striata, Dolichonyx oryzivorus,
+  Dryocopus pileatus, Elanus leucurus, Empidonax minimus, Empidonax traillii, Empidonax
+    virescens, Eremophila alpestris, Erithacus rubecula, Eudocimus albus, Euphagus
+    carolinus, Euphagus cyanocephalus, Falco sparverius, Ficedula hypoleuca, Gallinago
+    gallinago, Garrulus glandarius, Geococcyx californianus, Hylocichla mustelina,
+  Icterus galbula, Icterus pectoralis, Icterus spurius, Ictinia mississippiensis,
+  Junco hyemalis, Limnodromus scolopaceus, Limosa fedoa, Locustella naevia, Lullula
+    arborea, Megaceryle alcyon, Melanerpes erythrocephalus, Melospiza georgiana, Milvus
+    milvus, Muscicapa striata, Myadestes townsendi, Oenanthe oenanthe, Oriolus oriolus,
+  Passer domesticus, Passer montanus, Perisoreus canadensis, Phoenicurus ochruros,
+  Phoenicurus phoenicurus, Picoides pubescens, Platalea ajaja, Platalea leucorodia,
+  Plegadis falcinellus, Polioptila caerulea, Progne subis, Quiscalus quiscula, Regulus
+    calendula, Regulus satrapa, Riparia riparia, Rostrhamus sociabilis, Scolopax minor,
+  Scolopax rusticola, Setophaga ruticilla, Sialia sialis, Spiza americana, Spizella
+    passerina, Sturnella magna, Turdus merula, Turdus migratorius, Turdus philomelos,
+  Turdus viscivorus, Tyrannus forficatus, Vermivora peregrina, Vermivora ruficapilla,
+  Xanthocephalus xanthocephalus, Zonotrichia querula]
+sample_trees: [HackettStage2Full_2905.tre, HackettStage2Full_6150.tre, HackettStage2Full_4225.tre,
+  HackettStage2Full_7191.tre, HackettStage2Full_3717.tre, HackettStage2Full_0027.tre,
+  HackettStage2Full_8912.tre, HackettStage2Full_0430.tre, HackettStage2Full_8318.tre,
+  HackettStage2Full_8502.tre, HackettStage2Full_5705.tre, HackettStage2Full_8332.tre,
+  HackettStage2Full_5556.tre, HackettStage2Full_1033.tre, HackettStage2Full_0031.tre,
+  HackettStage2Full_0800.tre, HackettStage2Full_3762.tre, HackettStage2Full_2199.tre,
+  HackettStage2Full_0847.tre, HackettStage2Full_7449.tre, HackettStage2Full_7451.tre,
+  HackettStage2Full_2038.tre, HackettStage2Full_5732.tre, HackettStage2Full_4259.tre,
+  HackettStage2Full_2844.tre, HackettStage2Full_0604.tre, HackettStage2Full_1702.tre,
+  HackettStage2Full_9751.tre, HackettStage2Full_1360.tre, HackettStage2Full_2532.tre,
+  HackettStage2Full_1279.tre, HackettStage2Full_1875.tre, HackettStage2Full_6819.tre,
+  HackettStage2Full_0132.tre, HackettStage2Full_4635.tre, HackettStage2Full_5926.tre,
+  HackettStage2Full_7568.tre, HackettStage2Full_9331.tre, HackettStage2Full_2012.tre,
+  HackettStage2Full_8276.tre, HackettStage2Full_4566.tre, HackettStage2Full_7042.tre,
+  HackettStage2Full_9848.tre, HackettStage2Full_5062.tre, HackettStage2Full_6845.tre,
+  HackettStage2Full_1560.tre, HackettStage2Full_1265.tre, HackettStage2Full_9674.tre,
+  HackettStage2Full_1571.tre, HackettStage2Full_6796.tre, HackettStage2Full_0070.tre,
+  HackettStage2Full_6876.tre, HackettStage2Full_0329.tre, HackettStage2Full_6266.tre,
+  HackettStage2Full_1284.tre, HackettStage2Full_0399.tre, HackettStage2Full_4845.tre,
+  HackettStage2Full_3150.tre, HackettStage2Full_6900.tre, HackettStage2Full_7224.tre,
+  HackettStage2Full_1995.tre, HackettStage2Full_0850.tre, HackettStage2Full_6151.tre,
+  HackettStage2Full_9964.tre, HackettStage2Full_8383.tre, HackettStage2Full_3980.tre,
+  HackettStage2Full_7911.tre, HackettStage2Full_3573.tre, HackettStage2Full_8352.tre,
+  HackettStage2Full_9397.tre, HackettStage2Full_0885.tre, HackettStage2Full_2617.tre,
+  HackettStage2Full_4990.tre, HackettStage2Full_5575.tre, HackettStage2Full_1392.tre,
+  HackettStage2Full_6375.tre, HackettStage2Full_4896.tre, HackettStage2Full_7783.tre,
+  HackettStage2Full_7481.tre, HackettStage2Full_6243.tre, HackettStage2Full_5246.tre,
+  HackettStage2Full_9250.tre, HackettStage2Full_5360.tre, HackettStage2Full_3570.tre,
+  HackettStage2Full_6915.tre, HackettStage2Full_2518.tre, HackettStage2Full_5603.tre,
+  HackettStage2Full_1543.tre, HackettStage2Full_0543.tre, HackettStage2Full_7700.tre,
+  HackettStage2Full_2083.tre, HackettStage2Full_0106.tre, HackettStage2Full_4994.tre,
+  HackettStage2Full_0377.tre, HackettStage2Full_0892.tre, HackettStage2Full_9648.tre,
+  HackettStage2Full_5610.tre, HackettStage2Full_8325.tre, HackettStage2Full_9594.tre,
+  HackettStage2Full_3893.tre, HackettStage2Full_4018.tre, HackettStage2Full_7238.tre,
+  HackettStage2Full_1617.tre, HackettStage2Full_1485.tre, HackettStage2Full_4750.tre,
+  HackettStage2Full_6801.tre, HackettStage2Full_5523.tre, HackettStage2Full_5461.tre,
+  HackettStage2Full_5871.tre, HackettStage2Full_4150.tre, HackettStage2Full_1349.tre,
+  HackettStage2Full_3167.tre, HackettStage2Full_6743.tre, HackettStage2Full_8936.tre,
+  HackettStage2Full_3847.tre, HackettStage2Full_8552.tre, HackettStage2Full_2597.tre,
+  HackettStage2Full_5166.tre, HackettStage2Full_7216.tre, HackettStage2Full_8210.tre,
+  HackettStage2Full_2648.tre, HackettStage2Full_9171.tre, HackettStage2Full_0566.tre,
+  HackettStage2Full_3815.tre, HackettStage2Full_5206.tre, HackettStage2Full_5221.tre,
+  HackettStage2Full_7084.tre, HackettStage2Full_0738.tre, HackettStage2Full_1181.tre,
+  HackettStage2Full_5530.tre, HackettStage2Full_0583.tre, HackettStage2Full_0158.tre,
+  HackettStage2Full_1689.tre, HackettStage2Full_8508.tre, HackettStage2Full_7671.tre,
+  HackettStage2Full_1599.tre, HackettStage2Full_1347.tre, HackettStage2Full_3910.tre,
+  HackettStage2Full_6793.tre, HackettStage2Full_1720.tre, HackettStage2Full_4543.tre,
+  HackettStage2Full_8257.tre, HackettStage2Full_5589.tre, HackettStage2Full_9835.tre,
+  HackettStage2Full_6530.tre, HackettStage2Full_8232.tre, HackettStage2Full_7408.tre,
+  HackettStage2Full_9172.tre, HackettStage2Full_0492.tre, HackettStage2Full_7033.tre,
+  HackettStage2Full_0346.tre, HackettStage2Full_1430.tre, HackettStage2Full_9330.tre,
+  HackettStage2Full_6374.tre, HackettStage2Full_4540.tre, HackettStage2Full_6200.tre,
+  HackettStage2Full_5092.tre, HackettStage2Full_4290.tre, HackettStage2Full_7511.tre,
+  HackettStage2Full_5528.tre, HackettStage2Full_8049.tre, HackettStage2Full_2950.tre,
+  HackettStage2Full_7940.tre, HackettStage2Full_3774.tre, HackettStage2Full_3616.tre,
+  HackettStage2Full_8930.tre, HackettStage2Full_8048.tre, HackettStage2Full_5035.tre,
+  HackettStage2Full_4664.tre, HackettStage2Full_7749.tre, HackettStage2Full_1508.tre,
+  HackettStage2Full_6706.tre, HackettStage2Full_9426.tre, HackettStage2Full_7976.tre,
+  HackettStage2Full_2313.tre, HackettStage2Full_4209.tre, HackettStage2Full_5043.tre,
+  HackettStage2Full_1387.tre, HackettStage2Full_3625.tre, HackettStage2Full_3690.tre,
+  HackettStage2Full_2342.tre, HackettStage2Full_9909.tre, HackettStage2Full_8578.tre,
+  HackettStage2Full_4772.tre, HackettStage2Full_0098.tre, HackettStage2Full_8463.tre,
+  HackettStage2Full_5319.tre, HackettStage2Full_2045.tre, HackettStage2Full_6190.tre,
+  HackettStage2Full_5746.tre, HackettStage2Full_2242.tre, HackettStage2Full_4269.tre,
+  HackettStage2Full_1588.tre, HackettStage2Full_3915.tre, HackettStage2Full_5963.tre,
+  HackettStage2Full_5195.tre, HackettStage2Full_2389.tre, HackettStage2Full_0435.tre,
+  HackettStage2Full_2305.tre, HackettStage2Full_4349.tre, HackettStage2Full_9595.tre,
+  HackettStage2Full_5000.tre, HackettStage2Full_1159.tre, HackettStage2Full_5078.tre,
+  HackettStage2Full_3178.tre, HackettStage2Full_1108.tre, HackettStage2Full_1262.tre,
+  HackettStage2Full_3104.tre, HackettStage2Full_6844.tre, HackettStage2Full_6839.tre,
+  HackettStage2Full_0433.tre, HackettStage2Full_3044.tre, HackettStage2Full_6683.tre,
+  HackettStage2Full_6138.tre, HackettStage2Full_7456.tre, HackettStage2Full_5022.tre,
+  HackettStage2Full_8954.tre, HackettStage2Full_5027.tre, HackettStage2Full_4650.tre,
+  HackettStage2Full_2749.tre, HackettStage2Full_0744.tre, HackettStage2Full_6500.tre,
+  HackettStage2Full_6686.tre, HackettStage2Full_8474.tre, HackettStage2Full_2836.tre,
+  HackettStage2Full_5207.tre, HackettStage2Full_1429.tre, HackettStage2Full_1948.tre,
+  HackettStage2Full_5086.tre, HackettStage2Full_3704.tre, HackettStage2Full_7620.tre,
+  HackettStage2Full_6089.tre, HackettStage2Full_4426.tre, HackettStage2Full_1209.tre,
+  HackettStage2Full_3661.tre, HackettStage2Full_8333.tre, HackettStage2Full_2833.tre,
+  HackettStage2Full_4751.tre, HackettStage2Full_3274.tre, HackettStage2Full_2397.tre,
+  HackettStage2Full_9827.tre, HackettStage2Full_9241.tre, HackettStage2Full_9428.tre,
+  HackettStage2Full_8764.tre, HackettStage2Full_3619.tre, HackettStage2Full_2605.tre,
+  HackettStage2Full_4119.tre, HackettStage2Full_4441.tre, HackettStage2Full_0739.tre,
+  HackettStage2Full_1358.tre]
+status: CREATED
+created_at: "2026-09-05T00:05:50Z"
+completed_at: ""
+bad_names: {}

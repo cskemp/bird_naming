@@ -1,9 +1,9 @@
 # brown_britishnames
 
 Data and code for Cecil H. Brown's "British Names for American Birds" (*Journal of
-Linguistic Anthropology* 2(1):30–50, 1992), plus perceptual and taxonomic
-similarity measures computed for it using the same methods as the rest of this
-repository.
+Linguistic Anthropology* 2(1):30–50, 1992), plus perceptual, taxonomic and
+phylogenetic similarity measures computed for it using the same methods as the rest
+of this repository.
 
 Everything in this folder is self-contained. `BrownSimilarity.Rmd` reads the
 reference taxonomies under `preprocessing/data/` but writes only into this folder,
@@ -38,8 +38,8 @@ AOU-checklist names of that era, so a good many are now retired
 
 ## BrownSimilarity.Rmd
 
-Computes, for every pair of birds within each array, the two similarity measures
-the main analysis uses:
+Computes, for every pair of birds within each array, the similarity measures the
+main analysis uses:
 
 - **Perceptual similarity** — Euclidean distance in the 11-dimensional AVONET trait
   space (beak length culmen/nares, beak width, beak depth, tarsus length, wing
@@ -48,10 +48,13 @@ the main analysis uses:
 - **Taxonomic similarity** — number of steps up the taxonomic tree before two birds
   share a taxon, for **Clements 1974** and **Clements 2023**: 0 = same species,
   1 = same genus, 2 = same family, 3 = same order, 4 = neither.
+- **Phylogenetic similarity** — mean cophenetic distance over the 250 BirdTree
+  posterior samples in `nexus_brown.nex`. If that file is removed the notebook
+  still runs and reports the other three.
 
 It then ranks the six candidates in each array by each measure and draws two sets of
-histograms, three panels each, of where the measures ranked the birds the subjects
-picked. The dashed line at 3.5 marks the mean rank expected from a measure that
+histograms, one panel per measure, of where the measures ranked the birds the
+subjects picked. The dashed line at 3.5 marks the mean rank expected from a measure that
 ordered the candidates at random.
 
 - **Top choice only** — one observation per array, the rank of the candidate the
@@ -61,6 +64,26 @@ ordered the candidates at random.
   it, so a bird picked by 15 subjects contributes fifteen observations and one
   picked by a single subject contributes one. 883 observations (34 subjects × 26
   arrays, less the response missing from array 25).
+
+Both summary tables carry 95% bootstrap confidence intervals on the mean rank, and a
+further section compares every pair of measures on the same replicates (a paired
+comparison; p values are uncorrected, and there are six comparisons per block).
+
+**Two resampling schemes are reported side by side**, because they answer different
+questions:
+
+- **Over arrays** — draw 26 arrays with replacement. Asks how the measures would
+  compare on a *different set of birds*, which is the claim of scientific interest.
+- **Over subjects** — hold the arrays fixed and resample each array's 34 choices.
+  Asks how they would compare if *different people* judged these same pictures.
+
+The array intervals are several times wider, and the two schemes disagree. Under
+array resampling only the gaps involving Clements 1974 are clear; perceptual,
+phylogenetic and Clements 2023 cannot be separated from one another, so the
+mean-rank ordering of those three should not be read as a ranking. Under subject
+resampling perceptual does separate from Clements 2023 — but that only says these
+particular arrays would behave the same way with other people, not that the ordering
+would survive different birds.
 
 An important caveat is printed alongside those plots. Perceptual distance nearly
 always separates all six candidates, but the taxonomic measures average fewer than
@@ -82,8 +105,34 @@ Run it from RStudio, or:
 Rscript -e 'rmarkdown::render(here::here("brown_britishnames/BrownSimilarity.Rmd"))'
 ```
 
-It needs `tidyverse`, `here` and `rdist`, all already in the project `renv.lock`
-(`renv::restore()` if they are not installed).
+It needs `tidyverse`, `here`, `rdist` and `ape`, all already in the project
+`renv.lock` (`renv::restore()` if they are not installed).
+
+### Where nexus_brown.nex came from
+
+BirdTree phylogenies come from the tree pruner at <https://birdtree.org>, which
+takes a species list and returns a nexus of posterior samples pruned to it. The
+trees the main pipeline uses were downloaded that way, one job per language (the job
+IDs are recorded in `Preprocessing.Rmd`). Brown's birds needed their own job: the
+eight existing per-language trees between them cover only 35 of his 99 birds, and no
+single one covers more than 11, so nothing already in the repo could be reused, and
+cophenetic distances cannot be combined across separate downloads.
+
+To reproduce it:
+
+1. Knit the notebook once. It writes `brown_birdtree_species.csv`, the 99 birds with
+   their BirdLife V3 names — all 99 checked against the BirdTree taxonomy, so the
+   pruner finds every one.
+2. Paste that file's `ScientificNameV3` column into the pruner and ask for **250
+   trees** from **Hackett All Species**. That is the 9993-OTU set listed in
+   `preprocessing/data/taxonomy_birdtree.csv`, and the only option that includes
+   species placed without genetic data — Hackett Sequenced Species would silently
+   drop any of Brown's birds that lack sequence data.
+3. Save the download as `brown_britishnames/nexus_brown.nex` and re-knit.
+
+If the file is absent the notebook drops `DistPhy`/`zDistPhy` from the pair files,
+`RankPhy` from the table3 file, and the phylogenetic panel from each set of
+histograms, rather than failing.
 
 ### Scaling decision
 
@@ -145,6 +194,7 @@ Regenerate all three by running the notebook.
 | `BrownName1`, `BrownName2` | Brown's original binomials, in the order the pair was constructed |
 | `pair_type` | `target-candidate` (156 rows) or `candidate-candidate` (390 rows) |
 | `DistPer`, `zDistPer` | Perceptual distance, raw and z-scored |
+| `DistPhy`, `zDistPhy` | Phylogenetic distance — these two columns exist only when `nexus_brown.nex` is present |
 | `Dist23`, `zDist23` | Taxonomic distance under Clements 2023 |
 | `Dist74`, `zDist74` | Taxonomic distance under Clements 1974 |
 
@@ -156,8 +206,8 @@ columns and four rank columns appended, so everything sits next to Brown's `n` a
 judgements.
 
 The rank columns order the six candidates *within each array*, 1 being closest:
-`RankPer`, `Rank23`, `Rank74` from the three distance measures and `RankHuman` from
-the vote counts. All are **fractional** (`ties.method = "average"`), which matters
+`RankPer`, `Rank23`, `Rank74` (plus `RankPhy` when the BirdTree nexus is present)
+from the distance measures, and `RankHuman` from the vote counts. All are **fractional** (`ties.method = "average"`), which matters
 because the taxonomic distances are small integers and tie heavily.
 
 ### brown_bird_taxonomy.csv
@@ -166,6 +216,11 @@ because the taxonomic distances are small integers and tie heavily.
 name was arrived at (`NameSource`), the 1974/2021/2023 names with genus, family and
 order, and the 11 AVONET traits. Lets the mapping be audited by hand without
 re-running the notebook.
+
+### brown_birdtree_species.csv
+
+99 rows — the species list for the BirdTree tree pruner: `ScientificNameV3` with the
+Clements 2023 name and Brown's common name alongside for checking.
 
 ## Two things to know about the data
 
