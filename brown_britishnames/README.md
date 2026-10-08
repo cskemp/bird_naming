@@ -234,8 +234,3 @@ The spoonbill pair in array 24 is 1 step apart in 2023 (*Ajaia ajaja* became
 and the woodpecker pair in array 22 is 2 apart in 2023 but 1 apart in 1974 (the
 downy woodpecker was *Dendrocopos pubescens*, sharing a genus with *Dendrocopos
 major*).
-
-
-`colour_data.csv`
-
-
