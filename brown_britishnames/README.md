@@ -158,7 +158,7 @@ AVONET and the Clements taxonomies. Of the 99 unique birds:
 
   | Brown | Clements 2023 | Why |
   | --- | --- | --- |
-  | `Capella gallinago` | `Gallinago gallinago` | In the 1974 list as Common Snipe but with no 2023 partner, because that species was later split; the Old World bird Brown illustrates is *Gallinago gallinago* |
+  | `Capella gallinago` | `Gallinago delicata` | In the 1974 list as Common Snipe but with no 2023 partner, because that species was later split into *G. gallinago* (Old World) and *G. delicata* (Wilson's Snipe, New World). Brown uses it only as an American candidate, so it is *G. delicata* — the same mapping `preprocessing/Preprocessing.Rmd` uses for the Innu data |
   | `Picoides pubescens` | `Dryobates pubescens` | In neither list; the Downy Woodpecker moved to *Dryobates* |
   | `Quiscalus quiscalus` | `Quiscalus quiscula` | In neither list; older spelling of the Common Grackle's name |
 

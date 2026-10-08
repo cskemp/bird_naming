@@ -1,9 +1,9 @@
 "array","Species1","Species2","Species1Common","Species2Common","BrownName1","BrownName2","pair_type","DistPer","zDistPer","DistPhy","zDistPhy","Dist23","zDist23","Dist74","zDist74"
 1,"Catharus minimus","Catharus ustulatus","gray-cheeked thrush","Swainson's thrush","Catharus minimus","Catharus ustulatus","candidate-candidate",0.27,-1.39,35.16,-1.28,1,-2.15,1,-1.89
 1,"Catharus minimus","Hylocichla mustelina","gray-cheeked thrush","wood thrush","Catharus minimus","Hylocichla mustelina","candidate-candidate",0.93,-0.89,50.03,-0.91,2,-0.89,2,-0.65
-1,"Catharus minimus","Myadestes townsendi","gray-cheeked thrush","Townsend's solitaire","Catharus minimus","Myadestes townsendi","candidate-candidate",1.19,-0.69,55.45,-0.77,2,-0.89,2,-0.65
+1,"Catharus minimus","Myadestes townsendi","gray-cheeked thrush","Townsend's solitaire","Catharus minimus","Myadestes townsendi","candidate-candidate",1.19,-0.68,55.45,-0.77,2,-0.89,2,-0.65
 1,"Catharus minimus","Oenanthe oenanthe","gray-cheeked thrush","northern wheatear","Catharus minimus","Oenanthe oenanthe","candidate-candidate",0.68,-1.08,63.09,-0.58,3,0.36,2,-0.65
-1,"Catharus minimus","Turdus migratorius","gray-cheeked thrush","American robin","Catharus minimus","Turdus migratorius","candidate-candidate",1.74,-0.27,40.36,-1.15,2,-0.89,2,-0.65
+1,"Catharus minimus","Turdus migratorius","gray-cheeked thrush","American robin","Catharus minimus","Turdus migratorius","candidate-candidate",1.74,-0.26,40.36,-1.15,2,-0.89,2,-0.65
 1,"Catharus ustulatus","Hylocichla mustelina","Swainson's thrush","wood thrush","Catharus ustulatus","Hylocichla mustelina","candidate-candidate",1.03,-0.81,40.92,-1.13,2,-0.89,2,-0.65
 1,"Catharus ustulatus","Myadestes townsendi","Swainson's thrush","Townsend's solitaire","Catharus ustulatus","Myadestes townsendi","candidate-candidate",1.24,-0.65,57.74,-0.72,2,-0.89,2,-0.65
 1,"Catharus ustulatus","Oenanthe oenanthe","Swainson's thrush","northern wheatear","Catharus ustulatus","Oenanthe oenanthe","candidate-candidate",0.74,-1.03,64.81,-0.54,3,0.36,2,-0.65
@@ -22,9 +22,9 @@
 1,"Turdus migratorius","Turdus philomelos","American robin","song thrush","Turdus philomelos","Turdus migratorius","target-candidate",0.62,-1.12,43.77,-1.06,1,-2.15,1,-1.89
 2,"Catharus minimus","Catharus ustulatus","gray-cheeked thrush","Swainson's thrush","Catharus minimus","Catharus ustulatus","candidate-candidate",0.27,-1.39,35.16,-1.28,1,-2.15,1,-1.89
 2,"Catharus minimus","Hylocichla mustelina","gray-cheeked thrush","wood thrush","Catharus minimus","Hylocichla mustelina","candidate-candidate",0.93,-0.89,50.03,-0.91,2,-0.89,2,-0.65
-2,"Catharus minimus","Myadestes townsendi","gray-cheeked thrush","Townsend's solitaire","Catharus minimus","Myadestes townsendi","candidate-candidate",1.19,-0.69,55.45,-0.77,2,-0.89,2,-0.65
+2,"Catharus minimus","Myadestes townsendi","gray-cheeked thrush","Townsend's solitaire","Catharus minimus","Myadestes townsendi","candidate-candidate",1.19,-0.68,55.45,-0.77,2,-0.89,2,-0.65
 2,"Catharus minimus","Oenanthe oenanthe","gray-cheeked thrush","northern wheatear","Catharus minimus","Oenanthe oenanthe","candidate-candidate",0.68,-1.08,63.09,-0.58,3,0.36,2,-0.65
-2,"Catharus minimus","Turdus migratorius","gray-cheeked thrush","American robin","Catharus minimus","Turdus migratorius","candidate-candidate",1.74,-0.27,40.36,-1.15,2,-0.89,2,-0.65
+2,"Catharus minimus","Turdus migratorius","gray-cheeked thrush","American robin","Catharus minimus","Turdus migratorius","candidate-candidate",1.74,-0.26,40.36,-1.15,2,-0.89,2,-0.65
 2,"Catharus ustulatus","Hylocichla mustelina","Swainson's thrush","wood thrush","Catharus ustulatus","Hylocichla mustelina","candidate-candidate",1.03,-0.81,40.92,-1.13,2,-0.89,2,-0.65
 2,"Catharus ustulatus","Myadestes townsendi","Swainson's thrush","Townsend's solitaire","Catharus ustulatus","Myadestes townsendi","candidate-candidate",1.24,-0.65,57.74,-0.72,2,-0.89,2,-0.65
 2,"Catharus ustulatus","Oenanthe oenanthe","Swainson's thrush","northern wheatear","Catharus ustulatus","Oenanthe oenanthe","candidate-candidate",0.74,-1.03,64.81,-0.54,3,0.36,2,-0.65
@@ -57,13 +57,13 @@
 3,"Oenanthe oenanthe","Turdus migratorius","northern wheatear","American robin","Oenanthe oenanthe","Turdus migratorius","candidate-candidate",2.23,0.11,59.22,-0.68,3,0.36,2,-0.65
 3,"Quiscalus quiscula","Turdus migratorius","common grackle","American robin","Quiscalus quiscalus","Turdus migratorius","candidate-candidate",1.43,-0.5,90.14,0.09,3,0.36,3,0.59
 3,"Euphagus carolinus","Turdus merula","rusty blackbird","blackbird","Turdus merula","Euphagus carolinus","target-candidate",0.93,-0.88,88.39,0.05,3,0.36,3,0.59
-3,"Euphagus cyanocephalus","Turdus merula","Brewer's blackbird","blackbird","Turdus merula","Euphagus cyanocephalus","target-candidate",1.04,-0.81,90.14,0.09,3,0.36,3,0.59
+3,"Euphagus cyanocephalus","Turdus merula","Brewer's blackbird","blackbird","Turdus merula","Euphagus cyanocephalus","target-candidate",1.03,-0.81,90.14,0.09,3,0.36,3,0.59
 3,"Hylocichla mustelina","Turdus merula","wood thrush","blackbird","Turdus merula","Hylocichla mustelina","target-candidate",1.5,-0.45,59.61,-0.67,2,-0.89,2,-0.65
-3,"Oenanthe oenanthe","Turdus merula","northern wheatear","blackbird","Turdus merula","Oenanthe oenanthe","target-candidate",2.75,0.5,61.82,-0.61,3,0.36,2,-0.65
+3,"Oenanthe oenanthe","Turdus merula","northern wheatear","blackbird","Turdus merula","Oenanthe oenanthe","target-candidate",2.74,0.5,61.82,-0.61,3,0.36,2,-0.65
 3,"Quiscalus quiscula","Turdus merula","common grackle","blackbird","Turdus merula","Quiscalus quiscalus","target-candidate",1.08,-0.77,90.14,0.09,3,0.36,3,0.59
 3,"Turdus merula","Turdus migratorius","blackbird","American robin","Turdus merula","Turdus migratorius","target-candidate",0.83,-0.96,29.52,-1.42,1,-2.15,1,-1.89
 4,"Accipiter cooperii","Accipiter gentilis","Cooper's hawk","northern goshawk","Accipiter cooperii","Accipiter gentilis","candidate-candidate",1.67,-0.32,38.48,-1.19,1,-2.15,1,-1.89
-4,"Accipiter cooperii","Accipiter striatus","Cooper's hawk","sharp-shinned hawk","Accipiter cooperii","Accipiter striatus","candidate-candidate",1.74,-0.27,100.77,0.35,1,-2.15,1,-1.89
+4,"Accipiter cooperii","Accipiter striatus","Cooper's hawk","sharp-shinned hawk","Accipiter cooperii","Accipiter striatus","candidate-candidate",1.74,-0.26,100.77,0.35,1,-2.15,1,-1.89
 4,"Accipiter cooperii","Buteo regalis","Cooper's hawk","Ferruginous hawk","Accipiter cooperii","Buteo regalis","candidate-candidate",3,0.7,126.37,0.99,2,-0.89,2,-0.65
 4,"Accipiter cooperii","Buteo swainsoni","Cooper's hawk","Swainson's hawk","Accipiter cooperii","Buteo swainsoni","candidate-candidate",2.37,0.22,124.36,0.94,2,-0.89,2,-0.65
 4,"Accipiter cooperii","Falco sparverius","Cooper's hawk","sparrow hawk","Accipiter cooperii","Falco sparverius","candidate-candidate",2.45,0.28,161.06,1.85,4,1.62,3,0.59
@@ -72,11 +72,11 @@
 4,"Accipiter gentilis","Buteo swainsoni","northern goshawk","Swainson's hawk","Accipiter gentilis","Buteo swainsoni","candidate-candidate",1.24,-0.65,125.58,0.97,2,-0.89,2,-0.65
 4,"Accipiter gentilis","Falco sparverius","northern goshawk","sparrow hawk","Accipiter gentilis","Falco sparverius","candidate-candidate",3.66,1.2,161.06,1.85,4,1.62,3,0.59
 4,"Accipiter striatus","Buteo regalis","sharp-shinned hawk","Ferruginous hawk","Accipiter striatus","Buteo regalis","candidate-candidate",4.6,1.92,128.54,1.04,2,-0.89,2,-0.65
-4,"Accipiter striatus","Buteo swainsoni","sharp-shinned hawk","Swainson's hawk","Accipiter striatus","Buteo swainsoni","candidate-candidate",3.79,1.3,127.74,1.02,2,-0.89,2,-0.65
-4,"Accipiter striatus","Falco sparverius","sharp-shinned hawk","sparrow hawk","Accipiter striatus","Falco sparverius","candidate-candidate",1.59,-0.38,161.06,1.85,4,1.62,3,0.59
+4,"Accipiter striatus","Buteo swainsoni","sharp-shinned hawk","Swainson's hawk","Accipiter striatus","Buteo swainsoni","candidate-candidate",3.78,1.3,127.74,1.02,2,-0.89,2,-0.65
+4,"Accipiter striatus","Falco sparverius","sharp-shinned hawk","sparrow hawk","Accipiter striatus","Falco sparverius","candidate-candidate",1.58,-0.38,161.06,1.85,4,1.62,3,0.59
 4,"Buteo regalis","Buteo swainsoni","Ferruginous hawk","Swainson's hawk","Buteo regalis","Buteo swainsoni","candidate-candidate",1.29,-0.61,80.91,-0.14,1,-2.15,1,-1.89
 4,"Buteo regalis","Falco sparverius","Ferruginous hawk","sparrow hawk","Buteo regalis","Falco sparverius","candidate-candidate",4.71,2.01,158.71,1.79,4,1.62,3,0.59
-4,"Buteo swainsoni","Falco sparverius","Swainson's hawk","sparrow hawk","Buteo swainsoni","Falco sparverius","candidate-candidate",3.63,1.18,158.82,1.8,4,1.62,3,0.59
+4,"Buteo swainsoni","Falco sparverius","Swainson's hawk","sparrow hawk","Buteo swainsoni","Falco sparverius","candidate-candidate",3.63,1.19,158.82,1.8,4,1.62,3,0.59
 4,"Accipiter cooperii","Accipiter nisus","Cooper's hawk","sparrowhawk","Accipiter nisus","Accipiter cooperii","target-candidate",1.13,-0.74,47.55,-0.97,1,-2.15,1,-1.89
 4,"Accipiter gentilis","Accipiter nisus","northern goshawk","sparrowhawk","Accipiter nisus","Accipiter gentilis","target-candidate",2.62,0.41,39.38,-1.17,1,-2.15,1,-1.89
 4,"Accipiter nisus","Accipiter striatus","sparrowhawk","sharp-shinned hawk","Accipiter nisus","Accipiter striatus","target-candidate",0.88,-0.93,91.76,0.13,1,-2.15,1,-1.89
@@ -90,10 +90,10 @@
 5,"Catharus guttatus","Turdus migratorius","hermit thrush","American robin","Catharus guttatus","Turdus migratorius","candidate-candidate",2.17,0.07,44.59,-1.04,2,-0.89,2,-0.65
 5,"Hylocichla mustelina","Oenanthe oenanthe","wood thrush","northern wheatear","Hylocichla mustelina","Oenanthe oenanthe","candidate-candidate",1.39,-0.54,69.29,-0.43,3,0.36,2,-0.65
 5,"Hylocichla mustelina","Setophaga ruticilla","wood thrush","American redstart","Hylocichla mustelina","Setophaga ruticilla","candidate-candidate",2.94,0.66,96.24,0.24,3,0.36,3,0.59
-5,"Hylocichla mustelina","Sialia sialis","wood thrush","eastern bluebird","Hylocichla mustelina","Sialia sialis","candidate-candidate",1.45,-0.49,66.89,-0.49,2,-0.89,2,-0.65
+5,"Hylocichla mustelina","Sialia sialis","wood thrush","eastern bluebird","Hylocichla mustelina","Sialia sialis","candidate-candidate",1.45,-0.48,66.89,-0.49,2,-0.89,2,-0.65
 5,"Hylocichla mustelina","Turdus migratorius","wood thrush","American robin","Hylocichla mustelina","Turdus migratorius","candidate-candidate",1.05,-0.79,59.62,-0.67,2,-0.89,2,-0.65
 5,"Oenanthe oenanthe","Setophaga ruticilla","northern wheatear","American redstart","Oenanthe oenanthe","Setophaga ruticilla","candidate-candidate",2.12,0.02,87.5,0.02,3,0.36,3,0.59
-5,"Oenanthe oenanthe","Sialia sialis","northern wheatear","eastern bluebird","Oenanthe oenanthe","Sialia sialis","candidate-candidate",0.83,-0.97,40,-1.16,3,0.36,2,-0.65
+5,"Oenanthe oenanthe","Sialia sialis","northern wheatear","eastern bluebird","Oenanthe oenanthe","Sialia sialis","candidate-candidate",0.83,-0.96,40,-1.16,3,0.36,2,-0.65
 5,"Oenanthe oenanthe","Turdus migratorius","northern wheatear","American robin","Oenanthe oenanthe","Turdus migratorius","candidate-candidate",2.23,0.11,59.22,-0.68,3,0.36,2,-0.65
 5,"Setophaga ruticilla","Sialia sialis","American redstart","eastern bluebird","Setophaga ruticilla","Sialia sialis","candidate-candidate",2.05,-0.03,87.68,0.03,3,0.36,3,0.59
 5,"Setophaga ruticilla","Turdus migratorius","American redstart","American robin","Setophaga ruticilla","Turdus migratorius","candidate-candidate",3.85,1.35,90.14,0.09,3,0.36,3,0.59
@@ -111,10 +111,10 @@
 6,"Catharus guttatus","Turdus migratorius","hermit thrush","American robin","Catharus guttatus","Turdus migratorius","candidate-candidate",2.17,0.07,44.59,-1.04,2,-0.89,2,-0.65
 6,"Hylocichla mustelina","Oenanthe oenanthe","wood thrush","northern wheatear","Hylocichla mustelina","Oenanthe oenanthe","candidate-candidate",1.39,-0.54,69.29,-0.43,3,0.36,2,-0.65
 6,"Hylocichla mustelina","Setophaga ruticilla","wood thrush","American redstart","Hylocichla mustelina","Setophaga ruticilla","candidate-candidate",2.94,0.66,96.24,0.24,3,0.36,3,0.59
-6,"Hylocichla mustelina","Sialia sialis","wood thrush","eastern bluebird","Hylocichla mustelina","Sialia sialis","candidate-candidate",1.45,-0.49,66.89,-0.49,2,-0.89,2,-0.65
+6,"Hylocichla mustelina","Sialia sialis","wood thrush","eastern bluebird","Hylocichla mustelina","Sialia sialis","candidate-candidate",1.45,-0.48,66.89,-0.49,2,-0.89,2,-0.65
 6,"Hylocichla mustelina","Turdus migratorius","wood thrush","American robin","Hylocichla mustelina","Turdus migratorius","candidate-candidate",1.05,-0.79,59.62,-0.67,2,-0.89,2,-0.65
 6,"Oenanthe oenanthe","Setophaga ruticilla","northern wheatear","American redstart","Oenanthe oenanthe","Setophaga ruticilla","candidate-candidate",2.12,0.02,87.5,0.02,3,0.36,3,0.59
-6,"Oenanthe oenanthe","Sialia sialis","northern wheatear","eastern bluebird","Oenanthe oenanthe","Sialia sialis","candidate-candidate",0.83,-0.97,40,-1.16,3,0.36,2,-0.65
+6,"Oenanthe oenanthe","Sialia sialis","northern wheatear","eastern bluebird","Oenanthe oenanthe","Sialia sialis","candidate-candidate",0.83,-0.96,40,-1.16,3,0.36,2,-0.65
 6,"Oenanthe oenanthe","Turdus migratorius","northern wheatear","American robin","Oenanthe oenanthe","Turdus migratorius","candidate-candidate",2.23,0.11,59.22,-0.68,3,0.36,2,-0.65
 6,"Setophaga ruticilla","Sialia sialis","American redstart","eastern bluebird","Setophaga ruticilla","Sialia sialis","candidate-candidate",2.05,-0.03,87.68,0.03,3,0.36,3,0.59
 6,"Setophaga ruticilla","Turdus migratorius","American redstart","American robin","Setophaga ruticilla","Turdus migratorius","candidate-candidate",3.85,1.35,90.14,0.09,3,0.36,3,0.59
@@ -126,7 +126,7 @@
 6,"Phoenicurus ochruros","Sialia sialis","black redstart","eastern bluebird","Phoenicurus ochruros","Sialia sialis","target-candidate",1.66,-0.33,36.84,-1.23,3,0.36,2,-0.65
 6,"Phoenicurus ochruros","Turdus migratorius","black redstart","American robin","Phoenicurus ochruros","Turdus migratorius","target-candidate",3.12,0.79,59.07,-0.68,3,0.36,2,-0.65
 7,"Corthylio calendula","Leiothlypis ruficapilla","ruby-crowned kinglet","Nashville warbler","Regulus calendula","Vermivora ruficapilla","candidate-candidate",0.94,-0.88,99.96,0.33,3,0.36,3,0.59
-7,"Corthylio calendula","Polioptila caerulea","ruby-crowned kinglet","blue-gray gnatcatcher","Polioptila caerulea","Regulus calendula","candidate-candidate",0.74,-1.04,70.85,-0.39,3,0.36,2,-0.65
+7,"Corthylio calendula","Polioptila caerulea","ruby-crowned kinglet","blue-gray gnatcatcher","Polioptila caerulea","Regulus calendula","candidate-candidate",0.74,-1.03,70.85,-0.39,3,0.36,2,-0.65
 7,"Corthylio calendula","Regulus satrapa","ruby-crowned kinglet","golden-crowned kinglet","Regulus calendula","Regulus satrapa","candidate-candidate",0.7,-1.06,64.26,-0.55,2,-0.89,1,-1.89
 7,"Corthylio calendula","Setophaga castanea","ruby-crowned kinglet","bay-breasted warbler","Dendroica castanea","Regulus calendula","candidate-candidate",1.83,-0.2,96.23,0.24,3,0.36,3,0.59
 7,"Corthylio calendula","Setophaga striata","ruby-crowned kinglet","blackpoll warbler","Dendroica striata","Regulus calendula","candidate-candidate",1.81,-0.21,96.24,0.24,3,0.36,3,0.59
@@ -142,12 +142,12 @@
 7,"Setophaga castanea","Setophaga striata","bay-breasted warbler","blackpoll warbler","Dendroica castanea","Dendroica striata","candidate-candidate",0.31,-1.36,14.5,-1.79,1,-2.15,1,-1.89
 7,"Acrocephalus schoenobaenus","Corthylio calendula","sedge warbler","ruby-crowned kinglet","Acrocephalus schoenobaenus","Regulus calendula","target-candidate",1.25,-0.64,101.6,0.37,3,0.36,2,-0.65
 7,"Acrocephalus schoenobaenus","Leiothlypis ruficapilla","sedge warbler","Nashville warbler","Acrocephalus schoenobaenus","Vermivora ruficapilla","target-candidate",1.1,-0.76,83.36,-0.08,3,0.36,3,0.59
-7,"Acrocephalus schoenobaenus","Polioptila caerulea","sedge warbler","blue-gray gnatcatcher","Acrocephalus schoenobaenus","Polioptila caerulea","target-candidate",1.61,-0.37,101.6,0.37,3,0.36,2,-0.65
+7,"Acrocephalus schoenobaenus","Polioptila caerulea","sedge warbler","blue-gray gnatcatcher","Acrocephalus schoenobaenus","Polioptila caerulea","target-candidate",1.6,-0.37,101.6,0.37,3,0.36,2,-0.65
 7,"Acrocephalus schoenobaenus","Regulus satrapa","sedge warbler","golden-crowned kinglet","Acrocephalus schoenobaenus","Regulus satrapa","target-candidate",1.5,-0.45,104.47,0.45,3,0.36,2,-0.65
 7,"Acrocephalus schoenobaenus","Setophaga castanea","sedge warbler","bay-breasted warbler","Acrocephalus schoenobaenus","Dendroica castanea","target-candidate",0.89,-0.92,84.32,-0.05,3,0.36,3,0.59
 7,"Acrocephalus schoenobaenus","Setophaga striata","sedge warbler","blackpoll warbler","Acrocephalus schoenobaenus","Dendroica striata","target-candidate",0.78,-1,84.32,-0.05,3,0.36,3,0.59
 8,"Corthylio calendula","Leiothlypis ruficapilla","ruby-crowned kinglet","Nashville warbler","Regulus calendula","Vermivora ruficapilla","candidate-candidate",0.94,-0.88,99.96,0.33,3,0.36,3,0.59
-8,"Corthylio calendula","Polioptila caerulea","ruby-crowned kinglet","blue-gray gnatcatcher","Polioptila caerulea","Regulus calendula","candidate-candidate",0.74,-1.04,70.85,-0.39,3,0.36,2,-0.65
+8,"Corthylio calendula","Polioptila caerulea","ruby-crowned kinglet","blue-gray gnatcatcher","Polioptila caerulea","Regulus calendula","candidate-candidate",0.74,-1.03,70.85,-0.39,3,0.36,2,-0.65
 8,"Corthylio calendula","Regulus satrapa","ruby-crowned kinglet","golden-crowned kinglet","Regulus calendula","Regulus satrapa","candidate-candidate",0.7,-1.06,64.26,-0.55,2,-0.89,1,-1.89
 8,"Corthylio calendula","Setophaga castanea","ruby-crowned kinglet","bay-breasted warbler","Dendroica castanea","Regulus calendula","candidate-candidate",1.83,-0.2,96.23,0.24,3,0.36,3,0.59
 8,"Corthylio calendula","Setophaga striata","ruby-crowned kinglet","blackpoll warbler","Dendroica striata","Regulus calendula","candidate-candidate",1.81,-0.21,96.24,0.24,3,0.36,3,0.59
@@ -169,13 +169,13 @@
 8,"Locustella naevia","Setophaga striata","grasshopper warbler","blackpoll warbler","Locustella naevia","Dendroica striata","target-candidate",1.1,-0.76,88.64,0.05,3,0.36,3,0.59
 9,"Corthylio calendula","Leiothlypis peregrina","ruby-crowned kinglet","Tennessee warbler","Regulus calendula","Vermivora peregrina","candidate-candidate",0.97,-0.86,99.96,0.33,3,0.36,3,0.59
 9,"Corthylio calendula","Leiothlypis ruficapilla","ruby-crowned kinglet","Nashville warbler","Regulus calendula","Vermivora ruficapilla","candidate-candidate",0.94,-0.88,99.96,0.33,3,0.36,3,0.59
-9,"Corthylio calendula","Polioptila caerulea","ruby-crowned kinglet","blue-gray gnatcatcher","Polioptila caerulea","Regulus calendula","candidate-candidate",0.74,-1.04,70.85,-0.39,3,0.36,2,-0.65
+9,"Corthylio calendula","Polioptila caerulea","ruby-crowned kinglet","blue-gray gnatcatcher","Polioptila caerulea","Regulus calendula","candidate-candidate",0.74,-1.03,70.85,-0.39,3,0.36,2,-0.65
 9,"Corthylio calendula","Regulus satrapa","ruby-crowned kinglet","golden-crowned kinglet","Regulus calendula","Regulus satrapa","candidate-candidate",0.7,-1.06,64.26,-0.55,2,-0.89,1,-1.89
 9,"Corthylio calendula","Setophaga striata","ruby-crowned kinglet","blackpoll warbler","Dendroica striata","Regulus calendula","candidate-candidate",1.81,-0.21,96.24,0.24,3,0.36,3,0.59
 9,"Leiothlypis peregrina","Leiothlypis ruficapilla","Tennessee warbler","Nashville warbler","Vermivora peregrina","Vermivora ruficapilla","candidate-candidate",0.58,-1.15,19.96,-1.65,1,-2.15,1,-1.89
 9,"Leiothlypis peregrina","Polioptila caerulea","Tennessee warbler","blue-gray gnatcatcher","Polioptila caerulea","Vermivora peregrina","candidate-candidate",1.34,-0.57,99.96,0.33,3,0.36,3,0.59
 9,"Leiothlypis peregrina","Regulus satrapa","Tennessee warbler","golden-crowned kinglet","Regulus satrapa","Vermivora peregrina","candidate-candidate",1.14,-0.72,102.83,0.41,3,0.36,3,0.59
-9,"Leiothlypis peregrina","Setophaga striata","Tennessee warbler","blackpoll warbler","Dendroica striata","Vermivora peregrina","candidate-candidate",1.02,-0.82,38.01,-1.21,2,-0.89,2,-0.65
+9,"Leiothlypis peregrina","Setophaga striata","Tennessee warbler","blackpoll warbler","Dendroica striata","Vermivora peregrina","candidate-candidate",1.02,-0.81,38.01,-1.21,2,-0.89,2,-0.65
 9,"Leiothlypis ruficapilla","Polioptila caerulea","Nashville warbler","blue-gray gnatcatcher","Polioptila caerulea","Vermivora ruficapilla","candidate-candidate",1.07,-0.78,99.96,0.33,3,0.36,3,0.59
 9,"Leiothlypis ruficapilla","Regulus satrapa","Nashville warbler","golden-crowned kinglet","Regulus satrapa","Vermivora ruficapilla","candidate-candidate",0.99,-0.84,102.83,0.41,3,0.36,3,0.59
 9,"Leiothlypis ruficapilla","Setophaga striata","Nashville warbler","blackpoll warbler","Dendroica striata","Vermivora ruficapilla","candidate-candidate",1.46,-0.48,37.83,-1.21,2,-0.89,2,-0.65
@@ -189,14 +189,14 @@
 9,"Cettia cetti","Regulus satrapa","Cetti's warbler","golden-crowned kinglet","Cettia cetti","Regulus satrapa","target-candidate",1.71,-0.29,104.47,0.45,3,0.36,2,-0.65
 9,"Cettia cetti","Setophaga striata","Cetti's warbler","blackpoll warbler","Cettia cetti","Dendroica striata","target-candidate",2.24,0.12,82.39,-0.1,3,0.36,3,0.59
 10,"Corthylio calendula","Leiothlypis peregrina","ruby-crowned kinglet","Tennessee warbler","Regulus calendula","Vermivora peregrina","candidate-candidate",0.97,-0.86,99.96,0.33,3,0.36,3,0.59
-10,"Corthylio calendula","Polioptila caerulea","ruby-crowned kinglet","blue-gray gnatcatcher","Polioptila caerulea","Regulus calendula","candidate-candidate",0.74,-1.04,70.85,-0.39,3,0.36,2,-0.65
+10,"Corthylio calendula","Polioptila caerulea","ruby-crowned kinglet","blue-gray gnatcatcher","Polioptila caerulea","Regulus calendula","candidate-candidate",0.74,-1.03,70.85,-0.39,3,0.36,2,-0.65
 10,"Corthylio calendula","Regulus satrapa","ruby-crowned kinglet","golden-crowned kinglet","Regulus calendula","Regulus satrapa","candidate-candidate",0.7,-1.06,64.26,-0.55,2,-0.89,1,-1.89
 10,"Corthylio calendula","Setophaga castanea","ruby-crowned kinglet","bay-breasted warbler","Dendroica castanea","Regulus calendula","candidate-candidate",1.83,-0.2,96.23,0.24,3,0.36,3,0.59
 10,"Corthylio calendula","Setophaga striata","ruby-crowned kinglet","blackpoll warbler","Dendroica striata","Regulus calendula","candidate-candidate",1.81,-0.21,96.24,0.24,3,0.36,3,0.59
 10,"Leiothlypis peregrina","Polioptila caerulea","Tennessee warbler","blue-gray gnatcatcher","Polioptila caerulea","Vermivora peregrina","candidate-candidate",1.34,-0.57,99.96,0.33,3,0.36,3,0.59
 10,"Leiothlypis peregrina","Regulus satrapa","Tennessee warbler","golden-crowned kinglet","Regulus satrapa","Vermivora peregrina","candidate-candidate",1.14,-0.72,102.83,0.41,3,0.36,3,0.59
 10,"Leiothlypis peregrina","Setophaga castanea","Tennessee warbler","bay-breasted warbler","Dendroica castanea","Vermivora peregrina","candidate-candidate",1.01,-0.83,38.1,-1.2,2,-0.89,2,-0.65
-10,"Leiothlypis peregrina","Setophaga striata","Tennessee warbler","blackpoll warbler","Dendroica striata","Vermivora peregrina","candidate-candidate",1.02,-0.82,38.01,-1.21,2,-0.89,2,-0.65
+10,"Leiothlypis peregrina","Setophaga striata","Tennessee warbler","blackpoll warbler","Dendroica striata","Vermivora peregrina","candidate-candidate",1.02,-0.81,38.01,-1.21,2,-0.89,2,-0.65
 10,"Polioptila caerulea","Regulus satrapa","blue-gray gnatcatcher","golden-crowned kinglet","Polioptila caerulea","Regulus satrapa","candidate-candidate",1.06,-0.78,78.84,-0.19,3,0.36,2,-0.65
 10,"Polioptila caerulea","Setophaga castanea","blue-gray gnatcatcher","bay-breasted warbler","Dendroica castanea","Polioptila caerulea","candidate-candidate",2.12,0.02,96.23,0.24,3,0.36,3,0.59
 10,"Polioptila caerulea","Setophaga striata","blue-gray gnatcatcher","blackpoll warbler","Dendroica striata","Polioptila caerulea","candidate-candidate",2.15,0.05,96.24,0.24,3,0.36,3,0.59
@@ -208,7 +208,7 @@
 10,"Acrocephalus scirpaceus","Polioptila caerulea","reed warbler","blue-gray gnatcatcher","Acrocephalus scirpaceus","Polioptila caerulea","target-candidate",1.68,-0.31,101.6,0.37,3,0.36,2,-0.65
 10,"Acrocephalus scirpaceus","Regulus satrapa","reed warbler","golden-crowned kinglet","Acrocephalus scirpaceus","Regulus satrapa","target-candidate",1.83,-0.2,104.47,0.45,3,0.36,2,-0.65
 10,"Acrocephalus scirpaceus","Setophaga castanea","reed warbler","bay-breasted warbler","Acrocephalus scirpaceus","Dendroica castanea","target-candidate",0.93,-0.89,87.89,0.03,3,0.36,3,0.59
-10,"Acrocephalus scirpaceus","Setophaga striata","reed warbler","blackpoll warbler","Acrocephalus scirpaceus","Dendroica striata","target-candidate",0.85,-0.95,87.89,0.03,3,0.36,3,0.59
+10,"Acrocephalus scirpaceus","Setophaga striata","reed warbler","blackpoll warbler","Acrocephalus scirpaceus","Dendroica striata","target-candidate",0.85,-0.94,87.89,0.03,3,0.36,3,0.59
 11,"Corthylio calendula","Empidonax minimus","ruby-crowned kinglet","least flycatcher","Empidonax minimus","Regulus calendula","candidate-candidate",1.75,-0.26,136.04,1.23,3,0.36,3,0.59
 11,"Corthylio calendula","Empidonax traillii","ruby-crowned kinglet","willow flycatcher","Empidonax traillii","Regulus calendula","candidate-candidate",2.27,0.14,136.01,1.23,3,0.36,3,0.59
 11,"Corthylio calendula","Empidonax virescens","ruby-crowned kinglet","Acadian flycatcher","Empidonax virescens","Regulus calendula","candidate-candidate",2.38,0.22,136.04,1.23,3,0.36,3,0.59
@@ -224,7 +224,7 @@
 11,"Empidonax virescens","Myadestes townsendi","Acadian flycatcher","Townsend's solitaire","Empidonax virescens","Myadestes townsendi","candidate-candidate",2.16,0.06,137.89,1.28,3,0.36,3,0.59
 11,"Empidonax virescens","Setophaga pinus","Acadian flycatcher","pine warbler","Dendroica pinus","Empidonax virescens","candidate-candidate",1.37,-0.55,141.7,1.37,3,0.36,3,0.59
 11,"Myadestes townsendi","Setophaga pinus","Townsend's solitaire","pine warbler","Dendroica pinus","Myadestes townsendi","candidate-candidate",2.26,0.13,91.4,0.12,3,0.36,3,0.59
-11,"Corthylio calendula","Ficedula hypoleuca","ruby-crowned kinglet","pied flycatcher","Ficedula hypoleuca","Regulus calendula","target-candidate",1.88,-0.16,95.26,0.22,3,0.36,3,0.59
+11,"Corthylio calendula","Ficedula hypoleuca","ruby-crowned kinglet","pied flycatcher","Ficedula hypoleuca","Regulus calendula","target-candidate",1.87,-0.16,95.26,0.22,3,0.36,3,0.59
 11,"Empidonax minimus","Ficedula hypoleuca","least flycatcher","pied flycatcher","Ficedula hypoleuca","Empidonax minimus","target-candidate",1.41,-0.52,137.89,1.28,3,0.36,3,0.59
 11,"Empidonax traillii","Ficedula hypoleuca","willow flycatcher","pied flycatcher","Ficedula hypoleuca","Empidonax traillii","target-candidate",1.45,-0.49,137.89,1.28,3,0.36,3,0.59
 11,"Empidonax virescens","Ficedula hypoleuca","Acadian flycatcher","pied flycatcher","Ficedula hypoleuca","Empidonax virescens","target-candidate",1.23,-0.65,137.89,1.28,3,0.36,3,0.59
@@ -247,14 +247,14 @@
 12,"Myadestes townsendi","Setophaga pinus","Townsend's solitaire","pine warbler","Dendroica pinus","Myadestes townsendi","candidate-candidate",2.26,0.13,91.4,0.12,3,0.36,3,0.59
 12,"Corthylio calendula","Muscicapa striata","ruby-crowned kinglet","spotted flycatcher","Muscicapa striata","Regulus calendula","target-candidate",2.44,0.27,95.26,0.22,3,0.36,3,0.59
 12,"Empidonax minimus","Muscicapa striata","least flycatcher","spotted flycatcher","Muscicapa striata","Empidonax minimus","target-candidate",1.57,-0.39,137.89,1.28,3,0.36,3,0.59
-12,"Empidonax traillii","Muscicapa striata","willow flycatcher","spotted flycatcher","Muscicapa striata","Empidonax traillii","target-candidate",1.39,-0.54,137.89,1.28,3,0.36,3,0.59
+12,"Empidonax traillii","Muscicapa striata","willow flycatcher","spotted flycatcher","Muscicapa striata","Empidonax traillii","target-candidate",1.39,-0.53,137.89,1.28,3,0.36,3,0.59
 12,"Empidonax virescens","Muscicapa striata","Acadian flycatcher","spotted flycatcher","Muscicapa striata","Empidonax virescens","target-candidate",1.07,-0.78,137.89,1.28,3,0.36,3,0.59
 12,"Muscicapa striata","Myadestes townsendi","spotted flycatcher","Townsend's solitaire","Muscicapa striata","Myadestes townsendi","target-candidate",1.71,-0.29,61.83,-0.61,3,0.36,3,0.59
 12,"Muscicapa striata","Setophaga pinus","spotted flycatcher","pine warbler","Muscicapa striata","Dendroica pinus","target-candidate",1.12,-0.74,91.1,0.11,3,0.36,3,0.59
 13,"Icterus galbula","Icterus pectoralis","northern oriole","spotted oriole","Icterus galbula","Icterus pectoralis","candidate-candidate",1.39,-0.53,26.63,-1.49,1,-2.15,1,-1.89
 13,"Icterus galbula","Icterus spurius","northern oriole","orchard oriole","Icterus galbula","Icterus spurius","candidate-candidate",0.97,-0.86,23.69,-1.56,1,-2.15,1,-1.89
 13,"Icterus galbula","Sturnella magna","northern oriole","eastern meadowlark","Icterus galbula","Sturnella magna","candidate-candidate",1.77,-0.24,32.98,-1.33,2,-0.89,2,-0.65
-13,"Icterus galbula","Turdus migratorius","northern oriole","American robin","Icterus galbula","Turdus migratorius","candidate-candidate",1.48,-0.47,86.13,-0.01,3,0.36,3,0.59
+13,"Icterus galbula","Turdus migratorius","northern oriole","American robin","Icterus galbula","Turdus migratorius","candidate-candidate",1.48,-0.46,86.13,-0.01,3,0.36,3,0.59
 13,"Icterus galbula","Xanthocephalus xanthocephalus","northern oriole","yellow-headed blackbird","Icterus galbula","Xanthocephalus xanthocephalus","candidate-candidate",1.68,-0.31,44.47,-1.05,2,-0.89,2,-0.65
 13,"Icterus pectoralis","Icterus spurius","spotted oriole","orchard oriole","Icterus pectoralis","Icterus spurius","candidate-candidate",1.95,-0.1,22.5,-1.59,1,-2.15,1,-1.89
 13,"Icterus pectoralis","Sturnella magna","spotted oriole","eastern meadowlark","Icterus pectoralis","Sturnella magna","candidate-candidate",1.65,-0.33,25.31,-1.52,2,-0.89,2,-0.65
@@ -269,7 +269,7 @@
 13,"Icterus galbula","Oriolus oriolus","northern oriole","golden oriole","Oriolus oriolus","Icterus galbula","target-candidate",2.44,0.27,114.85,0.7,3,0.36,3,0.59
 13,"Icterus pectoralis","Oriolus oriolus","spotted oriole","golden oriole","Oriolus oriolus","Icterus pectoralis","target-candidate",2.88,0.61,114.85,0.7,3,0.36,3,0.59
 13,"Icterus spurius","Oriolus oriolus","orchard oriole","golden oriole","Oriolus oriolus","Icterus spurius","target-candidate",3.31,0.94,114.85,0.7,3,0.36,3,0.59
-13,"Oriolus oriolus","Sturnella magna","golden oriole","eastern meadowlark","Oriolus oriolus","Sturnella magna","target-candidate",2.22,0.1,114.85,0.7,3,0.36,3,0.59
+13,"Oriolus oriolus","Sturnella magna","golden oriole","eastern meadowlark","Oriolus oriolus","Sturnella magna","target-candidate",2.21,0.1,114.85,0.7,3,0.36,3,0.59
 13,"Oriolus oriolus","Turdus migratorius","golden oriole","American robin","Oriolus oriolus","Turdus migratorius","target-candidate",1.77,-0.24,114.69,0.7,3,0.36,3,0.59
 13,"Oriolus oriolus","Xanthocephalus xanthocephalus","golden oriole","yellow-headed blackbird","Oriolus oriolus","Xanthocephalus xanthocephalus","target-candidate",1.73,-0.28,114.85,0.7,3,0.36,3,0.59
 14,"Calcarius lapponicus","Melospiza georgiana","Smith's longspur","swamp sparrow","Calcarius lapponicus","Melospiza georgiana","candidate-candidate",2.11,0.02,50.17,-0.9,3,0.36,2,-0.65
@@ -277,12 +277,12 @@
 14,"Calcarius lapponicus","Spiza americana","Smith's longspur","dickcissel","Calcarius lapponicus","Spiza americana","candidate-candidate",0.96,-0.86,29.85,-1.41,3,0.36,2,-0.65
 14,"Calcarius lapponicus","Spizella passerina","Smith's longspur","chipping sparrow","Calcarius lapponicus","Spizella passerina","candidate-candidate",1.82,-0.2,47.68,-0.97,3,0.36,2,-0.65
 14,"Calcarius lapponicus","Zonotrichia querula","Smith's longspur","Harris' sparrow","Calcarius lapponicus","Zonotrichia querula","candidate-candidate",1.06,-0.79,55.56,-0.77,3,0.36,2,-0.65
-14,"Melospiza georgiana","Spinus pinus","swamp sparrow","pine siskin","Carduelis pinus","Melospiza georgiana","candidate-candidate",2.05,-0.03,54.85,-0.79,3,0.36,2,-0.65
+14,"Melospiza georgiana","Spinus pinus","swamp sparrow","pine siskin","Carduelis pinus","Melospiza georgiana","candidate-candidate",2.04,-0.03,54.85,-0.79,3,0.36,2,-0.65
 14,"Melospiza georgiana","Spiza americana","swamp sparrow","dickcissel","Melospiza georgiana","Spiza americana","candidate-candidate",1.46,-0.48,48.05,-0.96,3,0.36,2,-0.65
 14,"Melospiza georgiana","Spizella passerina","swamp sparrow","chipping sparrow","Melospiza georgiana","Spizella passerina","candidate-candidate",0.91,-0.9,22.21,-1.6,2,-0.89,2,-0.65
-14,"Melospiza georgiana","Zonotrichia querula","swamp sparrow","Harris' sparrow","Melospiza georgiana","Zonotrichia querula","candidate-candidate",1.73,-0.28,35.99,-1.26,2,-0.89,1,-1.89
+14,"Melospiza georgiana","Zonotrichia querula","swamp sparrow","Harris' sparrow","Melospiza georgiana","Zonotrichia querula","candidate-candidate",1.72,-0.28,35.99,-1.26,2,-0.89,1,-1.89
 14,"Spinus pinus","Spiza americana","pine siskin","dickcissel","Carduelis pinus","Spiza americana","candidate-candidate",1.63,-0.35,44.2,-1.05,3,0.36,2,-0.65
-14,"Spinus pinus","Spizella passerina","pine siskin","chipping sparrow","Carduelis pinus","Spizella passerina","candidate-candidate",1.33,-0.58,52.52,-0.85,3,0.36,2,-0.65
+14,"Spinus pinus","Spizella passerina","pine siskin","chipping sparrow","Carduelis pinus","Spizella passerina","candidate-candidate",1.32,-0.58,52.52,-0.85,3,0.36,2,-0.65
 14,"Spinus pinus","Zonotrichia querula","pine siskin","Harris' sparrow","Carduelis pinus","Zonotrichia querula","candidate-candidate",2.25,0.13,60.24,-0.65,3,0.36,2,-0.65
 14,"Spiza americana","Spizella passerina","dickcissel","chipping sparrow","Spiza americana","Spizella passerina","candidate-candidate",1.45,-0.49,45.57,-1.02,3,0.36,2,-0.65
 14,"Spiza americana","Zonotrichia querula","dickcissel","Harris' sparrow","Spiza americana","Zonotrichia querula","candidate-candidate",0.94,-0.88,53.45,-0.82,3,0.36,2,-0.65
@@ -290,20 +290,20 @@
 14,"Calcarius lapponicus","Passer domesticus","Smith's longspur","house sparrow","Passer domesticus","Calcarius lapponicus","target-candidate",0.98,-0.85,56.04,-0.76,3,0.36,3,0.59
 14,"Melospiza georgiana","Passer domesticus","swamp sparrow","house sparrow","Passer domesticus","Melospiza georgiana","target-candidate",1.62,-0.36,62.52,-0.6,3,0.36,3,0.59
 14,"Passer domesticus","Spinus pinus","house sparrow","pine siskin","Passer domesticus","Carduelis pinus","target-candidate",1.48,-0.47,54.92,-0.79,3,0.36,3,0.59
-14,"Passer domesticus","Spiza americana","house sparrow","dickcissel","Passer domesticus","Spiza americana","target-candidate",0.55,-1.18,57.16,-0.73,3,0.36,3,0.59
+14,"Passer domesticus","Spiza americana","house sparrow","dickcissel","Passer domesticus","Spiza americana","target-candidate",0.55,-1.17,57.16,-0.73,3,0.36,3,0.59
 14,"Passer domesticus","Spizella passerina","house sparrow","chipping sparrow","Passer domesticus","Spizella passerina","target-candidate",1.42,-0.51,60.19,-0.65,3,0.36,3,0.59
-14,"Passer domesticus","Zonotrichia querula","house sparrow","Harris' sparrow","Passer domesticus","Zonotrichia querula","target-candidate",1.22,-0.67,67.41,-0.48,3,0.36,3,0.59
+14,"Passer domesticus","Zonotrichia querula","house sparrow","Harris' sparrow","Passer domesticus","Zonotrichia querula","target-candidate",1.22,-0.66,67.41,-0.48,3,0.36,3,0.59
 15,"Calcarius lapponicus","Melospiza georgiana","Smith's longspur","swamp sparrow","Calcarius lapponicus","Melospiza georgiana","candidate-candidate",2.11,0.02,50.17,-0.9,3,0.36,2,-0.65
 15,"Calcarius lapponicus","Spinus pinus","Smith's longspur","pine siskin","Calcarius lapponicus","Carduelis pinus","candidate-candidate",1.71,-0.29,41.87,-1.11,3,0.36,2,-0.65
 15,"Calcarius lapponicus","Spiza americana","Smith's longspur","dickcissel","Calcarius lapponicus","Spiza americana","candidate-candidate",0.96,-0.86,29.85,-1.41,3,0.36,2,-0.65
 15,"Calcarius lapponicus","Spizella passerina","Smith's longspur","chipping sparrow","Calcarius lapponicus","Spizella passerina","candidate-candidate",1.82,-0.2,47.68,-0.97,3,0.36,2,-0.65
 15,"Calcarius lapponicus","Zonotrichia querula","Smith's longspur","Harris' sparrow","Calcarius lapponicus","Zonotrichia querula","candidate-candidate",1.06,-0.79,55.56,-0.77,3,0.36,2,-0.65
-15,"Melospiza georgiana","Spinus pinus","swamp sparrow","pine siskin","Carduelis pinus","Melospiza georgiana","candidate-candidate",2.05,-0.03,54.85,-0.79,3,0.36,2,-0.65
+15,"Melospiza georgiana","Spinus pinus","swamp sparrow","pine siskin","Carduelis pinus","Melospiza georgiana","candidate-candidate",2.04,-0.03,54.85,-0.79,3,0.36,2,-0.65
 15,"Melospiza georgiana","Spiza americana","swamp sparrow","dickcissel","Melospiza georgiana","Spiza americana","candidate-candidate",1.46,-0.48,48.05,-0.96,3,0.36,2,-0.65
 15,"Melospiza georgiana","Spizella passerina","swamp sparrow","chipping sparrow","Melospiza georgiana","Spizella passerina","candidate-candidate",0.91,-0.9,22.21,-1.6,2,-0.89,2,-0.65
-15,"Melospiza georgiana","Zonotrichia querula","swamp sparrow","Harris' sparrow","Melospiza georgiana","Zonotrichia querula","candidate-candidate",1.73,-0.28,35.99,-1.26,2,-0.89,1,-1.89
+15,"Melospiza georgiana","Zonotrichia querula","swamp sparrow","Harris' sparrow","Melospiza georgiana","Zonotrichia querula","candidate-candidate",1.72,-0.28,35.99,-1.26,2,-0.89,1,-1.89
 15,"Spinus pinus","Spiza americana","pine siskin","dickcissel","Carduelis pinus","Spiza americana","candidate-candidate",1.63,-0.35,44.2,-1.05,3,0.36,2,-0.65
-15,"Spinus pinus","Spizella passerina","pine siskin","chipping sparrow","Carduelis pinus","Spizella passerina","candidate-candidate",1.33,-0.58,52.52,-0.85,3,0.36,2,-0.65
+15,"Spinus pinus","Spizella passerina","pine siskin","chipping sparrow","Carduelis pinus","Spizella passerina","candidate-candidate",1.32,-0.58,52.52,-0.85,3,0.36,2,-0.65
 15,"Spinus pinus","Zonotrichia querula","pine siskin","Harris' sparrow","Carduelis pinus","Zonotrichia querula","candidate-candidate",2.25,0.13,60.24,-0.65,3,0.36,2,-0.65
 15,"Spiza americana","Spizella passerina","dickcissel","chipping sparrow","Spiza americana","Spizella passerina","candidate-candidate",1.45,-0.49,45.57,-1.02,3,0.36,2,-0.65
 15,"Spiza americana","Zonotrichia querula","dickcissel","Harris' sparrow","Spiza americana","Zonotrichia querula","candidate-candidate",0.94,-0.88,53.45,-0.82,3,0.36,2,-0.65
@@ -312,27 +312,27 @@
 15,"Melospiza georgiana","Passer montanus","swamp sparrow","tree sparrow","Passer montanus","Melospiza georgiana","target-candidate",1.17,-0.7,59.79,-0.66,3,0.36,3,0.59
 15,"Passer montanus","Spinus pinus","tree sparrow","pine siskin","Passer montanus","Carduelis pinus","target-candidate",1.37,-0.55,46.48,-1,3,0.36,3,0.59
 15,"Passer montanus","Spiza americana","tree sparrow","dickcissel","Passer montanus","Spiza americana","target-candidate",0.88,-0.93,49.69,-0.92,3,0.36,3,0.59
-15,"Passer montanus","Spizella passerina","tree sparrow","chipping sparrow","Passer montanus","Spizella passerina","target-candidate",0.94,-0.88,57.46,-0.72,3,0.36,3,0.59
+15,"Passer montanus","Spizella passerina","tree sparrow","chipping sparrow","Passer montanus","Spizella passerina","target-candidate",0.94,-0.87,57.46,-0.72,3,0.36,3,0.59
 15,"Passer montanus","Zonotrichia querula","tree sparrow","Harris' sparrow","Passer montanus","Zonotrichia querula","target-candidate",1.54,-0.42,65.18,-0.53,3,0.36,3,0.59
 16,"Buteo swainsoni","Coccyzus americanus","Swainson's hawk","yellow-billed cuckoo","Buteo swainsoni","Coccyzus americanus","candidate-candidate",4.4,1.77,166.11,1.98,4,1.62,4,1.83
 16,"Buteo swainsoni","Coccyzus erythropthalmus","Swainson's hawk","black-billed cuckoo","Buteo swainsoni","Coccyzus erythropthalmus","candidate-candidate",4.92,2.17,166.11,1.98,4,1.62,4,1.83
-16,"Buteo swainsoni","Geococcyx californianus","Swainson's hawk","greater roadrunner","Buteo swainsoni","Geococcyx californianus","candidate-candidate",5.53,2.64,166.7,1.99,4,1.62,4,1.83
+16,"Buteo swainsoni","Geococcyx californianus","Swainson's hawk","greater roadrunner","Buteo swainsoni","Geococcyx californianus","candidate-candidate",5.52,2.63,166.7,1.99,4,1.62,4,1.83
 16,"Buteo swainsoni","Ictinia mississippiensis","Swainson's hawk","Mississippi kite","Buteo swainsoni","Ictinia mississippiensis","candidate-candidate",2.1,0.01,102.73,0.4,2,-0.89,2,-0.65
 16,"Buteo swainsoni","Rostrhamus sociabilis","Swainson's hawk","snail kite","Buteo swainsoni","Rostrhamus sociabilis","candidate-candidate",1.4,-0.52,121.78,0.88,2,-0.89,2,-0.65
 16,"Coccyzus americanus","Coccyzus erythropthalmus","yellow-billed cuckoo","black-billed cuckoo","Coccyzus americanus","Coccyzus erythropthalmus","candidate-candidate",0.7,-1.06,92.71,0.15,1,-2.15,1,-1.89
-16,"Coccyzus americanus","Geococcyx californianus","yellow-billed cuckoo","greater roadrunner","Coccyzus americanus","Geococcyx californianus","candidate-candidate",5.23,2.41,133.15,1.16,2,-0.89,2,-0.65
+16,"Coccyzus americanus","Geococcyx californianus","yellow-billed cuckoo","greater roadrunner","Coccyzus americanus","Geococcyx californianus","candidate-candidate",5.22,2.4,133.15,1.16,2,-0.89,2,-0.65
 16,"Coccyzus americanus","Ictinia mississippiensis","yellow-billed cuckoo","Mississippi kite","Coccyzus americanus","Ictinia mississippiensis","candidate-candidate",2.93,0.64,166.11,1.98,4,1.62,4,1.83
 16,"Coccyzus americanus","Rostrhamus sociabilis","yellow-billed cuckoo","snail kite","Coccyzus americanus","Rostrhamus sociabilis","candidate-candidate",3.51,1.09,166.11,1.98,4,1.62,4,1.83
 16,"Coccyzus erythropthalmus","Geococcyx californianus","black-billed cuckoo","greater roadrunner","Coccyzus erythropthalmus","Geococcyx californianus","candidate-candidate",5.36,2.51,133.72,1.17,2,-0.89,2,-0.65
 16,"Coccyzus erythropthalmus","Ictinia mississippiensis","black-billed cuckoo","Mississippi kite","Coccyzus erythropthalmus","Ictinia mississippiensis","candidate-candidate",3.43,1.03,166.11,1.98,4,1.62,4,1.83
 16,"Coccyzus erythropthalmus","Rostrhamus sociabilis","black-billed cuckoo","snail kite","Coccyzus erythropthalmus","Rostrhamus sociabilis","candidate-candidate",3.95,1.43,166.11,1.98,4,1.62,4,1.83
-16,"Geococcyx californianus","Ictinia mississippiensis","greater roadrunner","Mississippi kite","Geococcyx californianus","Ictinia mississippiensis","candidate-candidate",6.06,3.04,166.7,1.99,4,1.62,4,1.83
-16,"Geococcyx californianus","Rostrhamus sociabilis","greater roadrunner","snail kite","Geococcyx californianus","Rostrhamus sociabilis","candidate-candidate",4.79,2.07,166.7,1.99,4,1.62,4,1.83
+16,"Geococcyx californianus","Ictinia mississippiensis","greater roadrunner","Mississippi kite","Geococcyx californianus","Ictinia mississippiensis","candidate-candidate",6.05,3.04,166.7,1.99,4,1.62,4,1.83
+16,"Geococcyx californianus","Rostrhamus sociabilis","greater roadrunner","snail kite","Geococcyx californianus","Rostrhamus sociabilis","candidate-candidate",4.78,2.06,166.7,1.99,4,1.62,4,1.83
 16,"Ictinia mississippiensis","Rostrhamus sociabilis","Mississippi kite","snail kite","Ictinia mississippiensis","Rostrhamus sociabilis","candidate-candidate",1.95,-0.11,54.19,-0.8,2,-0.89,2,-0.65
 16,"Buteo swainsoni","Cuculus canorus","Swainson's hawk","cuckoo","Cuculus canorus","Buteo swainsoni","target-candidate",3.82,1.33,166.7,1.99,4,1.62,4,1.83
 16,"Coccyzus americanus","Cuculus canorus","yellow-billed cuckoo","cuckoo","Cuculus canorus","Coccyzus americanus","target-candidate",1.09,-0.77,111.58,0.62,2,-0.89,2,-0.65
 16,"Coccyzus erythropthalmus","Cuculus canorus","black-billed cuckoo","cuckoo","Cuculus canorus","Coccyzus erythropthalmus","target-candidate",1.38,-0.54,121.41,0.87,2,-0.89,2,-0.65
-16,"Cuculus canorus","Geococcyx californianus","cuckoo","greater roadrunner","Cuculus canorus","Geococcyx californianus","target-candidate",5.38,2.53,92.05,0.14,2,-0.89,2,-0.65
+16,"Cuculus canorus","Geococcyx californianus","cuckoo","greater roadrunner","Cuculus canorus","Geococcyx californianus","target-candidate",5.38,2.52,92.05,0.14,2,-0.89,2,-0.65
 16,"Cuculus canorus","Ictinia mississippiensis","cuckoo","Mississippi kite","Cuculus canorus","Ictinia mississippiensis","target-candidate",2.27,0.14,166.7,1.99,4,1.62,4,1.83
 16,"Cuculus canorus","Rostrhamus sociabilis","cuckoo","snail kite","Cuculus canorus","Rostrhamus sociabilis","target-candidate",2.94,0.65,166.7,1.99,4,1.62,4,1.83
 17,"Aphelocoma coerulescens","Corvus brachyrhynchos","scrub jay","American crow","Aphelocoma coerulescens","Corvus brachyrhynchos","candidate-candidate",4.24,1.65,29.97,-1.41,2,-0.89,2,-0.65
@@ -351,7 +351,7 @@
 17,"Perisoreus canadensis","Turdus migratorius","gray jay","American robin","Perisoreus canadensis","Turdus migratorius","candidate-candidate",1.82,-0.2,108.47,0.55,3,0.36,3,0.59
 17,"Sialia sialis","Turdus migratorius","eastern bluebird","American robin","Sialia sialis","Turdus migratorius","candidate-candidate",2.15,0.05,55.64,-0.77,2,-0.89,2,-0.65
 17,"Aphelocoma coerulescens","Garrulus glandarius","scrub jay","jay","Garrulus glandarius","Aphelocoma coerulescens","target-candidate",1.65,-0.34,49,-0.93,2,-0.89,2,-0.65
-17,"Corvus brachyrhynchos","Garrulus glandarius","American crow","jay","Garrulus glandarius","Corvus brachyrhynchos","target-candidate",2.84,0.57,46.66,-0.99,2,-0.89,2,-0.65
+17,"Corvus brachyrhynchos","Garrulus glandarius","American crow","jay","Garrulus glandarius","Corvus brachyrhynchos","target-candidate",2.83,0.57,46.66,-0.99,2,-0.89,2,-0.65
 17,"Cyanocitta cristata","Garrulus glandarius","blue jay","jay","Garrulus glandarius","Cyanocitta cristata","target-candidate",1.4,-0.53,67.53,-0.47,2,-0.89,2,-0.65
 17,"Garrulus glandarius","Perisoreus canadensis","jay","gray jay","Garrulus glandarius","Perisoreus canadensis","target-candidate",1.29,-0.61,76.18,-0.26,2,-0.89,2,-0.65
 17,"Garrulus glandarius","Sialia sialis","jay","eastern bluebird","Garrulus glandarius","Sialia sialis","target-candidate",4.62,1.94,114.5,0.7,3,0.36,3,0.59
@@ -360,7 +360,7 @@
 18,"Colaptes auratus","Dryocopus pileatus","common flicker","pileated woodpecker","Colaptes auratus","Dryocopus pileatus","candidate-candidate",2.06,-0.02,26.04,-1.5,2,-0.89,2,-0.65
 18,"Colaptes auratus","Megaceryle alcyon","common flicker","belted kingfisher","Colaptes auratus","Megaceryle alcyon","candidate-candidate",2.27,0.14,98.6,0.3,4,1.62,4,1.83
 18,"Colaptes auratus","Quiscalus quiscula","common flicker","common grackle","Colaptes auratus","Quiscalus quiscalus","candidate-candidate",1.06,-0.79,157.57,1.77,4,1.62,4,1.83
-18,"Colaptes auratus","Sialia sialis","common flicker","eastern bluebird","Colaptes auratus","Sialia sialis","candidate-candidate",3.69,1.22,157.48,1.76,4,1.62,4,1.83
+18,"Colaptes auratus","Sialia sialis","common flicker","eastern bluebird","Colaptes auratus","Sialia sialis","candidate-candidate",3.69,1.23,157.48,1.76,4,1.62,4,1.83
 18,"Dryobates pubescens","Dryocopus pileatus","downy woodpecker","pileated woodpecker","Dryocopus pileatus","Picoides pubescens","candidate-candidate",5.39,2.53,49.34,-0.92,2,-0.89,2,-0.65
 18,"Dryobates pubescens","Megaceryle alcyon","downy woodpecker","belted kingfisher","Megaceryle alcyon","Picoides pubescens","candidate-candidate",4.17,1.6,92.54,0.15,4,1.62,4,1.83
 18,"Dryobates pubescens","Quiscalus quiscula","downy woodpecker","common grackle","Picoides pubescens","Quiscalus quiscalus","candidate-candidate",3.32,0.94,157.57,1.77,4,1.62,4,1.83
@@ -377,18 +377,18 @@
 18,"Alcedo atthis","Megaceryle alcyon","kingfisher","belted kingfisher","Alcedo atthis","Megaceryle alcyon","target-candidate",3.9,1.39,47.77,-0.96,2,-0.89,2,-0.65
 18,"Alcedo atthis","Quiscalus quiscula","kingfisher","common grackle","Alcedo atthis","Quiscalus quiscalus","target-candidate",4.29,1.69,158.38,1.79,4,1.62,4,1.83
 18,"Alcedo atthis","Sialia sialis","kingfisher","eastern bluebird","Alcedo atthis","Sialia sialis","target-candidate",3.29,0.92,158.38,1.79,4,1.62,4,1.83
-19,"Accipiter striatus","Buteo swainsoni","sharp-shinned hawk","Swainson's hawk","Accipiter striatus","Buteo swainsoni","candidate-candidate",3.79,1.3,127.74,1.02,2,-0.89,2,-0.65
-19,"Accipiter striatus","Elanus leucurus","sharp-shinned hawk","white-tailed kite","Accipiter striatus","Elanus leucurus","candidate-candidate",2.31,0.17,82.52,-0.1,2,-0.89,2,-0.65
-19,"Accipiter striatus","Falco sparverius","sharp-shinned hawk","sparrow hawk","Accipiter striatus","Falco sparverius","candidate-candidate",1.59,-0.38,161.06,1.85,4,1.62,3,0.59
+19,"Accipiter striatus","Buteo swainsoni","sharp-shinned hawk","Swainson's hawk","Accipiter striatus","Buteo swainsoni","candidate-candidate",3.78,1.3,127.74,1.02,2,-0.89,2,-0.65
+19,"Accipiter striatus","Elanus leucurus","sharp-shinned hawk","white-tailed kite","Accipiter striatus","Elanus leucurus","candidate-candidate",2.3,0.17,82.52,-0.1,2,-0.89,2,-0.65
+19,"Accipiter striatus","Falco sparverius","sharp-shinned hawk","sparrow hawk","Accipiter striatus","Falco sparverius","candidate-candidate",1.58,-0.38,161.06,1.85,4,1.62,3,0.59
 19,"Accipiter striatus","Ictinia mississippiensis","sharp-shinned hawk","Mississippi kite","Accipiter striatus","Ictinia mississippiensis","candidate-candidate",2.97,0.68,111.1,0.61,2,-0.89,2,-0.65
 19,"Accipiter striatus","Rostrhamus sociabilis","sharp-shinned hawk","snail kite","Accipiter striatus","Rostrhamus sociabilis","candidate-candidate",2.82,0.56,103.76,0.43,2,-0.89,2,-0.65
 19,"Buteo swainsoni","Elanus leucurus","Swainson's hawk","white-tailed kite","Buteo swainsoni","Elanus leucurus","candidate-candidate",2.16,0.06,144.48,1.44,2,-0.89,2,-0.65
-19,"Buteo swainsoni","Falco sparverius","Swainson's hawk","sparrow hawk","Buteo swainsoni","Falco sparverius","candidate-candidate",3.63,1.18,158.82,1.8,4,1.62,3,0.59
+19,"Buteo swainsoni","Falco sparverius","Swainson's hawk","sparrow hawk","Buteo swainsoni","Falco sparverius","candidate-candidate",3.63,1.19,158.82,1.8,4,1.62,3,0.59
 19,"Buteo swainsoni","Ictinia mississippiensis","Swainson's hawk","Mississippi kite","Buteo swainsoni","Ictinia mississippiensis","candidate-candidate",2.1,0.01,102.73,0.4,2,-0.89,2,-0.65
 19,"Buteo swainsoni","Rostrhamus sociabilis","Swainson's hawk","snail kite","Buteo swainsoni","Rostrhamus sociabilis","candidate-candidate",1.4,-0.52,121.78,0.88,2,-0.89,2,-0.65
 19,"Elanus leucurus","Falco sparverius","white-tailed kite","sparrow hawk","Elanus leucurus","Falco sparverius","candidate-candidate",1.98,-0.08,162.25,1.88,4,1.62,3,0.59
-19,"Elanus leucurus","Ictinia mississippiensis","white-tailed kite","Mississippi kite","Elanus leucurus","Ictinia mississippiensis","candidate-candidate",1.41,-0.52,127.84,1.03,2,-0.89,2,-0.65
-19,"Elanus leucurus","Rostrhamus sociabilis","white-tailed kite","snail kite","Elanus leucurus","Rostrhamus sociabilis","candidate-candidate",1.34,-0.58,127.33,1.01,2,-0.89,2,-0.65
+19,"Elanus leucurus","Ictinia mississippiensis","white-tailed kite","Mississippi kite","Elanus leucurus","Ictinia mississippiensis","candidate-candidate",1.4,-0.52,127.84,1.03,2,-0.89,2,-0.65
+19,"Elanus leucurus","Rostrhamus sociabilis","white-tailed kite","snail kite","Elanus leucurus","Rostrhamus sociabilis","candidate-candidate",1.34,-0.57,127.33,1.01,2,-0.89,2,-0.65
 19,"Falco sparverius","Ictinia mississippiensis","sparrow hawk","Mississippi kite","Falco sparverius","Ictinia mississippiensis","candidate-candidate",2.03,-0.04,159.43,1.81,4,1.62,3,0.59
 19,"Falco sparverius","Rostrhamus sociabilis","sparrow hawk","snail kite","Falco sparverius","Rostrhamus sociabilis","candidate-candidate",2.89,0.62,161.06,1.85,4,1.62,3,0.59
 19,"Ictinia mississippiensis","Rostrhamus sociabilis","Mississippi kite","snail kite","Ictinia mississippiensis","Rostrhamus sociabilis","candidate-candidate",1.95,-0.11,54.19,-0.8,2,-0.89,2,-0.65
@@ -413,7 +413,7 @@
 20,"Dolichonyx oryzivorus","Eremophila alpestris","bobolink","horned lark","Dolichonyx oryzivorus","Eremophila alpestris","candidate-candidate",1.27,-0.63,92.87,0.16,3,0.36,3,0.59
 20,"Dolichonyx oryzivorus","Sturnella magna","bobolink","eastern meadowlark","Dolichonyx oryzivorus","Sturnella magna","candidate-candidate",2.23,0.11,38.63,-1.19,2,-0.89,2,-0.65
 20,"Eremophila alpestris","Sturnella magna","horned lark","eastern meadowlark","Eremophila alpestris","Sturnella magna","candidate-candidate",2.78,0.53,92.87,0.16,3,0.36,3,0.59
-20,"Catharus guttatus","Lullula arborea","hermit thrush","woodlark","Lullula arborea","Catharus guttatus","target-candidate",0.9,-0.91,97.03,0.26,3,0.36,3,0.59
+20,"Catharus guttatus","Lullula arborea","hermit thrush","woodlark","Lullula arborea","Catharus guttatus","target-candidate",0.91,-0.9,97.03,0.26,3,0.36,3,0.59
 20,"Catharus minimus","Lullula arborea","gray-cheeked thrush","woodlark","Lullula arborea","Catharus minimus","target-candidate",1.12,-0.74,96.66,0.25,3,0.36,3,0.59
 20,"Catharus ustulatus","Lullula arborea","Swainson's thrush","woodlark","Lullula arborea","Catharus ustulatus","target-candidate",1.13,-0.73,97.11,0.26,3,0.36,3,0.59
 20,"Dolichonyx oryzivorus","Lullula arborea","bobolink","woodlark","Lullula arborea","Dolichonyx oryzivorus","target-candidate",1.94,-0.11,92.87,0.16,3,0.36,3,0.59
@@ -440,11 +440,11 @@
 21,"Alauda arvensis","Dolichonyx oryzivorus","skylark","bobolink","Alauda arvensis","Dolichonyx oryzivorus","target-candidate",1.24,-0.65,92.87,0.16,3,0.36,3,0.59
 21,"Alauda arvensis","Eremophila alpestris","skylark","horned lark","Alauda arvensis","Eremophila alpestris","target-candidate",0.56,-1.17,32.28,-1.35,2,-0.89,2,-0.65
 21,"Alauda arvensis","Sturnella magna","skylark","eastern meadowlark","Alauda arvensis","Sturnella magna","target-candidate",2.53,0.34,92.87,0.16,3,0.36,3,0.59
-22,"Contopus cooperi","Dryobates pubescens","olive-sided flycatcher","downy woodpecker","Nuttallornis borealis","Picoides pubescens","candidate-candidate",1.76,-0.25,156.89,1.75,4,1.62,4,1.83
+22,"Contopus cooperi","Dryobates pubescens","olive-sided flycatcher","downy woodpecker","Nuttallornis borealis","Picoides pubescens","candidate-candidate",1.75,-0.25,156.89,1.75,4,1.62,4,1.83
 22,"Contopus cooperi","Dryocopus pileatus","olive-sided flycatcher","pileated woodpecker","Dryocopus pileatus","Nuttallornis borealis","candidate-candidate",4.67,1.98,149.5,1.57,4,1.62,4,1.83
 22,"Contopus cooperi","Megaceryle alcyon","olive-sided flycatcher","belted kingfisher","Megaceryle alcyon","Nuttallornis borealis","candidate-candidate",3.31,0.94,157.82,1.77,4,1.62,4,1.83
-22,"Contopus cooperi","Melanerpes erythrocephalus","olive-sided flycatcher","red-headed woodpecker","Melanerpes erythrocephalus","Nuttallornis borealis","candidate-candidate",1.87,-0.17,152.48,1.64,4,1.62,4,1.83
-22,"Contopus cooperi","Tyrannus forficatus","olive-sided flycatcher","scissor-tailed flycatcher","Muscivora forficata","Nuttallornis borealis","candidate-candidate",2.46,0.28,53.58,-0.82,2,-0.89,2,-0.65
+22,"Contopus cooperi","Melanerpes erythrocephalus","olive-sided flycatcher","red-headed woodpecker","Melanerpes erythrocephalus","Nuttallornis borealis","candidate-candidate",1.86,-0.17,152.48,1.64,4,1.62,4,1.83
+22,"Contopus cooperi","Tyrannus forficatus","olive-sided flycatcher","scissor-tailed flycatcher","Muscivora forficata","Nuttallornis borealis","candidate-candidate",2.46,0.29,53.58,-0.82,2,-0.89,2,-0.65
 22,"Dryobates pubescens","Dryocopus pileatus","downy woodpecker","pileated woodpecker","Dryocopus pileatus","Picoides pubescens","candidate-candidate",5.39,2.53,49.34,-0.92,2,-0.89,2,-0.65
 22,"Dryobates pubescens","Megaceryle alcyon","downy woodpecker","belted kingfisher","Megaceryle alcyon","Picoides pubescens","candidate-candidate",4.17,1.6,92.54,0.15,4,1.62,4,1.83
 22,"Dryobates pubescens","Melanerpes erythrocephalus","downy woodpecker","red-headed woodpecker","Melanerpes erythrocephalus","Picoides pubescens","candidate-candidate",2.33,0.18,35.75,-1.26,2,-0.89,2,-0.65
@@ -462,18 +462,18 @@
 22,"Dendrocopos major","Melanerpes erythrocephalus","great spotted woodpecker","red-headed woodpecker","Dendrocopos major","Melanerpes erythrocephalus","target-candidate",0.59,-1.15,49.74,-0.91,2,-0.89,2,-0.65
 22,"Dendrocopos major","Tyrannus forficatus","great spotted woodpecker","scissor-tailed flycatcher","Dendrocopos major","Muscivora forficata","target-candidate",2.4,0.24,148.93,1.55,4,1.62,4,1.83
 23,"Catharus fuscescens","Catharus ustulatus","veery","Swainson's thrush","Catharus fuscescens","Catharus ustulatus","candidate-candidate",0.49,-1.22,44.46,-1.05,1,-2.15,1,-1.89
-23,"Catharus fuscescens","Hylocichla mustelina","veery","wood thrush","Catharus fuscescens","Hylocichla mustelina","candidate-candidate",0.79,-1,58.72,-0.69,2,-0.89,2,-0.65
+23,"Catharus fuscescens","Hylocichla mustelina","veery","wood thrush","Catharus fuscescens","Hylocichla mustelina","candidate-candidate",0.79,-0.99,58.72,-0.69,2,-0.89,2,-0.65
 23,"Catharus fuscescens","Oenanthe oenanthe","veery","northern wheatear","Catharus fuscescens","Oenanthe oenanthe","candidate-candidate",0.73,-1.04,61.82,-0.61,3,0.36,2,-0.65
 23,"Catharus fuscescens","Sialia sialis","veery","eastern bluebird","Catharus fuscescens","Sialia sialis","candidate-candidate",0.95,-0.87,58.84,-0.69,2,-0.89,2,-0.65
-23,"Catharus fuscescens","Turdus migratorius","veery","American robin","Catharus fuscescens","Turdus migratorius","candidate-candidate",1.69,-0.31,34.67,-1.29,2,-0.89,2,-0.65
+23,"Catharus fuscescens","Turdus migratorius","veery","American robin","Catharus fuscescens","Turdus migratorius","candidate-candidate",1.69,-0.3,34.67,-1.29,2,-0.89,2,-0.65
 23,"Catharus ustulatus","Hylocichla mustelina","Swainson's thrush","wood thrush","Catharus ustulatus","Hylocichla mustelina","candidate-candidate",1.03,-0.81,40.92,-1.13,2,-0.89,2,-0.65
 23,"Catharus ustulatus","Oenanthe oenanthe","Swainson's thrush","northern wheatear","Catharus ustulatus","Oenanthe oenanthe","candidate-candidate",0.74,-1.03,64.81,-0.54,3,0.36,2,-0.65
 23,"Catharus ustulatus","Sialia sialis","Swainson's thrush","eastern bluebird","Catharus ustulatus","Sialia sialis","candidate-candidate",0.84,-0.95,62.4,-0.6,2,-0.89,2,-0.65
 23,"Catharus ustulatus","Turdus migratorius","Swainson's thrush","American robin","Catharus ustulatus","Turdus migratorius","candidate-candidate",1.84,-0.19,48.76,-0.94,2,-0.89,2,-0.65
 23,"Hylocichla mustelina","Oenanthe oenanthe","wood thrush","northern wheatear","Hylocichla mustelina","Oenanthe oenanthe","candidate-candidate",1.39,-0.54,69.29,-0.43,3,0.36,2,-0.65
-23,"Hylocichla mustelina","Sialia sialis","wood thrush","eastern bluebird","Hylocichla mustelina","Sialia sialis","candidate-candidate",1.45,-0.49,66.89,-0.49,2,-0.89,2,-0.65
+23,"Hylocichla mustelina","Sialia sialis","wood thrush","eastern bluebird","Hylocichla mustelina","Sialia sialis","candidate-candidate",1.45,-0.48,66.89,-0.49,2,-0.89,2,-0.65
 23,"Hylocichla mustelina","Turdus migratorius","wood thrush","American robin","Hylocichla mustelina","Turdus migratorius","candidate-candidate",1.05,-0.79,59.62,-0.67,2,-0.89,2,-0.65
-23,"Oenanthe oenanthe","Sialia sialis","northern wheatear","eastern bluebird","Oenanthe oenanthe","Sialia sialis","candidate-candidate",0.83,-0.97,40,-1.16,3,0.36,2,-0.65
+23,"Oenanthe oenanthe","Sialia sialis","northern wheatear","eastern bluebird","Oenanthe oenanthe","Sialia sialis","candidate-candidate",0.83,-0.96,40,-1.16,3,0.36,2,-0.65
 23,"Oenanthe oenanthe","Turdus migratorius","northern wheatear","American robin","Oenanthe oenanthe","Turdus migratorius","candidate-candidate",2.23,0.11,59.22,-0.68,3,0.36,2,-0.65
 23,"Sialia sialis","Turdus migratorius","eastern bluebird","American robin","Sialia sialis","Turdus migratorius","candidate-candidate",2.15,0.05,55.64,-0.77,2,-0.89,2,-0.65
 23,"Catharus fuscescens","Erithacus rubecula","veery","robin","Erithacus rubecula","Catharus fuscescens","target-candidate",1.87,-0.16,61.67,-0.62,3,0.36,2,-0.65
@@ -482,66 +482,66 @@
 23,"Erithacus rubecula","Oenanthe oenanthe","robin","northern wheatear","Erithacus rubecula","Oenanthe oenanthe","target-candidate",1.82,-0.21,32.86,-1.33,2,-0.89,2,-0.65
 23,"Erithacus rubecula","Sialia sialis","robin","eastern bluebird","Erithacus rubecula","Sialia sialis","target-candidate",2.03,-0.05,34.86,-1.28,3,0.36,2,-0.65
 23,"Erithacus rubecula","Turdus migratorius","robin","American robin","Erithacus rubecula","Turdus migratorius","target-candidate",3.38,0.99,59.07,-0.68,3,0.36,2,-0.65
-24,"Eudocimus albus","Gallinago gallinago","white ibis","common snipe","Capella gallinago","Eudocimus albus","candidate-candidate",4.97,2.21,164.78,1.94,4,1.62,4,1.83
+24,"Eudocimus albus","Gallinago delicata","white ibis","common snipe","Capella gallinago","Eudocimus albus","candidate-candidate",4.99,2.22,164.78,1.94,4,1.62,4,1.83
 24,"Eudocimus albus","Limnodromus scolopaceus","white ibis","long-billed dowitcher","Eudocimus albus","Limnodromus scolopaceus","candidate-candidate",4.7,2,164.78,1.94,4,1.62,4,1.83
 24,"Eudocimus albus","Platalea ajaja","white ibis","roseate spoonbill","Ajaia ajaja","Eudocimus albus","candidate-candidate",1.84,-0.19,136.97,1.25,2,-0.89,2,-0.65
 24,"Eudocimus albus","Plegadis falcinellus","white ibis","glossy ibis","Eudocimus albus","Plegadis falcinellus","candidate-candidate",0.77,-1.01,90.88,0.11,2,-0.89,2,-0.65
-24,"Eudocimus albus","Scolopax minor","white ibis","American woodcock","Eudocimus albus","Philohela minor","candidate-candidate",4.06,1.51,164.78,1.94,4,1.62,4,1.83
-24,"Gallinago gallinago","Limnodromus scolopaceus","common snipe","long-billed dowitcher","Capella gallinago","Limnodromus scolopaceus","candidate-candidate",0.95,-0.87,52.2,-0.85,2,-0.89,2,-0.65
-24,"Gallinago gallinago","Platalea ajaja","common snipe","roseate spoonbill","Ajaia ajaja","Capella gallinago","candidate-candidate",6.33,3.25,152.36,1.64,4,1.62,4,1.83
-24,"Gallinago gallinago","Plegadis falcinellus","common snipe","glossy ibis","Capella gallinago","Plegadis falcinellus","candidate-candidate",4.41,1.78,164.78,1.94,4,1.62,4,1.83
-24,"Gallinago gallinago","Scolopax minor","common snipe","American woodcock","Capella gallinago","Philohela minor","candidate-candidate",1.84,-0.19,47.99,-0.96,2,-0.89,2,-0.65
+24,"Eudocimus albus","Scolopax minor","white ibis","American woodcock","Eudocimus albus","Philohela minor","candidate-candidate",4.06,1.52,164.78,1.94,4,1.62,4,1.83
+24,"Gallinago delicata","Limnodromus scolopaceus","common snipe","long-billed dowitcher","Capella gallinago","Limnodromus scolopaceus","candidate-candidate",0.79,-0.99,52.2,-0.85,2,-0.89,2,-0.65
+24,"Gallinago delicata","Platalea ajaja","common snipe","roseate spoonbill","Ajaia ajaja","Capella gallinago","candidate-candidate",6.35,3.27,152.36,1.64,4,1.62,4,1.83
+24,"Gallinago delicata","Plegadis falcinellus","common snipe","glossy ibis","Capella gallinago","Plegadis falcinellus","candidate-candidate",4.42,1.79,164.78,1.94,4,1.62,4,1.83
+24,"Gallinago delicata","Scolopax minor","common snipe","American woodcock","Capella gallinago","Philohela minor","candidate-candidate",1.95,-0.11,47.99,-0.96,2,-0.89,2,-0.65
 24,"Limnodromus scolopaceus","Platalea ajaja","long-billed dowitcher","roseate spoonbill","Ajaia ajaja","Limnodromus scolopaceus","candidate-candidate",6.1,3.08,152.36,1.64,4,1.62,4,1.83
 24,"Limnodromus scolopaceus","Plegadis falcinellus","long-billed dowitcher","glossy ibis","Limnodromus scolopaceus","Plegadis falcinellus","candidate-candidate",4.08,1.53,164.78,1.94,4,1.62,4,1.83
-24,"Limnodromus scolopaceus","Scolopax minor","long-billed dowitcher","American woodcock","Limnodromus scolopaceus","Philohela minor","candidate-candidate",2.36,0.21,56.23,-0.75,2,-0.89,2,-0.65
+24,"Limnodromus scolopaceus","Scolopax minor","long-billed dowitcher","American woodcock","Limnodromus scolopaceus","Philohela minor","candidate-candidate",2.35,0.2,56.23,-0.75,2,-0.89,2,-0.65
 24,"Platalea ajaja","Plegadis falcinellus","roseate spoonbill","glossy ibis","Ajaia ajaja","Plegadis falcinellus","candidate-candidate",2.36,0.21,125.37,0.97,2,-0.89,2,-0.65
 24,"Platalea ajaja","Scolopax minor","roseate spoonbill","American woodcock","Ajaia ajaja","Philohela minor","candidate-candidate",5.37,2.51,152.36,1.64,4,1.62,4,1.83
 24,"Plegadis falcinellus","Scolopax minor","glossy ibis","American woodcock","Philohela minor","Plegadis falcinellus","candidate-candidate",3.68,1.22,164.78,1.94,4,1.62,4,1.83
 24,"Eudocimus albus","Platalea leucorodia","white ibis","spoonbill","Platalea leucorodia","Eudocimus albus","target-candidate",2.1,0.01,121.6,0.87,2,-0.89,2,-0.65
-24,"Gallinago gallinago","Platalea leucorodia","common snipe","spoonbill","Platalea leucorodia","Capella gallinago","target-candidate",6.64,3.49,164.78,1.94,4,1.62,4,1.83
+24,"Gallinago delicata","Platalea leucorodia","common snipe","spoonbill","Platalea leucorodia","Capella gallinago","target-candidate",6.65,3.49,164.78,1.94,4,1.62,4,1.83
 24,"Limnodromus scolopaceus","Platalea leucorodia","long-billed dowitcher","spoonbill","Platalea leucorodia","Limnodromus scolopaceus","target-candidate",6.3,3.23,164.78,1.94,4,1.62,4,1.83
-24,"Platalea ajaja","Platalea leucorodia","roseate spoonbill","spoonbill","Platalea leucorodia","Ajaia ajaja","target-candidate",1.15,-0.72,105.43,0.47,1,-2.15,2,-0.65
-24,"Platalea leucorodia","Plegadis falcinellus","spoonbill","glossy ibis","Platalea leucorodia","Plegadis falcinellus","target-candidate",2.52,0.33,97.37,0.27,2,-0.89,2,-0.65
+24,"Platalea ajaja","Platalea leucorodia","roseate spoonbill","spoonbill","Platalea leucorodia","Ajaia ajaja","target-candidate",1.14,-0.72,105.43,0.47,1,-2.15,2,-0.65
+24,"Platalea leucorodia","Plegadis falcinellus","spoonbill","glossy ibis","Platalea leucorodia","Plegadis falcinellus","target-candidate",2.52,0.34,97.37,0.27,2,-0.89,2,-0.65
 24,"Platalea leucorodia","Scolopax minor","spoonbill","American woodcock","Platalea leucorodia","Philohela minor","target-candidate",5.88,2.91,164.78,1.94,4,1.62,4,1.83
 25,"Chaetura pelagica","Elanus leucurus","chimney swift","white-tailed kite","Chaetura pelagica","Elanus leucurus","candidate-candidate",7.43,4.1,165.71,1.97,4,1.62,4,1.83
-25,"Chaetura pelagica","Junco hyemalis","chimney swift","northern junco","Chaetura pelagica","Junco hyemalis","candidate-candidate",5.71,2.78,153.93,1.68,4,1.62,4,1.83
+25,"Chaetura pelagica","Junco hyemalis","chimney swift","northern junco","Chaetura pelagica","Junco hyemalis","candidate-candidate",5.7,2.77,153.93,1.68,4,1.62,4,1.83
 25,"Chaetura pelagica","Progne subis","chimney swift","purple martin","Chaetura pelagica","Progne subis","candidate-candidate",3.71,1.24,153.43,1.66,4,1.62,4,1.83
-25,"Chaetura pelagica","Quiscalus quiscula","chimney swift","common grackle","Chaetura pelagica","Quiscalus quiscalus","candidate-candidate",7.35,4.03,153.93,1.68,4,1.62,4,1.83
+25,"Chaetura pelagica","Quiscalus quiscula","chimney swift","common grackle","Chaetura pelagica","Quiscalus quiscalus","candidate-candidate",7.34,4.03,153.93,1.68,4,1.62,4,1.83
 25,"Chaetura pelagica","Riparia riparia","chimney swift","bank swallow","Chaetura pelagica","Riparia riparia","candidate-candidate",2.09,0,153.43,1.66,4,1.62,4,1.83
 25,"Elanus leucurus","Junco hyemalis","white-tailed kite","northern junco","Elanus leucurus","Junco hyemalis","candidate-candidate",6,3,162.25,1.88,4,1.62,4,1.83
-25,"Elanus leucurus","Progne subis","white-tailed kite","purple martin","Elanus leucurus","Progne subis","candidate-candidate",4.1,1.54,162.5,1.89,4,1.62,4,1.83
+25,"Elanus leucurus","Progne subis","white-tailed kite","purple martin","Elanus leucurus","Progne subis","candidate-candidate",4.09,1.54,162.5,1.89,4,1.62,4,1.83
 25,"Elanus leucurus","Quiscalus quiscula","white-tailed kite","common grackle","Elanus leucurus","Quiscalus quiscalus","candidate-candidate",3.18,0.84,162.25,1.88,4,1.62,4,1.83
-25,"Elanus leucurus","Riparia riparia","white-tailed kite","bank swallow","Elanus leucurus","Riparia riparia","candidate-candidate",6.66,3.51,162.5,1.89,4,1.62,4,1.83
-25,"Junco hyemalis","Progne subis","northern junco","purple martin","Junco hyemalis","Progne subis","candidate-candidate",3.88,1.37,84.8,-0.04,3,0.36,3,0.59
+25,"Elanus leucurus","Riparia riparia","white-tailed kite","bank swallow","Elanus leucurus","Riparia riparia","candidate-candidate",6.66,3.5,162.5,1.89,4,1.62,4,1.83
+25,"Junco hyemalis","Progne subis","northern junco","purple martin","Junco hyemalis","Progne subis","candidate-candidate",3.87,1.37,84.8,-0.04,3,0.36,3,0.59
 25,"Junco hyemalis","Quiscalus quiscula","northern junco","common grackle","Junco hyemalis","Quiscalus quiscalus","candidate-candidate",3.75,1.28,37.26,-1.22,3,0.36,3,0.59
-25,"Junco hyemalis","Riparia riparia","northern junco","bank swallow","Junco hyemalis","Riparia riparia","candidate-candidate",3.95,1.43,85.71,-0.02,3,0.36,3,0.59
-25,"Progne subis","Quiscalus quiscula","purple martin","common grackle","Progne subis","Quiscalus quiscalus","candidate-candidate",3.95,1.42,90.3,0.09,3,0.36,3,0.59
+25,"Junco hyemalis","Riparia riparia","northern junco","bank swallow","Junco hyemalis","Riparia riparia","candidate-candidate",3.95,1.42,85.71,-0.02,3,0.36,3,0.59
+25,"Progne subis","Quiscalus quiscula","purple martin","common grackle","Progne subis","Quiscalus quiscalus","candidate-candidate",3.94,1.42,90.3,0.09,3,0.36,3,0.59
 25,"Progne subis","Riparia riparia","purple martin","bank swallow","Progne subis","Riparia riparia","candidate-candidate",2.7,0.47,42.44,-1.1,2,-0.89,2,-0.65
-25,"Quiscalus quiscula","Riparia riparia","common grackle","bank swallow","Quiscalus quiscalus","Riparia riparia","candidate-candidate",5.98,2.99,90.71,0.1,3,0.36,3,0.59
+25,"Quiscalus quiscula","Riparia riparia","common grackle","bank swallow","Quiscalus quiscalus","Riparia riparia","candidate-candidate",5.98,2.98,90.71,0.1,3,0.36,3,0.59
 25,"Apus apus","Chaetura pelagica","swift","chimney swift","Apus apus","Chaetura pelagica","target-candidate",1.73,-0.27,66.93,-0.49,2,-0.89,2,-0.65
 25,"Apus apus","Elanus leucurus","swift","white-tailed kite","Apus apus","Elanus leucurus","target-candidate",6.38,3.29,165.71,1.97,4,1.62,4,1.83
 25,"Apus apus","Junco hyemalis","swift","northern junco","Apus apus","Junco hyemalis","target-candidate",5.87,2.9,153.95,1.68,4,1.62,4,1.83
-25,"Apus apus","Progne subis","swift","purple martin","Apus apus","Progne subis","target-candidate",2.9,0.63,153.95,1.68,4,1.62,4,1.83
-25,"Apus apus","Quiscalus quiscula","swift","common grackle","Apus apus","Quiscalus quiscalus","target-candidate",6.77,3.59,153.95,1.68,4,1.62,4,1.83
-25,"Apus apus","Riparia riparia","swift","bank swallow","Apus apus","Riparia riparia","target-candidate",2.47,0.29,153.95,1.68,4,1.62,4,1.83
-26,"Calidris canutus","Gallinago gallinago","red knot","common snipe","Calidris canutus","Capella gallinago","candidate-candidate",2.05,-0.03,68.02,-0.46,2,-0.89,2,-0.65
+25,"Apus apus","Progne subis","swift","purple martin","Apus apus","Progne subis","target-candidate",2.9,0.62,153.95,1.68,4,1.62,4,1.83
+25,"Apus apus","Quiscalus quiscula","swift","common grackle","Apus apus","Quiscalus quiscalus","target-candidate",6.77,3.58,153.95,1.68,4,1.62,4,1.83
+25,"Apus apus","Riparia riparia","swift","bank swallow","Apus apus","Riparia riparia","target-candidate",2.46,0.29,153.95,1.68,4,1.62,4,1.83
+26,"Calidris canutus","Gallinago delicata","red knot","common snipe","Calidris canutus","Capella gallinago","candidate-candidate",1.9,-0.14,68.02,-0.46,2,-0.89,2,-0.65
 26,"Calidris canutus","Limnodromus scolopaceus","red knot","long-billed dowitcher","Calidris canutus","Limnodromus scolopaceus","candidate-candidate",1.77,-0.24,68,-0.46,2,-0.89,2,-0.65
 26,"Calidris canutus","Limosa fedoa","red knot","marbled godwit","Calidris canutus","Limosa fedoa","candidate-candidate",3.47,1.06,65.73,-0.52,2,-0.89,2,-0.65
 26,"Calidris canutus","Scolopax minor","red knot","American woodcock","Calidris canutus","Philohela minor","candidate-candidate",3.42,1.02,68.44,-0.45,2,-0.89,2,-0.65
 26,"Calidris canutus","Tringa semipalmata","red knot","willet","Calidris canutus","Catoptrophorus semipalmatus","candidate-candidate",2.43,0.26,60.13,-0.66,2,-0.89,2,-0.65
-26,"Gallinago gallinago","Limnodromus scolopaceus","common snipe","long-billed dowitcher","Capella gallinago","Limnodromus scolopaceus","candidate-candidate",0.95,-0.87,52.2,-0.85,2,-0.89,2,-0.65
-26,"Gallinago gallinago","Limosa fedoa","common snipe","marbled godwit","Capella gallinago","Limosa fedoa","candidate-candidate",3.07,0.75,72.71,-0.34,2,-0.89,2,-0.65
-26,"Gallinago gallinago","Scolopax minor","common snipe","American woodcock","Capella gallinago","Philohela minor","candidate-candidate",1.84,-0.19,47.99,-0.96,2,-0.89,2,-0.65
-26,"Gallinago gallinago","Tringa semipalmata","common snipe","willet","Capella gallinago","Catoptrophorus semipalmatus","candidate-candidate",2.28,0.15,66.44,-0.5,2,-0.89,2,-0.65
+26,"Gallinago delicata","Limnodromus scolopaceus","common snipe","long-billed dowitcher","Capella gallinago","Limnodromus scolopaceus","candidate-candidate",0.79,-0.99,52.2,-0.85,2,-0.89,2,-0.65
+26,"Gallinago delicata","Limosa fedoa","common snipe","marbled godwit","Capella gallinago","Limosa fedoa","candidate-candidate",3.01,0.71,72.71,-0.34,2,-0.89,2,-0.65
+26,"Gallinago delicata","Scolopax minor","common snipe","American woodcock","Capella gallinago","Philohela minor","candidate-candidate",1.95,-0.11,47.99,-0.96,2,-0.89,2,-0.65
+26,"Gallinago delicata","Tringa semipalmata","common snipe","willet","Capella gallinago","Catoptrophorus semipalmatus","candidate-candidate",2.27,0.14,66.44,-0.5,2,-0.89,2,-0.65
 26,"Limnodromus scolopaceus","Limosa fedoa","long-billed dowitcher","marbled godwit","Limnodromus scolopaceus","Limosa fedoa","candidate-candidate",2.45,0.28,72.71,-0.34,2,-0.89,2,-0.65
-26,"Limnodromus scolopaceus","Scolopax minor","long-billed dowitcher","American woodcock","Limnodromus scolopaceus","Philohela minor","candidate-candidate",2.36,0.21,56.23,-0.75,2,-0.89,2,-0.65
+26,"Limnodromus scolopaceus","Scolopax minor","long-billed dowitcher","American woodcock","Limnodromus scolopaceus","Philohela minor","candidate-candidate",2.35,0.2,56.23,-0.75,2,-0.89,2,-0.65
 26,"Limnodromus scolopaceus","Tringa semipalmata","long-billed dowitcher","willet","Catoptrophorus semipalmatus","Limnodromus scolopaceus","candidate-candidate",1.78,-0.23,66.09,-0.51,2,-0.89,2,-0.65
 26,"Limosa fedoa","Scolopax minor","marbled godwit","American woodcock","Limosa fedoa","Philohela minor","candidate-candidate",3.28,0.92,72.75,-0.34,2,-0.89,2,-0.65
 26,"Limosa fedoa","Tringa semipalmata","marbled godwit","willet","Catoptrophorus semipalmatus","Limosa fedoa","candidate-candidate",1.64,-0.34,68.56,-0.45,2,-0.89,2,-0.65
 26,"Scolopax minor","Tringa semipalmata","American woodcock","willet","Catoptrophorus semipalmatus","Philohela minor","candidate-candidate",2.74,0.5,67,-0.49,2,-0.89,2,-0.65
 26,"Calidris canutus","Scolopax rusticola","red knot","woodcock","Scolopax rusticola","Calidris canutus","target-candidate",3.03,0.72,71.32,-0.38,2,-0.89,2,-0.65
-26,"Gallinago gallinago","Scolopax rusticola","common snipe","woodcock","Scolopax rusticola","Capella gallinago","target-candidate",2.18,0.07,60.62,-0.64,2,-0.89,2,-0.65
-26,"Limnodromus scolopaceus","Scolopax rusticola","long-billed dowitcher","woodcock","Scolopax rusticola","Limnodromus scolopaceus","target-candidate",2.17,0.06,64.14,-0.56,2,-0.89,2,-0.65
+26,"Gallinago delicata","Scolopax rusticola","common snipe","woodcock","Scolopax rusticola","Capella gallinago","target-candidate",2.18,0.07,60.62,-0.64,2,-0.89,2,-0.65
+26,"Limnodromus scolopaceus","Scolopax rusticola","long-billed dowitcher","woodcock","Scolopax rusticola","Limnodromus scolopaceus","target-candidate",2.16,0.06,64.14,-0.56,2,-0.89,2,-0.65
 26,"Limosa fedoa","Scolopax rusticola","marbled godwit","woodcock","Scolopax rusticola","Limosa fedoa","target-candidate",2.14,0.04,75.62,-0.27,2,-0.89,2,-0.65
 26,"Scolopax minor","Scolopax rusticola","American woodcock","woodcock","Scolopax rusticola","Philohela minor","target-candidate",1.63,-0.35,36.96,-1.23,1,-2.15,2,-0.65
 26,"Scolopax rusticola","Tringa semipalmata","woodcock","willet","Scolopax rusticola","Catoptrophorus semipalmatus","target-candidate",1.84,-0.19,69.89,-0.41,2,-0.89,2,-0.65

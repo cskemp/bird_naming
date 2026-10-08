@@ -385,15 +385,17 @@ names; 12 more are retired 1974 names that the change file maps forward.
 # The three names that neither the 2023 checklist nor the 1974-2023 change file
 # resolves. Each was checked by hand:
 #  - Capella gallinago  appears in the 1974 list (Common Snipe) but with no 2023
-#    partner, because the 1974 species was later split; the Old World bird Brown
-#    illustrates is Gallinago gallinago.
+#    partner, because the 1974 species was later split into Gallinago gallinago
+#    (Old World) and Gallinago delicata (New World, Wilson's Snipe). Brown uses it
+#    only as an American candidate, so it is Gallinago delicata - the same mapping
+#    preprocessing/Preprocessing.Rmd uses for Capella gallinago in the Innu data.
 #  - Picoides pubescens and Quiscalus quiscalus appear in neither list. The Downy
 #    Woodpecker moved to Dryobates, and Quiscalus quiscalus is the older spelling
 #    of Quiscalus quiscula (Common Grackle).
 
 manual_2023 <- tribble(
   ~BrownName,             ~ManualName2023,
-  "Capella gallinago",    "Gallinago gallinago",
+  "Capella gallinago",    "Gallinago delicata",
   "Picoides pubescens",   "Dryobates pubescens",
   "Quiscalus quiscalus",  "Quiscalus quiscula"
 )
@@ -543,10 +545,20 @@ back_23_V3 <- changes_V3_23 %>%
   select(ScientificName2023, BackNameV3 = ScientificNameV3) %>%
   distinct()
 
+# V3 (and so BirdTree) does not recognise Gallinago delicata: it is lumped into
+# Gallinago gallinago, and the change file lists it with a blank V3 name. Map it
+# by hand, as preprocessing/Preprocessing.Rmd does for the Innu data.
+
+manual_V3 <- tribble(
+  ~ScientificName2023,   ~ManualNameV3,
+  "Gallinago delicata",  "Gallinago gallinago"
+)
+
 brown_birds <- brown_birds %>%
   left_join(back_23_V3, by = "ScientificName2023") %>%
-  mutate(ScientificNameV3 = coalesce(BackNameV3, ScientificName2023)) %>%
-  select(-BackNameV3)
+  left_join(manual_V3, by = "ScientificName2023") %>%
+  mutate(ScientificNameV3 = coalesce(ManualNameV3, BackNameV3, ScientificName2023)) %>%
+  select(-BackNameV3, -ManualNameV3)
 
 # Every bird must land on a recognised V3 name, and the 99 must stay distinct -
 # BirdTree tip labels are the join key for the phylogenetic distances below
@@ -1716,7 +1728,7 @@ col_all_subjects$comparisons
 Adding colour at equal weight does not help. Over all choices, colour on its own
 has a mean rank of 3.11. That is better than Clements 1974 (3.37) but behind AVONET
 (2.76), phylogenetic (2.85) and Clements 2023 (2.91). The equal-weight combination
-lands between its two parts, at 2.92 over all choices and 2.63 for the top choice,
+lands between its two parts, at 2.93 over all choices and 2.63 for the top choice,
 so giving colour as much weight as AVONET pulls AVONET towards the weaker of the
 two. Within arrays the two distances are only weakly correlated (r = 0.21), so
 colour is not just repeating what AVONET already says.
@@ -1726,8 +1738,8 @@ the combination does marginally better than AVONET alone: 2.74 against 2.76 over
 all choices, and 2.41 against 2.44 for the top choice. These are the lowest mean
 ranks of any measure, but the gain over AVONET is tiny and not distinguishable from
 zero under either resampling scheme. Colour still matters at that weight: it changes
-the rank of 30 of the 156 candidates, in 12 of the 26 arrays (the equal-weight
-combination changes 98, in 24 arrays). The reorderings just help and hurt about
+the rank of 31 of the 156 candidates, in 12 of the 26 arrays (the equal-weight
+combination changes 97, in 24 arrays). The reorderings just help and hurt about
 equally.
 
 As before, resampling over arrays separates little. The only clear gaps involving a
