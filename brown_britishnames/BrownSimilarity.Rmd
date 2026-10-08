@@ -1,6 +1,8 @@
 ---
 title: "Brown (1992) British names for American birds - similarity measures"
-output: html_notebook
+output:
+  html_document:
+    df_print: paged
 ---
 
 Computes perceptual similarity (AVONET Euclidean distance), phylogenetic similarity
@@ -19,6 +21,9 @@ The phylogenetic measure reads `nexus_brown.nex`, the BirdTree tree-pruner downl
 covering Brown's 99 birds that sits alongside this notebook - see the phylogenetic
 section below for how it was produced. If it is removed the notebook still runs and
 reports the other three measures.
+
+A final section adds the plumage colour data the pipeline uses, as a measure on its
+own and combined with AVONET.
 
 # Setup
 
@@ -799,8 +804,13 @@ brown_pairs <- array_pairs %>%
          zDistPhy = if (have_phylo) round(scale(DistPhy)[,1], 2) else NA_real_,
          zDist23 = round(scale(Dist23)[,1], 2),
          zDist74 = round(scale(Dist74)[,1], 2),
-         DistPer = round(DistPer, 2),
-         DistPhy = round(DistPhy, 2),
+         # The candidates are ranked on these distances below, so they are kept at
+         # full precision here and only rounded to 2 dp on export - rounding to 2 dp
+         # merges two perceptual distances in array 5 into a false tie. 8 dp is
+         # enough to clear the floating-point noise that averaging cophenetic
+         # distances over 250 trees can leave on genuinely tied phylogenetic values.
+         DistPer = round(DistPer, 8),
+         DistPhy = round(DistPhy, 8),
          # Species1/Species2 are sorted alphabetically, so the common names have to
          # follow that order rather than the order the pair was constructed in
          Species1Common = if_else(Species1 == canonical[BrownName1],
@@ -916,6 +926,56 @@ all_choice_ranks_full <- brown_table3_similarity %>%
                           levels = measures$Measure)) %>%
   select(-RankColumn)
 
+# The span of integer ranks each candidate's tie group occupies. A candidate tied
+# with m - 1 others sits somewhere in RankMin..RankMax (m slots), and its fractional
+# rank is the midpoint of that span. The histograms below use the span rather than
+# the midpoint.
+
+rank_spans <- brown_table3_similarity %>%
+  select(array, american_bird, all_of(measures$DistColumn)) %>%
+  pivot_longer(cols = all_of(measures$DistColumn),
+               names_to = "DistColumn",
+               values_to = "Dist") %>%
+  group_by(array, DistColumn) %>%
+  mutate(RankMin = rank(Dist, ties.method = "min"),
+         RankMax = rank(Dist, ties.method = "max")) %>%
+  ungroup() %>%
+  mutate(Measure = factor(measures$Measure[match(DistColumn, measures$DistColumn)],
+                          levels = measures$Measure)) %>%
+  select(array, american_bird, Measure, RankMin, RankMax)
+
+# american_bird is the join key back onto the rank tables, so it must be unique
+# within an array
+stopifnot(
+  nrow(distinct(brown_table3_similarity, array, american_bird)) ==
+    nrow(brown_table3_similarity)
+)
+
+# Spread each row of a long rank table evenly over the integer ranks its tie group
+# occupies: a candidate tied with one other for first contributes 0.5 to rank 1 and
+# 0.5 to rank 2. This is the distribution of its rank if ties were broken uniformly
+# at random. `share` is the fraction of the row that lands on `Slot`.
+
+SplitTies <- function(ranks, spans = rank_spans) {
+  ranks %>%
+    left_join(spans, by = c("array", "american_bird", "Measure")) %>%
+    mutate(Slot = map2(RankMin, RankMax, seq)) %>%
+    unnest(Slot) %>%
+    mutate(share = 1 / (RankMax - RankMin + 1)) %>%
+    select(-RankMin, -RankMax)
+}
+
+# The split distribution has the fractional rank as its mean, so every mean rank
+# reported below is the same whichever way ties are handled
+stopifnot(
+  isTRUE(all.equal(
+    SplitTies(all_choice_ranks_full) %>%
+      group_by(array, american_bird, Measure) %>%
+      summarise(Rank = first(Rank), mean_slot = sum(share * Slot), .groups = "drop") %>%
+      with(Rank - mean_slot),
+    rep(0, nrow(all_choice_ranks_full))))
+)
+
 # How much tying each measure produces: the number of distinct values per array
 
 brown_table3_similarity %>%
@@ -931,9 +991,13 @@ always separates all six candidates, but the taxonomic measures average fewer th
 two distinct values per array, and in some arrays all six candidates are the same
 taxonomic distance from the target. That is by design: Brown built most arrays out
 of candidates drawn from the target's own family, so taxonomy has very little room
-to discriminate within an array. Every candidate tied means a fractional rank of
-3.5 for all of them, which is why the taxonomic histograms below have a large spike
-at 3.5.
+to discriminate within an array.
+
+The histograms below do not plot fractional ranks. A candidate whose tie group
+spans ranks k to k + m - 1 instead contributes 1/m to each of those m ranks, so two
+candidates tied for closest each put 0.5 on rank 1 and 0.5 on rank 2. When all six
+candidates are tied, the chosen bird is spread evenly over ranks 1 to 6, which is
+what an uninformative measure should look like.
 
 # Rank of the top human choice
 
@@ -967,12 +1031,13 @@ nrow(top_choice)
 
 ```{r fig.width = 12, fig.height = 3.4}
 
-# Fractional ranks of 6 candidates always fall on a 0.5 grid, so half-unit bins
-# centred on each possible rank show the distribution exactly. The dashed line at
-# 3.5 is the mean rank expected if a measure ordered the candidates at random.
+# Ties are split over the ranks they span, so the bars sit on the integer ranks
+# 1-6 and can hold fractional counts. The dashed line at 3.5 is the mean rank
+# expected if a measure ordered the candidates at random.
 
-rank_histograms <- ggplot(top_choice_ranks, aes(x = Rank)) +
-  geom_histogram(binwidth = 0.5, boundary = 0.25,
+rank_histograms <- ggplot(SplitTies(top_choice_ranks),
+                          aes(x = Slot, weight = share)) +
+  geom_histogram(binwidth = 1, boundary = 0.5,
                  fill = "steelblue", colour = "white", linewidth = 0.3) +
   geom_vline(xintercept = 3.5, linetype = "dashed", colour = "grey40") +
   facet_wrap(~ Measure, nrow = 1) +
@@ -990,9 +1055,9 @@ rank_histograms
 
 ```
 
-Mean rank of the top human choice under each measure, and how often each measure
-put it first. `at_rank_1` counts outright firsts; `rank_1_or_tied_first` also
-counts the arrays where it was tied for closest (fractional rank below 2).
+Mean rank of the top human choice under each measure. The mean of the
+tie-split distribution in the histograms is exactly the fractional rank, so these
+means are the same whichever way ties are handled.
 
 ```{r}
 
@@ -1005,9 +1070,7 @@ top_choice_draws_subjects <- BootstrapMeanRankSubjects(
 top_choice_base <- top_choice_ranks %>%
   group_by(Measure) %>%
   summarise(observations = n(),
-            mean_rank = mean(Rank),
-            at_rank_1 = sum(Rank == 1),
-            rank_1_or_tied_first = sum(Rank < 2))
+            mean_rank = mean(Rank))
 
 ```
 
@@ -1069,11 +1132,12 @@ stopifnot(
 
 ```{r fig.width = 12, fig.height = 3.4}
 
-# Same bins and chance line as the top-choice histograms, but each row is weighted
-# by the number of subjects who picked that candidate
+# Same bins, tie splitting and chance line as the top-choice histograms, but each
+# row is also weighted by the number of subjects who picked that candidate
 
-all_choice_histograms <- ggplot(all_choice_ranks, aes(x = Rank, weight = n)) +
-  geom_histogram(binwidth = 0.5, boundary = 0.25,
+all_choice_histograms <- ggplot(SplitTies(all_choice_ranks),
+                                aes(x = Slot, weight = n * share)) +
+  geom_histogram(binwidth = 1, boundary = 0.5,
                  fill = "darkseagreen4", colour = "white", linewidth = 0.3) +
   geom_vline(xintercept = 3.5, linetype = "dashed", colour = "grey40") +
   facet_wrap(~ Measure, nrow = 1) +
@@ -1103,9 +1167,7 @@ all_choice_draws_subjects <- BootstrapMeanRankSubjects(
 all_choice_base <- all_choice_ranks %>%
   group_by(Measure) %>%
   summarise(choices = sum(n),
-            mean_rank = weighted.mean(Rank, n),
-            at_rank_1 = sum(n[Rank == 1]),
-            proportion_at_rank_1 = round(sum(n[Rank == 1]) / sum(n), 3))
+            mean_rank = weighted.mean(Rank, n))
 
 ```
 
@@ -1284,6 +1346,11 @@ drop_unused_phylo <- function(data) {
   if (have_phylo) data else select(data, -any_of(c("DistPhy", "zDistPhy")))
 }
 
+# The distances were kept at full precision for ranking; 2 dp is plenty on export
+round_distances <- function(data) {
+  mutate(data, across(any_of(c("DistPer", "DistPhy")), ~round(.x, 2)))
+}
+
 brown_bird_taxonomy <- brown_birds %>%
   select(BrownName, CommonNameBrown, NameSource,
          ScientificName2023, CommonName2023, Genus2023, Family2023, Order2023,
@@ -1296,12 +1363,388 @@ write.csv(brown_bird_taxonomy,
           here("brown_britishnames/brown_bird_taxonomy.csv"),
           row.names = FALSE)
 
-write.csv(brown_pairs %>% drop_unused_phylo(),
+write.csv(brown_pairs %>% drop_unused_phylo() %>% round_distances(),
           here("brown_britishnames/brown_similarity_pairs.csv"),
           row.names = FALSE)
 
-write.csv(brown_table3_similarity %>% drop_unused_phylo(),
+write.csv(brown_table3_similarity %>% drop_unused_phylo() %>% round_distances(),
           here("brown_britishnames/brown_table3_similarity.csv"),
           row.names = FALSE)
 
 ```
+
+# Perceptual similarity with colour
+
+AVONET describes shape and size but says nothing about plumage, and Brown's
+subjects were looking at coloured pictures. This section adds the colour data the
+pipeline uses and builds a perceptual measure from AVONET and colour together.
+
+The colour data and its handling are copied from `preprocessing/Preprocessing.Rmd`
+(the "Colour Data" section, which follows Santangeli et al.). The six colour
+variables are black, white, yellow, blue, red and green; red, blue and green are
+the sums of their light and dark versions. Where a species has separate male and
+female rows, the more colourful one is kept. The pipeline's colour distance is
+Euclidean distance on the six z-scored variables, with no log transform.
+
+The pipeline never builds a single combined distance. The analyses
+(`analyses/Analyses.Rmd`) enter `zDistPer` and `zDistCol` side by side in logistic
+regressions predicting name sharing, and let the fit weight them. Brown's data has
+nothing to fit, so two fixed weightings are tried:
+
+    DistPerCol  = z(DistPer) + z(DistCol)
+    DistPerColW = z(DistPer) + (0.38 / 3.70) z(DistCol)
+
+The first gives the two equal weight. The second takes its weights from the
+regression pooled over all languages in `output/ResultsTableLR_col.tex`
+(Per+Col model: beta = -3.70 for perceptual, -0.38 for colour), so colour counts
+for about a tenth as much as AVONET. The per-language ratios range from about
+2.6:1 (Saami) to 17:1 (Anindilyakwa).
+
+Both are z-scored over the 546 within-array pairs, the same scaling as the `zDist`
+columns above. The regressions z-score over all pairs within a language instead, so
+the borrowed weights are an approximation. Colour on its own is reported as well,
+so the combined measures can be read against both of their parts.
+
+## Load the colour data
+
+```{r}
+
+colour_data <- read.csv(here("preprocessing/data/colour_data.csv")) %>%
+  rename(ScientificNameV3 = BirdTREE,
+         ScientificName2021 = sciName_ebird2021,
+         cDiversity = n.loci,
+         cElaboration = elaboration,
+         cBlack = black,
+         cWhite = white,
+         cYellow = yellow) %>%
+  mutate(cRed = redD + redL,
+         cBlue = blueD + blueL,
+         cGreen = greenD + greenL) %>%
+  filter(!is.na(cElaboration)) %>%
+  arrange(desc(cElaboration)) %>%
+  select(ScientificName2021,
+         cBlack,
+         cWhite,
+         cYellow,
+         cBlue,
+         cRed,
+         cGreen,
+         cElaboration) %>%
+  # Keep the most colourful set of observations for each bird
+  distinct(ScientificName2021, .keep_all = TRUE)
+
+# The pipeline falls back to the V3 name when the 2021 name finds nothing, and
+# duplicates the Larus canus row for Larus brachyrhynchus. Neither is needed here:
+# all 99 of Brown's birds match on their 2021 name.
+
+brown_colours <- brown_birds %>%
+  select(CanonicalName, ScientificName2021) %>%
+  left_join(colour_data, by = "ScientificName2021", relationship = "one-to-one")
+
+stopifnot(
+  nrow(brown_colours) == 99,
+  !any(is.na(brown_colours %>% select(cBlack:cGreen)))
+)
+
+```
+
+## Colour and combined distances
+
+```{r}
+
+col_data <- brown_colours %>%
+  select(CanonicalName, cBlack:cGreen) %>%
+  mutate_if(is.numeric, ~scale(.)[,1])
+
+# Make a matrix with euclidean distances between all birds based on their colours
+
+col_matrix <- col_data %>%
+  select(cBlack:cGreen) %>%
+  data.matrix() %>%
+  pdist(metric = "euclidean", p = 2) %>%
+  as.data.frame()
+
+rownames(col_matrix) <- col_data$CanonicalName
+colnames(col_matrix) <- col_data$CanonicalName
+
+col_dist_list <- data.frame(t(combn(names(col_matrix), 2)),
+                            DistCol = t(col_matrix)[lower.tri(col_matrix)]) %>%
+  mutate(Species1 = pmin(X1, X2),
+         Species2 = pmax(X1, X2)) %>%
+  select(Species1, Species2, DistCol)
+
+# Colour coefficient relative to perceptual, from the pooled Per+Col logistic
+# regression in analyses/Analyses.Rmd (output/ResultsTableLR_col.tex)
+colour_weight <- 0.38 / 3.70
+
+# Within-array pairs, with the combined distances. Rounded to 8 dp for ranking, as
+# DistPer and DistPhy are above.
+
+colour_pairs <- brown_pairs %>%
+  select(array, Species1, Species2, DistPer) %>%
+  left_join(col_dist_list, by = c("Species1", "Species2")) %>%
+  mutate(DistPerCol = scale(DistPer)[,1] + scale(DistCol)[,1],
+         DistPerColW = scale(DistPer)[,1] + colour_weight * scale(DistCol)[,1],
+         DistCol = round(DistCol, 8),
+         DistPerCol = round(DistPerCol, 8),
+         DistPerColW = round(DistPerColW, 8)) %>%
+  select(-DistPer)
+
+stopifnot(
+  nrow(colour_pairs) == 546,
+  !any(is.na(colour_pairs$DistCol))
+)
+
+# How closely the two parts agree within arrays
+cor(brown_pairs$DistPer, colour_pairs$DistCol)
+
+brown_table3_colour <- brown_table3_similarity %>%
+  mutate(Species1 = pmin(british_scientificname2023, american_scientificname2023),
+         Species2 = pmax(british_scientificname2023, american_scientificname2023)) %>%
+  left_join(colour_pairs, by = c("array", "Species1", "Species2")) %>%
+  select(-Species1, -Species2)
+
+stopifnot(
+  nrow(brown_table3_colour) == 156,
+  !any(is.na(brown_table3_colour$DistPerCol)),
+  !any(is.na(brown_table3_colour$DistPerColW))
+)
+
+```
+
+## Rank the candidates
+
+The same ranking as before, now over seven measures. The four existing measures are
+re-ranked from the same distances, and a check confirms their ranks are unchanged.
+
+```{r}
+
+measures_col <- bind_rows(
+  measures %>% slice(1),
+  tribble(
+    ~DistColumn,  ~RankColumn,  ~Measure,
+    "DistCol",    "RankCol",    "Colour",
+    "DistPerCol", "RankPerCol", "Perceptual + colour (equal)",
+    "DistPerColW", "RankPerColW", "Perceptual + colour (weighted)"),
+  measures %>% slice(-1)
+)
+
+col_ranks_full <- brown_table3_colour %>%
+  select(array, american_bird, n, all_of(measures_col$DistColumn)) %>%
+  pivot_longer(cols = all_of(measures_col$DistColumn),
+               names_to = "DistColumn",
+               values_to = "Dist") %>%
+  group_by(array, DistColumn) %>%
+  mutate(Rank = rank(Dist, ties.method = "average"),
+         RankMin = rank(Dist, ties.method = "min"),
+         RankMax = rank(Dist, ties.method = "max")) %>%
+  ungroup() %>%
+  mutate(Measure = factor(measures_col$Measure[match(DistColumn,
+                                                     measures_col$DistColumn)],
+                          levels = measures_col$Measure))
+
+col_spans <- col_ranks_full %>%
+  select(array, american_bird, Measure, RankMin, RankMax)
+
+col_ranks_full <- col_ranks_full %>%
+  select(array, american_bird, n, Measure, Rank)
+
+# The existing measures must rank exactly as they did before
+stopifnot(
+  isTRUE(all.equal(
+    col_ranks_full %>%
+      filter(Measure %in% measures$Measure) %>%
+      arrange(array, american_bird, Measure) %>%
+      pull(Rank),
+    all_choice_ranks_full %>%
+      arrange(array, american_bird, Measure) %>%
+      pull(Rank)))
+)
+
+col_top_ranks <- col_ranks_full %>%
+  semi_join(top_choice, by = c("array", "american_bird"))
+
+col_all_ranks <- col_ranks_full %>%
+  filter(n > 0)
+
+stopifnot(
+  nrow(col_top_ranks) == 27 * nrow(measures_col),
+  sum(col_all_ranks$n) == 883 * nrow(measures_col)
+)
+
+```
+
+## Histograms
+
+The same tie-split histograms as above, for all seven measures.
+
+```{r fig.width = 14, fig.height = 6}
+
+col_top_histograms <- ggplot(SplitTies(col_top_ranks, col_spans),
+                             aes(x = Slot, weight = share)) +
+  geom_histogram(binwidth = 1, boundary = 0.5,
+                 fill = "steelblue", colour = "white", linewidth = 0.3) +
+  geom_vline(xintercept = 3.5, linetype = "dashed", colour = "grey40") +
+  facet_wrap(~ Measure, ncol = 4) +
+  scale_x_continuous(breaks = 1:6) +
+  scale_y_continuous(breaks = scales::breaks_width(2),
+                     expand = expansion(mult = c(0, 0.05))) +
+  coord_cartesian(xlim = c(0.5, 6.5)) +
+  theme_bw() +
+  labs(x = "Rank of the top human choice (1 = closest)",
+       y = "Number of top choices")
+
+col_top_histograms
+
+```
+
+```{r fig.width = 14, fig.height = 6}
+
+col_all_histograms <- ggplot(SplitTies(col_all_ranks, col_spans),
+                             aes(x = Slot, weight = n * share)) +
+  geom_histogram(binwidth = 1, boundary = 0.5,
+                 fill = "darkseagreen4", colour = "white", linewidth = 0.3) +
+  geom_vline(xintercept = 3.5, linetype = "dashed", colour = "grey40") +
+  facet_wrap(~ Measure, ncol = 4) +
+  scale_x_continuous(breaks = 1:6) +
+  scale_y_continuous(breaks = scales::breaks_width(50),
+                     expand = expansion(mult = c(0, 0.05))) +
+  coord_cartesian(xlim = c(0.5, 6.5)) +
+  theme_bw() +
+  labs(x = "Rank of the chosen bird (1 = closest)",
+       y = "Number of subject choices")
+
+col_all_histograms
+
+```
+
+## Mean rank
+
+Mean rank of the chosen birds under all seven measures, with 95% intervals. The
+comparisons are restricted to the pairs that involve one of the three new measures.
+The rows for the four existing measures repeat the earlier tables apart from the
+bootstrap noise in their intervals.
+
+```{r}
+
+# Runs one resampling scheme. `weighted` is TRUE for all choices (each row weighted
+# by its votes) and FALSE for the top choice only. Returns the summary table and the
+# comparisons involving a new measure.
+
+ColourScheme <- function(ranks, weighted, scheme = c("arrays", "subjects")) {
+
+  scheme <- match.arg(scheme)
+  ranks <- ranks %>% mutate(w = if (weighted) n else 1)
+
+  if (scheme == "arrays") {
+    draws <- BootstrapMeanRankArrays(ranks)
+  } else {
+    draws <- BootstrapMeanRankSubjects(col_ranks_full,
+                                       if (weighted) "weighted" else "top")
+  }
+
+  base <- ranks %>%
+    group_by(Measure) %>%
+    summarise(mean_rank = sum(w * Rank) / sum(w))
+
+  observed <- setNames(base$mean_rank, as.character(base$Measure))
+
+  new_measures <- c("Colour", "Perceptual + colour (equal)",
+                    "Perceptual + colour (weighted)")
+
+  comparisons <- BootstrapCompare(draws, observed) %>%
+    filter(Measure_A %in% new_measures | Measure_B %in% new_measures) %>%
+    RoundComparisons()
+
+  list(summary = AddCi(base, draws), comparisons = comparisons)
+}
+
+```
+
+### Top choice only
+
+Resampling over arrays:
+
+```{r}
+
+col_top_arrays <- ColourScheme(col_top_ranks, weighted = FALSE, scheme = "arrays")
+
+col_top_arrays$summary
+
+col_top_arrays$comparisons
+
+```
+
+Resampling over subjects:
+
+```{r}
+
+col_top_subjects <- ColourScheme(col_top_ranks, weighted = FALSE, scheme = "subjects")
+
+col_top_subjects$summary
+
+col_top_subjects$comparisons
+
+```
+
+### All choices
+
+Resampling over arrays:
+
+```{r}
+
+col_all_arrays <- ColourScheme(col_all_ranks, weighted = TRUE, scheme = "arrays")
+
+col_all_arrays$summary
+
+col_all_arrays$comparisons
+
+```
+
+Resampling over subjects:
+
+```{r}
+
+col_all_subjects <- ColourScheme(col_all_ranks, weighted = TRUE, scheme = "subjects")
+
+col_all_subjects$summary
+
+col_all_subjects$comparisons
+
+```
+
+Adding colour at equal weight does not help. Over all choices, colour on its own
+has a mean rank of 3.11. That is better than Clements 1974 (3.37) but behind AVONET
+(2.76), phylogenetic (2.85) and Clements 2023 (2.91). The equal-weight combination
+lands between its two parts, at 2.92 over all choices and 2.63 for the top choice,
+so giving colour as much weight as AVONET pulls AVONET towards the weaker of the
+two. Within arrays the two distances are only weakly correlated (r = 0.21), so
+colour is not just repeating what AVONET already says.
+
+With the weights from the language data, where colour counts about a tenth as much,
+the combination does marginally better than AVONET alone: 2.74 against 2.76 over
+all choices, and 2.41 against 2.44 for the top choice. These are the lowest mean
+ranks of any measure, but the gain over AVONET is tiny and not distinguishable from
+zero under either resampling scheme. Colour still matters at that weight: it changes
+the rank of 30 of the 156 candidates, in 12 of the 26 arrays (the equal-weight
+combination changes 98, in 24 arrays). The reorderings just help and hurt about
+equally.
+
+As before, resampling over arrays separates little. The only clear gaps involving a
+new measure are that the weighted combination beats Clements 1974, on both the top
+choice and all choices. Resampling over subjects:
+
+- AVONET beats colour alone, for both the top choice and all choices.
+- The weighted combination beats the equal-weight one for both, and beats colour
+  alone for both.
+- On all choices, AVONET beats the equal-weight combination, and the weighted
+  combination beats Clements 2023.
+- Both combinations beat Clements 1974, for both the top choice and all choices.
+- Colour alone falls behind AVONET, phylogenetic and Clements 2023 but beats
+  Clements 1974.
+
+Two caveats. Neither weighting is fitted to Brown's data: equal weighting is
+arbitrary, and the regression weights come from a different task (sharing a folk
+name) on a different scale (z-scored within a language). And the six colour scores
+are coarse proportions of plumage area, which say nothing about where on the bird a
+colour sits - often what makes two pictures look alike.
