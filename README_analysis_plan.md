@@ -6,8 +6,8 @@ four measures predict which birds share a folk name, and how to compare them. Th
 measures are Clements 1974 taxonomy (`74`), Clements 2023 taxonomy (`23`),
 BirdTree phylogeny (`Phy`) and AVONET perceptual distance (`Per`).
 
-Nothing here has been implemented yet. The plan is to add new notebooks, such as
-`analyses/Robustness.Rmd`, and leave `analyses/Analyses.Rmd` unchanged.
+Status: §1 is implemented in `cv_analyses/`, and §2 in `perm_analyses/`, with
+the changes to §2 described there. `analyses/Analyses.Rmd` is unchanged.
 
 ## The problem
 
@@ -83,40 +83,37 @@ weight optimisation done only on the training languages.
 (b) whether it adds anything beyond the other measures, and (c) whether 1974 fits
 better than 2023.
 
-**Null model: shuffle species among categories.** Within a language, randomly
-reassign the species to the folk categories, keeping the number of categories and
-their sizes fixed. Each shuffle produces a random taxonomy with the same structure
-as the real one, so all dependence between pairs is preserved. The existing
-`bird_perm` code (`Analyses.Rmd` ~3385–3540, currently `eval=FALSE`) already does
-this shuffle, so it can be reused.
+**Which null for which question.** Shuffling species among the folk
+categories (keeping the number of categories and their sizes fixed) preserves
+all the dependence between pairs. But it only tests against "no folk structure
+at all". That suits (a). It does not suit (b) or (c): a random taxonomy has no
+structure, so every measure beats it easily, and the spread of LL(`74`) −
+LL(`23`) under that null says nothing about whether the observed difference is
+real. As implemented in `perm_analyses/`:
 
-**Statistic.** For each shuffle, refit the pair models and record one of:
+- (a) **Overall effect: QAP.** Relabel the species of X's distance matrix.
+  This is equivalent to the species shuffle. The statistic is the signed root
+  log-likelihood gain of `SameName ~ X` over the intercept-only model.
+- (b) **Added value: MRQAP** with double-semi-partialling (Dekker, Krackhardt &
+  Snijders, 2007). Regress X on the other measures Z, relabel the species of
+  the residual, and refit `SameName ~ Z + residual`. This keeps the
+  correlation between e.g. `74` and `Phy` intact, so it also tests the
+  wrong-sign `Phy` coefficients in Innu and Saami (issue A2). The statistic is
+  signed, so a wrong-sign effect does not count as support.
+- (c) **1974 vs 2023: encompassing MRQAP plus a category bootstrap.** Test
+  `74 | 23` and `23 | 74`. If only the first is significant, 1974 is better.
+  For an effect size, resample the folk categories with replacement and give a
+  percentile interval for LL(`74`) − LL(`23`).
 
-- (a) **Overall effect:** the log-likelihood improvement of `SameName ~ X` over
-  the intercept-only model.
-- (b) **Added value:** the log-likelihood improvement from adding X to a model
-  that already includes the other measures, e.g. `74 + Per` vs `74`.
-- (c) **1974 vs 2023:** LL(`74`) − LL(`23`). The null here is two-sided: under a
-  random taxonomy, neither measure should be favoured.
-
-The p-value is the proportion of shuffles, out of 1000–5000, whose statistic is
-at least as large as the observed one. To pool over languages, either sum the
-statistic across languages, shuffling within each language, or combine the
-per-language p-values (e.g. with Fisher's method).
-
-**Alternative for (b): MRQAP.** Shuffling species among categories tests against
-"no structure at all". To test one predictor while controlling for others, it
-is more standard to permute the *residuals* of that predictor, as in the
-double-semi-partialling method of Dekker, Krackhardt & Snijders (2007). The
-`sna` package (`netlogit`) implements this approach. It keeps the correlation
-between `74` and `Phy` intact, so it also resolves the wrong-sign `Phy`
-coefficients in Innu and Saami (issue A2): if `Phy` adds nothing real, its
-contribution won't stand out against this null.
+Pooling over languages uses a model with a fixed intercept for each language
+and common slopes, with species relabelled within each language. The existing
+`bird_perm` code (`Analyses.Rmd` ~3385–3540) does the species shuffle, but with
+a within-category variance statistic, so it was not reused.
 
 **Notes.**
 - With about 70k pairs, refitting thousands of times takes a while but is
-  manageable. Use `glm.fit` or `speedglm`, and cache the distance vectors so
-  only `SameName` changes between shuffles.
+  manageable with `glm.fit`. `SameName` stays fixed and only the species
+  labels of the predictor (or residual) matrix change between permutations.
 - Fix the random seed and save the null distributions to `output/`.
 
 ### 3. Recovering the folk categories by clustering
@@ -146,7 +143,7 @@ bands. This would make a natural SI figure, and possibly a main-text one.
 
 - **Analysis 2 (singletons).** Each row is a species, so the observations are
   close to independent and the current models are reasonable. As a cheap check,
-  re-run the 1974-vs-2023 and added-value comparisons with the shuffles from
+  re-run the 1974-vs-2023 and added-value comparisons with the permutation tests from
   section 2 and with species-level cross-validation.
 - **Analysis 3 (companion counts).** The outcome is shared by all members of a
   category. Either:
@@ -174,10 +171,10 @@ bands. This would make a natural SI figure, and possibly a main-text one.
 
 ## Order of work
 
-1. Section 2(c) and 2(b) for Analysis 1, reusing `bird_perm`. This is the
-   quickest way to see whether the main claims survive.
-2. Section 1: cross-validation holding out species and holding out languages,
-   including the redone weighted-perceptual analysis.
+1. Section 2 for Analysis 1 (done: `perm_analyses/`).
+2. Section 1: cross-validation holding out species and holding out languages
+   (done: `cv_analyses/`). The redone weighted-perceptual analysis is still to
+   do.
 3. Section 3: clustering-recovery figure.
 4. Analysis 2 and 3 checks, and the sensitivity analyses.
 

@@ -123,5 +123,5 @@ cross-language tests use these normalised values.
   sampling uncertainty.
 - **What the CV does provide** is a fairer point estimate of predictive
   performance than in-sample BIC. Valid p-values for "does this measure add
-  anything?" and "is 1974 better than 2023?" need the permutation tests and
-  MRQAP in `README_analysis_plan.md` §2, which are not implemented here.
+  anything?" and "is 1974 better than 2023?" come from the permutation tests,
+  MRQAP and category bootstrap in `perm_analyses/`.

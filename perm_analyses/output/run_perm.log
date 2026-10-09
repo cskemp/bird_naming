@@ -1,0 +1,15 @@
+06:03:20 B = 2000, B_boot = 2000, R_cal = 100, B_cal = 199, seed = 302, cores = 9
+06:03:20 Checks
+06:03:21 Checks passed
+06:03:21 MRQAP: Anindilyakwa
+06:04:02 MRQAP: Innu
+06:04:13 MRQAP: Saami
+06:04:21 MRQAP: Tlingit
+06:04:47 MRQAP: Tobelo
+06:05:06 MRQAP: Tzeltal
+06:05:50 MRQAP: Zapotec
+06:06:16 MRQAP: All
+06:11:53 Category bootstrap
+06:15:09 Calibration
+06:17:17 Calibration: MRQAP rejects 5%, naive Wald rejects 23.4% at alpha = .05
+06:17:17 Done

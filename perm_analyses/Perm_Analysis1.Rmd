@@ -1,0 +1,246 @@
+---
+title: "Analysis 1 with permutation tests: which measures predict name-sharing?"
+output:
+  html_document:
+    toc: true
+params:
+  quick: false
+---
+
+This notebook reports permutation tests for Analysis 1. It reads the cached
+results written by `perm_analyses/run_perm.R` and does no model fitting
+itself. See `perm_analyses/README.md` for the design.
+
+```{r setup, message = FALSE}
+library(tidyverse)
+library(here)
+library(knitr)
+library(kableExtra)
+
+out_dir <- here("perm_analyses", "output", if (params$quick) "quick" else "")
+source(here("perm_analyses", "perm_functions.R"))
+
+lang_order <- c(languages, "All")
+test_order <- sapply(perm_tests, `[[`, "test")
+
+res <- readRDS(file.path(out_dir, "perm_tests.rds")) %>%
+  mutate(language = factor(language, lang_order),
+         test = factor(test, test_order))
+boot <- readRDS(file.path(out_dir, "boot_74v23.rds"))
+cal <- readRDS(file.path(out_dir, "calibration.rds"))
+run_info <- readLines(file.path(out_dir, "run_info.txt"))
+B <- length(res$null[[1]])
+
+fmt <- function(x, d = 1) formatC(x, format = "f", digits = d)
+fmt_p <- function(p) ifelse(p < .001, "<.001", formatC(p, format = "f", digits = 3))
+```
+
+Settings: `r paste(run_info[1:5], collapse = ", ")`.
+
+# How the tests work
+
+The outcome is the species × species matrix of `SameName`. It is never changed,
+so all the dependence between pairs is kept: each species appears in many
+pairs, and if A and B share a name and B and C do, then A and C must too.
+
+To test whether a measure X adds to a set of measures Z (Z may be empty):
+
+1. Fit `SameName ~ Z + X` and `SameName ~ Z` by logistic regression. The
+   statistic is the signed root deviance gain,
+   s = sign(−β~X~) · √(2 · ΔLL). It is positive when more distant birds are
+   less likely to share a name, which is the expected direction.
+2. Regress X on Z over the pairs, and keep the residual matrix.
+3. Relabel the species of the residual matrix at random, refit, and recompute
+   s. This was repeated `r B` times.
+
+This is MRQAP with double-semi-partialling (Dekker, Krackhardt & Snijders,
+2007). With Z empty it is plain QAP, which is the same as shuffling species
+among the folk categories while keeping their sizes fixed.
+
+For the non-nested comparisons (74 vs 23, Per vs Phy), each measure is tested
+given the other in both directions. If 74 adds to 23 but 23 adds nothing to 74,
+then 74 is the better measure. If each adds to the other, then each carries
+something the other lacks, and the test doesn't pick a winner.
+
+"All" is a pooled model with a fixed intercept for each language and common
+slopes. Species are relabelled within each language.
+
+# Calibration
+
+Before the results: does the test have the right false-positive rate? For
+each language, `r n_distinct(cal$rep)` "noise" predictors were made by shuffling
+the species labels of the Per matrix. Each one has the matrix structure of a
+real distance measure but no true relation to naming. Each was tested given
+74, by MRQAP and by the naive Wald test from the logistic regression, which
+treats pairs as independent, as BIC does.
+
+```{r calibration}
+cal_tab <- cal %>%
+  mutate(language = factor(language, languages)) %>%
+  group_by(language) %>%
+  summarise(`MRQAP (%)` = 100 * mean(p_mrqap < .05),
+            `Naive Wald (%)` = 100 * mean(p_naive < .05), .groups = "drop") %>%
+  bind_rows(tibble(language = factor("All languages"),
+                   `MRQAP (%)` = 100 * mean(cal$p_mrqap < .05),
+                   `Naive Wald (%)` = 100 * mean(cal$p_naive < .05)))
+write.csv(cal_tab, file.path(out_dir, "table_calibration.csv"), row.names = FALSE)
+kable(cal_tab, digits = 1,
+      caption = "Percentage of noise predictors declared significant at α = .05 (nominal rate 5%)") %>%
+  kable_styling(full_width = FALSE)
+```
+
+The naive test treats thousands of dependent pairs as independent, so it finds
+"effects" of pure noise far more often than 5% of the time. This is issue A1 in
+`REVIEW.md` in concrete form. The BIC comparisons in the paper have the same
+problem.
+
+# Results
+
+Each cell shows the observed statistic s, with the two-sided permutation
+p-value in brackets. The smallest possible p-value is 1/(B + 1) =
+`r fmt(1 / (B + 1), 4)`. Negative s means the measure's slope has the
+"wrong" sign: given Z, *more* distant birds are *more* likely to share a name.
+
+```{r table-results}
+res_wide <- res %>%
+  mutate(cell = paste0(fmt(s_obs), " (", fmt_p(p_two), ")")) %>%
+  select(question, test, language, cell) %>%
+  pivot_wider(names_from = language, values_from = cell) %>%
+  arrange(test)
+
+write.csv(select(res, -null), file.path(out_dir, "table_perm.csv"),
+          row.names = FALSE)
+
+kable(select(res_wide, -question), align = c("l", rep("r", length(lang_order))),
+      caption = "Signed root deviance gain s (two-sided permutation p)") %>%
+  kable_styling(full_width = FALSE) %>%
+  pack_rows("(a) Does the measure predict naming at all?", 1, 4) %>%
+  pack_rows("(b) Does the measure add to the others?", 5, 9) %>%
+  pack_rows("(c) Non-nested comparisons, tested both ways", 10, 13)
+
+latex_perm <- select(res_wide, -question) %>%
+  kable(format = "latex", booktabs = TRUE, linesep = "",
+        align = c("l", rep("r", length(lang_order))),
+        caption = "Permutation tests for Analysis 1: signed root deviance gain (two-sided p)") %>%
+  pack_rows("(a) Overall effect", 1, 4) %>%
+  pack_rows("(b) Added value", 5, 9) %>%
+  pack_rows("(c) Non-nested, both directions", 10, 13) %>%
+  kable_styling(latex_options = c("hold_position", "scale_down"))
+writeLines(latex_perm, file.path(out_dir, "table_perm.tex"))
+```
+
+## Naive p-values for comparison
+
+The same tests, with p-values from the naive Wald test. The permutation
+p-values are much larger.
+
+```{r table-naive}
+res %>%
+  mutate(cell = paste0(fmt_p(p_two), " / ", formatC(p_naive, format = "e", digits = 0))) %>%
+  select(test, language, cell) %>%
+  pivot_wider(names_from = language, values_from = cell) %>%
+  arrange(test) %>%
+  kable(align = c("l", rep("r", length(lang_order))),
+        caption = "Permutation p / naive Wald p (two-sided)") %>%
+  kable_styling(full_width = FALSE)
+```
+
+## Figure
+
+```{r figure, fig.width = 10, fig.height = 7}
+p <- res %>%
+  mutate(sig = case_when(p_two < .05 & s_obs > 0 ~ "p < .05, expected sign",
+                         p_two < .05 ~ "p < .05, wrong sign",
+                         TRUE ~ "p ≥ .05"),
+         test = fct_rev(test)) %>%
+  ggplot(aes(y = test)) +
+  geom_vline(xintercept = 0, colour = "grey70") +
+  geom_linerange(aes(xmin = null_q025, xmax = null_q975), colour = "grey60",
+                 linewidth = 3, alpha = .5) +
+  geom_point(aes(x = s_obs, colour = sig), size = 2) +
+  scale_colour_manual(values = c("p < .05, expected sign" = "#1b7837",
+                                 "p < .05, wrong sign" = "#b2182b",
+                                 "p ≥ .05" = "grey40"), name = NULL) +
+  facet_wrap(~ language, nrow = 2, scales = "free_x") +
+  labs(x = "Signed root deviance gain s (grey band: central 95% of the permutation null)",
+       y = NULL) +
+  theme_bw() +
+  theme(legend.position = "bottom")
+p
+ggsave(file.path(out_dir, "perm_tests.png"), p, width = 10, height = 7, dpi = 150)
+```
+
+# 1974 vs 2023: category bootstrap
+
+The encompassing tests above ask whether each taxonomy carries information the
+other lacks. They don't give an effect size for "how much better is 1974?"
+with uncertainty that reflects the category structure. For that, the folk
+categories were resampled with replacement within each language, and
+LL(74) − LL(23) was recomputed on each resample (`r nrow(boot$boot)`
+resamples). Large categories contribute many same-name pairs, so the result
+depends heavily on which of them are drawn. The interval shows how much.
+The differences are rescaled to the original number of pairs.
+
+```{r boot}
+boot_tab <- summarise_boot(boot$boot, boot$observed) %>%
+  mutate(language = factor(language, lang_order)) %>%
+  arrange(language)
+write.csv(boot_tab, file.path(out_dir, "table_boot_74v23.csv"), row.names = FALSE)
+
+boot_tab %>%
+  transmute(Language = language, `Observed ΔLL` = fmt(observed),
+            `Bootstrap SD` = fmt(boot_sd),
+            `95% interval` = paste0("[", fmt(ci_lo), ", ", fmt(ci_hi), "]"),
+            `% favouring 74` = fmt(pct_favour_74, 0)) %>%
+  kable(align = c("l", "r", "r", "r", "r"),
+        caption = "LL(74) − LL(23): observed and category-bootstrap percentile interval") %>%
+  kable_styling(full_width = FALSE)
+```
+
+For comparison, the paper's ΔBIC for 74 vs 23 is 2 × ΔLL, e.g.
+`r fmt(2 * boot$observed[["Anindilyakwa"]])` in Anindilyakwa, and it is read as
+decisive evidence. The bootstrap SD of 2 × ΔLL there is
+`r fmt(2 * boot_tab$boot_sd[boot_tab$language == "Anindilyakwa"])`.
+
+# Summary
+
+These notes describe the full run (B = 2000). They are written by hand, so
+re-check them if the settings change.
+
+- **Calibration.** MRQAP's false-positive rate is close to nominal. The naive
+  test's rate is about 4–5 times too high.
+- **(a)** Every measure predicts name-sharing in every language
+  (p < .001).
+- **Per adds to 74** in five languages and in the pooled model. It does not in
+  Innu or Saami.
+- **Phy never adds to 74 in the expected direction.** Given 74, or 74 + Per,
+  its slope has a significantly *wrong* sign in several languages and in the
+  pooled model. So the wrong-sign coefficients (A2) are not just noise from
+  collinearity: once taxonomy is controlled, birds that are phylogenetically
+  closer are somewhat *less* likely to share a name.
+- **74 adds to Phy + Per** in every language.
+- **74 vs 23.** 74 adds to 23 in all seven languages. But 23 also adds to 74
+  (expected sign) in Tzeltal, Zapotec, Tobelo and the pooled model, so each
+  taxonomy carries something the other lacks. In the category bootstrap, the
+  95% interval for LL(74) − LL(23) excludes 0 only in Tlingit. Pooled, 90% of
+  resamples favour 74, but the interval includes 0. Most languages lean
+  towards 1974, but how big its advantage is depends on a few large categories.
+  The data don't support the claim that 1974 is decisively better.
+
+# Limitations
+
+- **The null is "relabel species".** MRQAP asks whether the observed match
+  between a measure's residual and the folk names is better than for random
+  relabellings of the same residual. It keeps the dependence in the outcome
+  exactly, but the relabelled residuals don't keep the clade structure of a
+  real residual (e.g. 74 and 23 differ in a few specific clades). The
+  calibration check suggests the test's error rate is close to nominal for a
+  predictor with realistic structure.
+- **The bootstrap is approximate.** Duplicated categories bring duplicated
+  between-category pairs, and different copies of the same category can't be
+  paired. Each overdifferentiated species is resampled with its smallest
+  category, and keeps its other memberships through the original `SameName`
+  values (9 memberships in total; 5 in Tobelo).
+- **Seven languages.** The pooled tests treat the seven languages as fixed.
+  Whether a result carries over to other folk taxonomies is the question that
+  leave-one-language-out in `cv_analyses/` addresses, with little power.
