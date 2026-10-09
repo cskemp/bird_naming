@@ -1,0 +1,19 @@
+05:42:37 K = 10, R = 50, seed = 302, cores = 9
+05:42:37 Anindilyakwa: 17766 pairs, 479 sharing a name
+05:42:37 Innu: 4656 pairs, 103 sharing a name
+05:42:37 Saami: 3081 pairs, 56 sharing a name
+05:42:37 Tlingit: 8385 pairs, 88 sharing a name
+05:42:37 Tobelo: 6555 pairs, 71 sharing a name
+05:42:37 Tzeltal: 17391 pairs, 233 sharing a name
+05:42:37 Zapotec: 11476 pairs, 309 sharing a name
+05:42:37 In-sample fits
+05:42:55 Species-held-out CV: Anindilyakwa
+05:43:07 Species-held-out CV: Innu
+05:43:11 Species-held-out CV: Saami
+05:43:13 Species-held-out CV: Tlingit
+05:43:19 Species-held-out CV: Tobelo
+05:43:26 Species-held-out CV: Tzeltal
+05:43:42 Species-held-out CV: Zapotec
+05:43:50 Species-held-out CV: pooled
+05:45:58 Leave-one-language-out
+05:46:17 Done

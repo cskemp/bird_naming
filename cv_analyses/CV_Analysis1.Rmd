@@ -1,0 +1,270 @@
+---
+title: "Analysis 1 with cross-validation: which measures predict name-sharing?"
+output:
+  html_document:
+    toc: true
+---
+
+This notebook reports the cross-validated version of Analysis 1. It reads the
+cached results written by `cv_analyses/run_cv.R` and does no model fitting
+itself. See `cv_analyses/README.md` for the design.
+
+```{r setup, message = FALSE}
+library(tidyverse)
+library(here)
+library(knitr)
+library(kableExtra)
+
+out_dir <- here("cv_analyses", "output")
+source(here("cv_analyses", "cv_functions.R"))
+
+lang_order <- c(languages, "All")
+model_order <- names(models)
+contrast_order <- names(contrasts)
+
+insample <- read.csv(file.path(out_dir, "in_sample.csv"))
+cv <- readRDS(file.path(out_dir, "cv_species.rds"))
+lolo <- readRDS(file.path(out_dir, "cv_lolo.rds"))
+run_info <- readLines(file.path(out_dir, "run_info.txt"))
+
+cv_sum <- summarise_cv(cv)
+cv_con <- summarise_contrasts(cv)
+lolo_con <- bind_rows(summarise_lolo_contrasts(lolo, "ll_pop"),
+                      summarise_lolo_contrasts(lolo, "ll_recal"))
+
+n_reps <- n_distinct(cv$rep)
+```
+
+Settings: `r paste(run_info[1:3], collapse = ", ")`.
+
+# 1. Species held out, within each language
+
+For each language, species were split at random into 10 folds. Each model was
+fitted to the pairs in which neither species was in the held-out fold, and
+scored on the pairs in which at least one was. Every pair is scored once, so
+the summed held-out log-likelihood (LL) is on the same scale as the in-sample
+LL. This was repeated with `r n_reps` random fold splits. The "All" column is
+a pooled model with a separate intercept per language and common slopes.
+
+## Held-out deviance compared with in-sample BIC
+
+Each cell shows the held-out deviance difference from the best model,
+ΔDev = 2 × (LL~best~ − LL~model~), averaged over splits. Below it, in
+brackets, is the in-sample ΔBIC from Table 2 of the paper. Both are 0 for the
+best model, and both are on the deviance scale. ΔBIC adds a penalty for each
+extra parameter, while ΔDev penalises overfitting by testing on held-out pairs.
+
+```{r table-ddev}
+ddev_tab <- cv_sum %>%
+  select(language, model, ddev_mean, ddev_sd, pct_best) %>%
+  left_join(insample %>% select(language, model, dbic),
+            by = c("language", "model")) %>%
+  mutate(language = factor(language, lang_order),
+         model = factor(model, model_order)) %>%
+  arrange(model, language)
+
+write.csv(ddev_tab, file.path(out_dir, "table_ddev.csv"), row.names = FALSE)
+
+fmt <- function(x) formatC(x, format = "f", digits = 1)
+
+ddev_wide <- ddev_tab %>%
+  mutate(cell = paste0(fmt(ddev_mean), " (", fmt(dbic), ")")) %>%
+  select(model, language, cell) %>%
+  pivot_wider(names_from = language, values_from = cell)
+
+kable(ddev_wide, align = c("l", rep("r", length(lang_order))),
+      caption = "Held-out ΔDev, with in-sample ΔBIC in brackets") %>%
+  kable_styling(full_width = FALSE)
+
+latex_ddev <- ddev_wide %>%
+  kable(format = "latex", booktabs = TRUE, linesep = "",
+        align = c("l", rep("c", length(lang_order))),
+        caption = paste("Cross-validated model comparison for name-sharing.",
+                        "Cells show the held-out deviance difference from the",
+                        "best model (mean over", n_reps, "random 10-fold",
+                        "species splits), with the in-sample $\\Delta$BIC in",
+                        "brackets."),
+        label = "table:cvLR", escape = FALSE) %>%
+  kable_styling(latex_options = c("hold_position", "scale_down"))
+writeLines(latex_ddev, file.path(out_dir, "table_ddev.tex"))
+```
+
+How often each model came out best, as a percentage of splits:
+
+```{r table-pct-best}
+ddev_tab %>%
+  select(model, language, pct_best) %>%
+  pivot_wider(names_from = language, values_from = pct_best) %>%
+  kable(align = c("l", rep("r", length(lang_order)))) %>%
+  kable_styling(full_width = FALSE)
+```
+
+AUC (mean over splits) for each model's held-out predictions:
+
+```{r table-auc}
+cv_sum %>%
+  mutate(language = factor(language, lang_order),
+         model = factor(model, model_order)) %>%
+  arrange(model, language) %>%
+  select(model, language, auc_mean) %>%
+  mutate(auc_mean = round(auc_mean, 3)) %>%
+  pivot_wider(names_from = language, values_from = auc_mean) %>%
+  kable(align = c("l", rep("r", length(lang_order)))) %>%
+  kable_styling(full_width = FALSE)
+```
+
+## Key contrasts
+
+Each value is LL(first model) − LL(second model) on the held-out pairs, in
+nats. Positive values favour the first model. The mean and SD are over splits,
+and the last column is the percentage of splits favouring the first model.
+**The SD measures how much the result depends on the random split. It is not
+a standard error, and these numbers are not significance tests** (see
+Limitations).
+
+```{r table-contrasts}
+con_tab <- cv_con %>%
+  mutate(language = factor(language, lang_order),
+         contrast = factor(contrast, contrast_order)) %>%
+  arrange(contrast, language) %>%
+  mutate(cell = paste0(fmt(diff_mean), " ± ", fmt(diff_sd),
+                       " [", round(pct_favour_first), "%]"))
+
+write.csv(con_tab %>% select(-cell), file.path(out_dir, "table_contrasts.csv"),
+          row.names = FALSE)
+
+con_tab %>%
+  select(contrast, language, cell) %>%
+  pivot_wider(names_from = language, values_from = cell) %>%
+  kable(align = c("l", rep("r", length(lang_order))),
+        caption = "Held-out LL difference: mean ± SD over splits [% of splits favouring the first model]") %>%
+  kable_styling(full_width = FALSE)
+```
+
+# 2. Leave one language out
+
+For each language, the mixed model `SameName ~ predictors + (1 | Language)`
+was fitted to the other six languages and scored on the held-out one. There
+are two scoring variants:
+
+- **Population intercept.** The model is used as is, with the random intercept
+  set to zero. This is the strictest test, but the result also depends on how
+  well the base rate of shared names transfers to the new language.
+- **Recalibrated intercept.** The slopes come from the six training languages,
+  and only the intercept is refitted on the held-out language. This asks
+  whether the *relationship* between distance and name-sharing transfers. The
+  same single parameter is refitted for every model.
+
+Differences are given per 1000 held-out pairs, so that languages of different
+sizes are comparable.
+
+```{r table-lolo}
+lolo_tab <- lolo_con %>%
+  mutate(held_out = factor(held_out, languages),
+         contrast = factor(contrast, contrast_order),
+         score = recode(score, ll_pop = "Population intercept",
+                        ll_recal = "Recalibrated intercept")) %>%
+  arrange(score, contrast, held_out)
+
+write.csv(lolo_tab, file.path(out_dir, "table_lolo.csv"), row.names = FALSE)
+
+lolo_tab %>%
+  select(score, contrast, held_out, diff_per_1000) %>%
+  mutate(diff_per_1000 = round(diff_per_1000, 2)) %>%
+  pivot_wider(names_from = held_out, values_from = diff_per_1000) %>%
+  left_join(lolo_tab %>%
+              distinct(score, contrast, n_favour_first, n_languages,
+                       sign_test_p, mean_diff_per_1000, ci_lo, ci_hi) %>%
+              mutate(`Favour first` = paste0(n_favour_first, "/", n_languages),
+                     `Mean [95% CI]` = paste0(round(mean_diff_per_1000, 2),
+                                              " [", round(ci_lo, 2), ", ",
+                                              round(ci_hi, 2), "]"),
+                     `Sign test p` = signif(sign_test_p, 2)) %>%
+              select(score, contrast, `Favour first`, `Mean [95% CI]`,
+                     `Sign test p`),
+            by = c("score", "contrast")) %>%
+  kable(caption = "LOLO: held-out LL difference per 1000 pairs (first − second model)") %>%
+  kable_styling(full_width = FALSE) %>%
+  collapse_rows(columns = 1, valign = "top")
+```
+
+# 3. Figure
+
+The figure shows each contrast in each language, in nats per 1000 held-out
+pairs. Filled circles are species-held-out CV, with bars for ±1 SD over
+splits. Open triangles are LOLO with a recalibrated intercept. "All" is the
+pooled species-held-out model.
+
+```{r figure, fig.width = 10, fig.height = 4.5}
+fig_species <- cv %>%
+  cross_join(bind_rows(lapply(names(contrasts), function(cn)
+    tibble(contrast = cn, a = contrasts[[cn]][1], b = contrasts[[cn]][2])))) %>%
+  filter(model == a | model == b) %>%
+  mutate(sign = if_else(model == a, 1, -1)) %>%
+  group_by(language, contrast, rep) %>%
+  summarise(diff = 1000 * sum(sign * ll) / first(n_pairs), .groups = "drop") %>%
+  group_by(language, contrast) %>%
+  summarise(mean = mean(diff), sd = sd(diff), .groups = "drop") %>%
+  mutate(method = "Species held out")
+
+fig_lolo <- lolo_tab %>%
+  filter(score == "Recalibrated intercept") %>%
+  transmute(language = as.character(held_out), contrast = as.character(contrast),
+            mean = diff_per_1000, sd = NA_real_,
+            method = "Language held out")
+
+fig_levels <- rev(lang_order)
+fig_data <- bind_rows(fig_species, fig_lolo) %>%
+  mutate(contrast = factor(contrast, contrast_order),
+         method = factor(method, c("Species held out", "Language held out")),
+         # offset the LOLO marker below the species-held-out one
+         y = match(language, fig_levels) +
+           if_else(method == "Language held out", -0.22, 0.12))
+
+p <- ggplot(fig_data, aes(x = mean, y = y)) +
+  geom_vline(xintercept = 0, colour = "grey60", linewidth = 0.4) +
+  geom_errorbarh(aes(xmin = mean - sd, xmax = mean + sd),
+                 data = filter(fig_data, !is.na(sd)),
+                 height = 0, colour = "grey20", linewidth = 0.5) +
+  geom_point(aes(shape = method), size = 2.4, colour = "grey10",
+             fill = "grey10", stroke = 0.7) +
+  scale_shape_manual(values = c("Species held out" = 21,
+                                "Language held out" = 2), name = NULL) +
+  scale_y_continuous(breaks = seq_along(fig_levels), labels = fig_levels,
+                     expand = expansion(add = 0.5)) +
+  facet_wrap(~ contrast, nrow = 1, scales = "free_x") +
+  labs(x = "Held-out LL difference per 1000 pairs (positive favours first model)",
+       y = NULL) +
+  theme_minimal(base_size = 10) +
+  theme(legend.position = "top",
+        panel.spacing.x = unit(1.4, "lines"),
+        panel.border = element_rect(colour = "grey85", fill = NA),
+        panel.grid.major.y = element_line(colour = "grey95"),
+        panel.grid.minor = element_blank(),
+        panel.grid.major.x = element_line(colour = "grey92"))
+p
+ggsave(file.path(out_dir, "cv_contrasts.png"), p, width = 10, height = 4.5,
+       dpi = 300, bg = "white")
+```
+
+# Limitations
+
+- **Leave-one-language-out has only 7 languages, so its inferential power is
+  limited.** A two-sided sign test can't reach p < .05 unless all 7 languages
+  agree, and even then p ≈ .016. If 6 of 7 agree, p ≈ .125. A paired t-test
+  across languages has 6 df and low power. The 7 languages are also a
+  convenience sample, not a random sample of the world's folk taxonomies: they
+  come from different ethnographers and are clustered by region. So "the
+  relationship transfers to a new language" means "to languages like these".
+  The LOLO results are therefore best read as effect sizes, language by
+  language, rather than as a test.
+- **The species-held-out CV isn't a significance test either.** The SD across
+  splits shows how much the result depends on the random fold assignment, not
+  the sampling uncertainty in the comparison. Pairs still share species and
+  categories, so no simple standard error applies.
+- **What the CV does provide** is a fairer point estimate of how well each
+  model predicts unseen species than in-sample BIC, which treats about 70k
+  dependent pairs as independent. Valid p-values for "does this measure add
+  anything?" and "is 1974 better than 2023?" need the permutation tests and
+  MRQAP described in `README_analysis_plan.md` §2, which are not implemented
+  here.
