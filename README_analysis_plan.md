@@ -175,8 +175,58 @@ bands. This would make a natural SI figure, and possibly a main-text one.
 2. Section 1: cross-validation holding out species and holding out languages
    (done: `cv_analyses/`). The redone weighted-perceptual analysis is still to
    do.
-3. Section 3: clustering-recovery figure.
-4. Analysis 2 and 3 checks, and the sensitivity analyses.
+3. **Next:** bootstrap intervals on coefficients and contrasts (see "Next
+   step" below).
+4. Section 3: clustering-recovery figure.
+5. Analysis 2 and 3 checks, and the sensitivity analyses.
+
+## Next step: intervals from the category bootstrap
+
+**Aim.** The permutation tests in `perm_analyses/` give valid p-values, but no
+intervals. Report 95% intervals on the coefficients of the Analysis 1 models,
+and on their log-likelihood contrasts, that reflect the dependence between
+pairs. A simple Bayesian fit or the glm's Wald intervals won't do. Both rest on
+the pair likelihood, which treats ~70k pairs as independent. In the
+calibration check, naive tests at α = .05 found effects in 23% of noise
+predictors.
+
+**Procedure.** Extend the category bootstrap in `perm_analyses/perm_functions.R`
+(`home_categories()`, `draw_categories()`, `boot_pairs()`), which currently
+covers only LL(74) − LL(23):
+
+1. Within each language, resample the folk categories with replacement,
+   B = 2000, as now. For the pooled model, resample within each language and
+   fit with a fixed intercept per language and common slopes.
+2. For each resample, fit the nine models of Table 2 and record:
+   - every slope coefficient;
+   - LL differences for the contrasts in `cv_analyses/cv_functions.R`
+     (`74 vs 23`, `74+Per vs 74`, `74+Phy+Per vs 74+Per`, `74+Phy vs 74`,
+     `Per vs Phy`), rescaled to the original number of pairs.
+3. Keep the predictors on their full-data z-scale (as in `make_language()`),
+   so that coefficients are comparable across resamples.
+4. Report the estimate, the bootstrap SD, the 95% percentile interval and the
+   % of resamples with the expected sign. Also report the ratio of the
+   bootstrap SD to the naive Wald SE, which measures how overconfident the
+   pair model is.
+
+**Checks.**
+- Drawing every category once reproduces the full-data glm coefficients.
+- **Coverage:** reuse the noise predictors from the calibration check (`Per`
+  with its species labels shuffled, entered alongside `74`). The 95% bootstrap
+  interval for the noise coefficient should include 0 in about 95% of cases.
+  There are only 45–106 categories per language, so percentile intervals may
+  be too narrow. If coverage is clearly below 95%, try BCa intervals, or
+  report the observed coverage next to the intervals.
+
+**Output.** A table of coefficients with intervals, by model and language,
+next to the paper's Table 2. Also a figure of the contrasts with their
+intervals, next to the permutation p-values. Add these to
+`perm_analyses/Perm_Analysis1.Rmd` (or to a new `Boot_Analysis1.Rmd`).
+
+**Caveats.** The bootstrap is approximate: duplicated categories bring
+duplicated between-category pairs, and a few large categories dominate. Treat
+the intervals as effect sizes alongside the permutation p-values, not as a
+replacement for them.
 
 ## References
 
